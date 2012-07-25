@@ -1,0 +1,22 @@
+# depslib dependency file v1.0
+1342969148 source:d:\duan\c\shtml\shtml.cpp
+	"shtml.h"
+
+1342969136 d:\duan\c\shtml\shtml.h
+	<string>
+	<iostream>
+	<fstream>
+	<stdlib.h>
+	<algorithm>
+
+1342969657 source:d:\duan\c\shtml\main.cpp
+	<iostream>
+	"shtml.h"
+
+1342636352 source:d:\duan\c\shtml\xstring.cpp
+	"xstring.h"
+
+1342636453 d:\duan\c\shtml\xstring.h
+	<string>
+	<iostream>
+
