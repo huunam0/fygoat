@@ -604,7 +604,6 @@ bool shtml::loadfromfile(const string fileName)
 	string line;
 	htm.clear();
 	ifstream myFile(fileName.c_str());
-	//myFile.open(fileName);
 	cout<<"Open file "<<fileName<<endl;
 	if(!myFile.good())
 	{
@@ -619,6 +618,27 @@ bool shtml::loadfromfile(const string fileName)
 	}
 	myFile.close();
 	return true;
+}
+bool shtml::loadFromURL(const string sUrl)
+{
+    FILE *in;
+    char buff[1024];
+    char command[250];
+    sprintf(command,"%s '%s'","wget -q -O - ",sUrl.c_str());
+    cout<<"Load from "<<command<<endl;
+    htm.clear();
+    if(!(in = popen(command, "r")))
+        {
+            return false;
+        }
+
+    while(fgets(buff, sizeof(buff), in)!=NULL)
+        {
+            string s(buff);
+            htm+= s;
+        }
+    pclose(in);
+    return true;
 }
 bool shtml::writeFile(const string fileName)
 {
