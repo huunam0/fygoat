@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="shtml" />
+		<Option title="gtoday" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -32,12 +32,15 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="gmatch.cpp" />
-		<Unit filename="gtable.cpp" />
-		<Unit filename="gtoday.cpp" />
-		<Unit filename="main.cpp" />
-		<Unit filename="shtml.cpp" />
-		<Unit filename="shtml.h" />
+		<Unit filename="gtoday.cpp">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="shtml.cpp">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="shtml.h">
+			<Option target="Release" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />

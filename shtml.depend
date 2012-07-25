@@ -2,12 +2,16 @@
 1342969148 source:d:\duan\c\shtml\shtml.cpp
 	"shtml.h"
 
+1342636453 
+
 1342969136 d:\duan\c\shtml\shtml.h
 	<string>
 	<iostream>
 	<fstream>
 	<stdlib.h>
 	<algorithm>
+
+1342969136 >
 
 1342969657 source:d:\duan\c\shtml\main.cpp
 	<iostream>
@@ -16,7 +20,35 @@
 1342636352 source:d:\duan\c\shtml\xstring.cpp
 	"xstring.h"
 
+1342636352 "
+
 1342636453 d:\duan\c\shtml\xstring.h
 	<string>
 	<iostream>
+
+1343100924 source:/home/thnam/projects/shtml/shtml.cpp
+	"shtml.h"
+
+1343100594 /home/thnam/projects/shtml/shtml.h
+	<string>
+	<iostream>
+	<fstream>
+	<stdlib.h>
+	<algorithm>
+
+1343100594 source:/home/thnam/projects/shtml/main.cpp
+	<iostream>
+	"shtml.h"
+
+1343099267 source:/home/thnam/projects/shtml/gtable.cpp
+	<iostream>
+	"shtml.h"
+
+1343098903 source:/home/thnam/projects/shtml/gmatch.cpp
+	<iostream>
+	"shtml.h"
+
+1343098849 source:/home/thnam/projects/shtml/gtoday.cpp
+	<iostream>
+	"shtml.h"
 

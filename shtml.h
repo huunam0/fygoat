@@ -1,11 +1,7 @@
 #ifndef SHTML_H
 #define SHTML_H
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <stdlib.h>
-#include <algorithm>
-using namespace std;
+
+#include "needed.h"
 
 class shtml
 {
@@ -37,6 +33,7 @@ class shtml
         void removeAllTags();
         string getText();
         bool loadfromfile(const string fileName);
+        bool loadFromURL(const string sUrl);
         bool writeFile(const string fileName);
         bool isEmpty();
         bool contain(string sSub);
