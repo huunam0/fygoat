@@ -625,7 +625,7 @@ bool shtml::loadFromURL(const string sUrl)
     char buff[1024];
     char command[250];
     sprintf(command,"%s '%s'","wget -q -O - ",sUrl.c_str());
-    cout<<"Load from "<<command<<endl;
+    cout<<"Load from "<<sUrl<<endl;
     htm.clear();
     if(!(in = popen(command, "r")))
         {

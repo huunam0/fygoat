@@ -91,7 +91,7 @@ void getToday(string day="")
     //m.viewContent();
 }
 
-int main(int argc, char** argv)
+int main1(int argc, char** argv)
 {
     getToday(argv[1]);
     return 0;

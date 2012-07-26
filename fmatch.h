@@ -11,7 +11,7 @@ class fmatch
         fmatch(int _id);
         fmatch(int _id, int _hteam, int _ateam);
         virtual ~fmatch();
-        void getData();
+        bool getData();
         void setValue(int iIndex, int iValue, int iTeam=0);
         void emitEvent(int iIndex, int iValue=0, int iTeam=0);
     protected:

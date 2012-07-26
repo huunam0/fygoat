@@ -9,7 +9,7 @@ int main(int argc, char** argv)
     {
         int i=0;
         fmatch m(atoi(argv[1]));
-        m.getData();
+        if (!m.getData()) return 1;
         while (m.status<4)
         {
             m.getData();
