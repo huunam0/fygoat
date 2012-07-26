@@ -32,6 +32,8 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="fmatch.cpp" />
+		<Unit filename="fmatch.h" />
 		<Unit filename="gmatch.cpp" />
 		<Unit filename="gtable.cpp" />
 		<Unit filename="gtoday.cpp" />

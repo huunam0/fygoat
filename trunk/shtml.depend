@@ -52,3 +52,40 @@
 	<iostream>
 	"shtml.h"
 
+1343284569 source:/home/thnam/projects/fygoat/shtml.cpp
+	"shtml.h"
+
+1343134703 /home/thnam/projects/fygoat/shtml.h
+	"needed.h"
+
+1343143925 /home/thnam/projects/fygoat/needed.h
+	<string>
+	<iostream>
+	<fstream>
+	<stdlib.h>
+	<algorithm>
+
+1343284424 source:/home/thnam/projects/fygoat/fmatch.cpp
+	"fmatch.h"
+
+1343283870 /home/thnam/projects/fygoat/fmatch.h
+	"needed.h"
+	"shtml.h"
+
+1343280803 source:/home/thnam/projects/fygoat/gtoday.cpp
+	<iostream>
+	"shtml.h"
+
+1343280803 source:/home/thnam/projects/fygoat/gtable.cpp
+	<iostream>
+	"shtml.h"
+
+1343285710 source:/home/thnam/projects/fygoat/main.cpp
+	"fmatch.h"
+	<time.h>
+	<pthread.h>
+
+1343280803 source:/home/thnam/projects/fygoat/gmatch.cpp
+	"fmatch.h"
+	<time.h>
+

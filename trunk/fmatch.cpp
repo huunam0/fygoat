@@ -36,14 +36,16 @@ void fmatch::setValue(int iIndex, int iValue, int iTeam)
         emitEvent(iIndex,iValue,iTeam);
     }
 }
-void fmatch::getData()
+bool fmatch::getData()
 {
     shtml sh,t,n,nh,nh2;
     int i=0,v=0;
     char url[300];
     bool reCard = true;
     sprintf(url,"http://soccernet.espn.go.com/match/_/id/%d?cc=4716",id);
+    //sprintf(url,"http://soccernet.espn.go.com/match?id=%d&cc=4716",id);
     sh.loadFromURL(url);
+    if (sh.isEmpty()) return false;
     sh.removeBetween("<!--","-->",-1);
     t=sh.cutTagByName("div");
     while (!t.isEmpty())
@@ -71,7 +73,7 @@ void fmatch::getData()
     else if (n.contain("Match"))
     {
         status=0;
-        return;
+        return true;
     }
     else if (n.contain("First Half"))
     {
@@ -206,6 +208,8 @@ void fmatch::getData()
             t=sh.cutTagByName("div");
         }
     isFirstTime=false;
+    cout<<"End of get data"<<endl;
+    return true;
 }
 
 void fmatch::emitEvent(int iIndex, int iValue, int iTeam)
@@ -245,7 +249,7 @@ void fmatch::emitEvent(int iIndex, int iValue, int iTeam)
     if (!field.empty())
     {
         sprintf(sql,"UPDATE f_matches SET %s=%d where match_id=%d",(t+field).c_str(),iValue,id);
-        cout<<sql<<endl;
+        //cout<<sql<<endl;
     }
 
 }

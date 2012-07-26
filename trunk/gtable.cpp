@@ -96,7 +96,7 @@ void getTable(string sLeague)
     }
     //m.viewContent();
 }
-int main(int argc, char** argv)
+int main2(int argc, char** argv)
 {
     if (argc>1)
     {

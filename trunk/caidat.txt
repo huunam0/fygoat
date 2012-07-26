@@ -1,0 +1,3 @@
+copy file footygoat.conf to /etc/
+bien dich
+
