@@ -34,6 +34,8 @@ void test_thread()
 }
 int main(int argc, char** argv)
 {
+    //database db;
+    //int database::c=1;
     //int m1=349361, m2=349360;
     //getMatch(&m1);
     test_thread();

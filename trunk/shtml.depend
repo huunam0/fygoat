@@ -65,12 +65,13 @@
 	<stdlib.h>
 	<algorithm>
 
-1343284424 source:/home/thnam/projects/fygoat/fmatch.cpp
+1343288235 source:/home/thnam/projects/fygoat/fmatch.cpp
 	"fmatch.h"
 
-1343283870 /home/thnam/projects/fygoat/fmatch.h
+1343288203 /home/thnam/projects/fygoat/fmatch.h
 	"needed.h"
 	"shtml.h"
+	"database.h"
 
 1343280803 source:/home/thnam/projects/fygoat/gtoday.cpp
 	<iostream>
@@ -80,7 +81,7 @@
 	<iostream>
 	"shtml.h"
 
-1343285710 source:/home/thnam/projects/fygoat/main.cpp
+1343289773 source:/home/thnam/projects/fygoat/main.cpp
 	"fmatch.h"
 	<time.h>
 	<pthread.h>
@@ -88,4 +89,10 @@
 1343280803 source:/home/thnam/projects/fygoat/gmatch.cpp
 	"fmatch.h"
 	<time.h>
+
+1343290011 /home/thnam/projects/fygoat/database.h
+	"needed.h"
+
+1343289986 source:/home/thnam/projects/fygoat/database.cpp
+	"database.h"
 

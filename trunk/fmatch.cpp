@@ -216,7 +216,8 @@ void fmatch::emitEvent(int iIndex, int iValue, int iTeam)
 {
     char sql[300];
     sprintf(sql,"INSERT INTO f_timeline (event, value, team, match, date) VALUE (%d,%d,%d,%d,NOW())",iIndex,iValue,iTeam,id);
-    cout<<sql<<endl;
+    database db;
+    db.anounce(sql);
     string t,field;
     t=(iTeam==1?"a":"h");
     switch (iIndex)
