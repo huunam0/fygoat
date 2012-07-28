@@ -3,6 +3,8 @@
 
 #include "needed.h"
 #include "shtml.h"
+#include "database.h"
+
 class fmatch
 {
     public:
