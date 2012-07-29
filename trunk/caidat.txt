@@ -1,3 +1,6 @@
-copy file footygoat.conf to /etc/
-bien dich
+Make directory /etc/footygoat/
+copy file footygoat.conf to /etc/footygoat/
+Make directory /var/log/footygoat/
+Chmod +write for this directory
+Compile All
 

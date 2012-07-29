@@ -604,10 +604,10 @@ bool shtml::loadfromfile(const string fileName)
 	string line;
 	htm.clear();
 	ifstream myFile(fileName.c_str());
-	cout<<"Open file "<<fileName<<endl;
+	//cout<<"Open file "<<fileName<<endl;
 	if(!myFile.good())
 	{
-		cout << "Error opening file "<<fileName<<endl;
+		//cout << "Error opening file "<<fileName<<endl;
 		return false;
 	}
 
@@ -625,7 +625,7 @@ bool shtml::loadFromURL(const string sUrl)
     char buff[1024];
     char command[250];
     sprintf(command,"%s '%s'","wget -q -O - ",sUrl.c_str());
-    cout<<"Load from "<<sUrl<<endl;
+    //cout<<"Load from "<<sUrl<<endl;
     htm.clear();
     if(!(in = popen(command, "r")))
         {
@@ -646,7 +646,7 @@ bool shtml::writeFile(const string fileName)
 
     if(!out)
     {
-        cout << "Cannot open output file.\n";
+        //cout << "Cannot open output file.\n";
         return false;
     }
 

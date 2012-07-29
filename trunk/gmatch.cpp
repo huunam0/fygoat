@@ -2,6 +2,7 @@
 #include <mysql/mysql.h>
 #include <string.h>
 #include "shtml.h"
+#include <stdarg.h>
 
 #define BUFFER_SIZE 1024
 static char host_name[BUFFER_SIZE];
@@ -12,31 +13,7 @@ static int port_number;
 static int DEBUG=0;
 
 static MYSQL *conn;
-/*
-int main3(int argc, char** argv)
-{
-    if (argc>1)
-    {
-        int i=0;
-        fmatch m(atoi(argv[1]));
-        if (!m.getData()) return 1;
-        while (m.status<4)
-        {
-            m.getData();
-            sleep(3);
-            if (i++>10) break;
-        }
 
-
-    }
-    else
-    {
-        cout<<"Usage: gmatch <match_id>"<<endl;
-        cout<<"by Tran Huu Nam, huunam0@gmail.com"<<endl;
-    }
-    return 0;
-}
-*/
 int m[2][8];
 int status=0;
 int mid=0;
@@ -46,7 +23,8 @@ int after_equal(char * c){
 	for(;c[i]!='\0'&&c[i]!='=';i++);
 	return ++i;
 }
-void trim(char * c){
+void trim(char * c)
+{
     char buf[BUFFER_SIZE];
     char * start,*end;
     strcpy(buf,c);
@@ -57,8 +35,10 @@ void trim(char * c){
     *end='\0';
     strcpy(c,start);
 }
-bool read_buf(char * buf,const char * key,char * value){
-   if (strncmp(buf,key, strlen(key)) == 0) {
+bool read_buf(char * buf,const char * key,char * value)
+{
+   if (strncmp(buf,key, strlen(key)) == 0)
+    {
 		strcpy(value, buf + after_equal(buf));
 		trim(value);
 		if (DEBUG) printf("%s\n",value);
@@ -66,13 +46,33 @@ bool read_buf(char * buf,const char * key,char * value){
    }
    return 0;
 }
-void read_int(char * buf,const char * key,int * value){
+void read_int(char * buf,const char * key,int * value)
+{
 	char buf2[BUFFER_SIZE];
 	if (read_buf(buf,key,buf2))
 		sscanf(buf2, "%d", value);
 
 }
-bool init_mysql_conf() {
+void write_log(const char *fmt, ...)
+{
+	va_list         ap;
+	char            buffer[4096];
+	sprintf(buffer,"/var/log/footygoat/match.log");
+	FILE *fp = fopen(buffer, "a+");
+	if (fp==NULL)
+    {
+		 fprintf(stderr,"openfile error!\n");
+		 system("pwd");
+	}va_start(ap, fmt);
+	vsprintf(buffer, fmt, ap);
+	fprintf(fp,"%s\n",buffer);
+	if (DEBUG) printf("%s\n",buffer);
+	va_end(ap);
+	fclose(fp);
+
+}
+bool init_mysql_conf()
+{
 	FILE *fp=NULL;
 	char buf[BUFFER_SIZE];
 	host_name[0]=0;
@@ -82,14 +82,16 @@ bool init_mysql_conf() {
 	port_number=3306;
 
 	fp = fopen("/etc/footygoat/footygoat.conf", "r");
-	if(fp!=NULL){
-		while (fgets(buf, BUFFER_SIZE - 1, fp)) {
-			read_buf(buf,"F_HOST_NAME",host_name);
-			read_buf(buf, "F_USER_NAME",user_name);
-			read_buf(buf, "F_PASSWORD",password);
-			read_buf(buf, "F_DB_NAME",db_name);
-			read_int(buf , "F_PORT_NUMBER", &port_number);
-		}
+	if(fp!=NULL)
+    {
+        while (fgets(buf, BUFFER_SIZE - 1, fp))
+        {
+            read_buf(buf,"F_HOST_NAME",host_name);
+            read_buf(buf, "F_USER_NAME",user_name);
+            read_buf(buf, "F_PASSWORD",password);
+            read_buf(buf, "F_DB_NAME",db_name);
+            read_int(buf , "F_PORT_NUMBER", &port_number);
+        }
         /*
         cout<<"Host_Name:"<<host_name<<endl;
         cout<<"User_Name:"<<user_name<<endl;
@@ -102,30 +104,33 @@ bool init_mysql_conf() {
     }
     else
     {
-        cout<<"Cannot open File"<<endl;
+        write_log("Cannot open file 'footygoat.conf'");
         return false;
     }
 }
 bool executesql(const char * sql){
 
-	if (mysql_real_query(conn,sql,strlen(sql))){
+	if (mysql_real_query(conn,sql,strlen(sql)))
+    {
 		sleep(20);
-		cout<<mysql_error(conn)<<endl;
+		write_log("Error iin sql %s:%s",sql,mysql_error(conn));
 		//conn=NULL;
 		return false;
-	}else
+	}
+	else
 	    return true;
 }
 int init_mysql() {
-    if(conn==NULL){
+    if(conn==NULL)
+    {
 		conn=mysql_init(NULL);		// init the database connection
 		/* connect the database */
 		const char timeout=30;
 		mysql_options(conn,MYSQL_OPT_CONNECT_TIMEOUT,&timeout);
 
-		if(!mysql_real_connect(conn,host_name,user_name,password,
-				db_name,port_number,0,0)){
-			cout<<mysql_error(conn)<<endl;
+		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
+        {
+			write_log("Error init mysql: %s",mysql_error(conn));
 			sleep(20);
 			return false;
 		}
@@ -137,30 +142,31 @@ int init_mysql() {
 void emitEvent(int iIndex, int iValue, int iTeam)
 {
     char sql[300];
+    if (DEBUG)
+        cout<<"Event "<<iIndex<<" value: "<<iValue<<" with team "<<iTeam<<endl;
     sprintf(sql,"INSERT INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iIndex,iValue,iTeam,mid);
     executesql(sql);
-    cout<<sql<<endl;
     string t,field;
     t=(iTeam==1?"a":"h");
     switch (iIndex)
     {
     case 0:
-        field="goal";
+        field="goals";
         break;
     case 1:
-        field="1goal";
+        field="1goals";
         break;
     case 2:
-        field="red";
+        field="reds";
         break;
     case 3:
-        field="yellow";
+        field="yellows";
         break;
     case 4:
-        field="shot";
+        field="shots";
         break;
     case 5:
-        field="shotgoal";
+        field="gshots";
         break;
     case 6:
         field="corner";
@@ -172,7 +178,8 @@ void emitEvent(int iIndex, int iValue, int iTeam)
     if (!field.empty())
     {
         sprintf(sql,"UPDATE f_matches SET %s=%d where match_id=%d",(t+field).c_str(),iValue,mid);
-        cout<<sql<<endl;
+        //cout<<sql<<endl;
+        executesql(sql);
     }
 
 }
@@ -192,6 +199,8 @@ bool getMatch(int id)
     bool reCard = true;
     sprintf(url,"http://soccernet.espn.go.com/match/_/id/%d?cc=4716",id);
     //sprintf(url,"http://soccernet.espn.go.com/match?id=%d&cc=4716",id);
+    if (DEBUG)
+        cout<<"Loading from "<<url<<endl;
     sh.loadFromURL(url);
     if (sh.isEmpty()) return false;
     sh.removeBetween("<!--","-->",-1);
@@ -231,11 +240,16 @@ bool getMatch(int id)
     {
         status=2;
     }
+    else if (n.contain("Final score"))
+    {
+        status=5;
+    }
     else
     {
         status=3;
     }
-    cout<<"Status:"<<status<<endl;
+    if (DEBUG)
+        cout<<"Status:"<<status<<endl;
     t.retainTagByName("p");
     //t.viewContent();
     sh.retainTagByName("div",2);
@@ -253,6 +267,7 @@ bool getMatch(int id)
                 if (nh.contain("'"))
                 {
                     nh.retainBetween("(","'");
+                    if (nh.contain(" miss ")) break;
                     while (nh.contain(" "))
                         {
                             nh.deleteTo(" ");
