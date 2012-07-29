@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="gtoday" />
+		<Option title="gmatch" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -32,9 +32,7 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="gtoday.cpp">
-			<Option target="Release" />
-		</Unit>
+		<Unit filename="gmatch.cpp" />
 		<Unit filename="shtml.cpp">
 			<Option target="Release" />
 		</Unit>
