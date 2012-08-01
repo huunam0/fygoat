@@ -7,9 +7,9 @@ LFLAG= -L/usr/local/mysql/lib/mysql -L/usr/lib/mysql  -lmysqlclient
 all: 
 	$(CC) -o gtoday shtml.cpp gtoday.cpp $(GFLAG)
 gtoday:	
-	$(CC) -o gtoday shtml.cpp gtoday.cpp $(GFLAG)
+	$(CC) -o gtoday shtml.cpp gtoday.cpp $(GFLAG) $(MFLAG) $(LFLAG)
 gtable:
-	$(CC) -o gtable shtml.cpp gtable.cpp $(GFLAG)
+	$(CC) -o gtable shtml.cpp gtable.cpp $(GFLAG) $(MFLAG) $(LFLAG)
 gmatch: needed.h
 	$(CC) -o gmatch shtml.cpp gmatch.cpp $(GFLAG) $(MFLAG) $(LFLAG)
 
