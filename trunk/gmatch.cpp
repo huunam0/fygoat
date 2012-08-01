@@ -41,7 +41,7 @@ bool read_buf(char * buf,const char * key,char * value)
     {
 		strcpy(value, buf + after_equal(buf));
 		trim(value);
-		if (DEBUG) printf("%s\n",value);
+		//if (DEBUG) printf("%s\n",value);
 		return 1;
    }
    return 0;
@@ -92,13 +92,6 @@ bool init_mysql_conf()
             read_buf(buf, "F_DB_NAME",db_name);
             read_int(buf , "F_PORT_NUMBER", &port_number);
         }
-        /*
-        cout<<"Host_Name:"<<host_name<<endl;
-        cout<<"User_Name:"<<user_name<<endl;
-        cout<<"Password:"<<password<<endl;
-        cout<<"DB_Name:"<<db_name<<endl;
-        cout<<"Port:"<<port_number<<endl;
-        */
 		return true;
 	//	fclose(fp);
     }
@@ -112,7 +105,7 @@ bool executesql(const char * sql){
 
 	if (mysql_real_query(conn,sql,strlen(sql)))
     {
-		sleep(20);
+		//sleep(20);
 		write_log("Error iin sql %s:%s",sql,mysql_error(conn));
 		//conn=NULL;
 		return false;
@@ -131,7 +124,7 @@ int init_mysql() {
 		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
         {
 			write_log("Error init mysql: %s",mysql_error(conn));
-			sleep(20);
+			//sleep(20);
 			return false;
 		}
 	}
@@ -144,7 +137,7 @@ void emitEvent(int iIndex, int iValue, int iTeam)
     char sql[300];
     if (DEBUG)
         cout<<"Event "<<iIndex<<" value: "<<iValue<<" with team "<<iTeam<<endl;
-    sprintf(sql,"INSERT INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iIndex,iValue,iTeam,mid);
+    sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iIndex,iValue,iTeam,mid);
     executesql(sql);
     string t,field;
     t=(iTeam==1?"a":"h");
@@ -255,6 +248,7 @@ bool getMatch(int id)
     sh.retainTagByName("div",2);
     t=sh.cutTagByName("div");
     if (t.contain("Scoring Summary")) {
+        if (DEBUG) cout<<"->Scoring Summary"<<endl;
         t.retainTagByName("tbody");
         n=t.cutTagByName("tr");
         int sc[2]={0,0};
@@ -267,7 +261,7 @@ bool getMatch(int id)
                 if (nh.contain("'"))
                 {
                     nh.retainBetween("(","'");
-                    if (nh.contain(" miss ")) break;
+                    if (nh.contain(" miss ")) continue;
                     while (nh.contain(" "))
                         {
                             nh.deleteTo(" ");
@@ -290,13 +284,18 @@ bool getMatch(int id)
         t=sh.cutTagByName("div");
     }
     if (t.contain("Match Stats")) {
-        t.retainTagByName("tbody");
+        if (DEBUG) cout<<"->Match Stats"<<endl;
+        t.retainTagByName("table");
         n=t.cutTagByName("tr");
+        //if (DEBUG) n.viewContent();
         if (n.contain("Shots"))
         {
             for (i=0;i<2;i++)
             {
-                nh=n.cutTagByName("td",i);
+                nh=n.cutTagByName("td",i+1);
+                nh.trim();
+                //if (DEBUG) nh.viewContent();
+                if (nh.contain("-")) continue;
                 v=nh.toInt();
                 setValue(4,v,i);
                 nh.retainBetween("(",")");
@@ -313,7 +312,9 @@ bool getMatch(int id)
         {
             for (i=0;i<2;i++)
             {
-                nh=n.cutTagByName("td",i);
+                nh=n.cutTagByName("td",i+1);
+                nh.trim();
+                if (nh.contain("-")) continue;
                 v=nh.toInt();
                 setValue(6,v,i);
             }
@@ -327,7 +328,9 @@ bool getMatch(int id)
         {
             for (i=0;i<2;i++)
             {
-                nh=n.cutTagByName("td",i);
+                nh=n.cutTagByName("td",i+1);
+                nh.trim();
+                if (nh.contain("-")) continue;
                 v=nh.toInt();
                 setValue(7,v,i);
             }
@@ -337,7 +340,9 @@ bool getMatch(int id)
         {
             for (i=0;i<2;i++)
             {
-                nh=n.cutTagByName("td",i);
+                nh=n.cutTagByName("td",i+1);
+                nh.trim();
+                if (nh.contain("-")) continue;
                 v=nh.toInt();
                 if (v>0) reCard=false;
                 setValue(3,v,i);
@@ -348,7 +353,9 @@ bool getMatch(int id)
         {
             for (i=0;i<2;i++)
             {
-                nh=n.cutTagByName("td",i);
+                nh=n.cutTagByName("td",i+1);
+                nh.trim();
+                if (nh.contain("-")) continue;
                 v=nh.toInt();
                 if (reCard) if (v>0) reCard=false;
                 setValue(2,v,i);
@@ -359,6 +366,7 @@ bool getMatch(int id)
         t=sh.cutTagByName("div");
     }
     if (reCard)
+        if (DEBUG) cout<<"->Recalcule red & yellow cards"<<endl;
         for (i=0; i<2; i++)
         {
             t.removeTagByName("div",3);
