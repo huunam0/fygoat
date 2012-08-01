@@ -141,9 +141,9 @@ INSERT INTO `f_params` (`p_name`,`p_value`) VALUES ('dbversion','1.0');
 
 DROP TABLE IF EXISTS `f_teams`;
 CREATE TABLE `f_teams` (
-  `team_id` int(11) unsigned NOT NULL,
+  `team_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `team_name` varchar(30) NOT NULL,
-  `team_group` varchar(2) DEFAULT NULL,
+  `team_group` smallint(2) DEFAULT 1,
   `team_league` varchar(20) DEFAULT NULL,
   `team_pos` smallint(2) DEFAULT NULL,
   `team_op` smallint(2) DEFAULT NULL,
@@ -166,7 +166,7 @@ CREATE TABLE `f_teams` (
   `team_pts` smallint(2) DEFAULT NULL,
   `team_date` datetime DEFAULT NULL,
   PRIMARY KEY (`team_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=100000 DEFAULT CHARSET=utf8;
 
 --
 -- Data for Table `f_teams`
