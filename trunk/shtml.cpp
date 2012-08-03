@@ -72,6 +72,33 @@ string shtml::getBetween(string sFrom, string sTo, int iIndex)
         }
     }
 }
+string shtml::getBetweenAttr(string sFrom, string sTo, int iIndex)
+{
+    int iPosFrom = attr.find(sFrom);
+    int iFromLength=sFrom.length();
+    while ((iPosFrom!=string::npos) && (iIndex>1))
+    {
+        iIndex--;
+        iPosFrom = attr.find(sFrom,iPosFrom+iFromLength);
+    }
+    if (iPosFrom==string::npos)
+    {
+        return string("");
+    }
+    else
+    {
+        iPosFrom+=iFromLength;
+        int iPosTo = attr.find(sTo,iPosFrom);
+        if (iPosTo==string::npos)
+        {
+            return attr.substr(iPosFrom);
+        }
+        else
+        {
+            return attr.substr(iPosFrom,iPosTo-iPosFrom);
+        }
+    }
+}
 /*****************************************************
  * Function getPairBetween
  * Input: sFrom, sTo, iIndex

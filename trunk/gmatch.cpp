@@ -184,6 +184,33 @@ void setValue(int iIndex, int iValue, int iTeam)
         emitEvent(iIndex,iValue,iTeam);
     }
 }
+int parseStatus(const shtml status)
+{
+    if (status.contain("Full-time"))
+    {
+        return 7;
+    }
+    else if (status.contain("Match"))
+    {
+        return 0;
+    }
+    else if (status.contain("First Half"))
+    {
+        return 1;
+    }
+    else if (status.contain("Second Half"))
+    {
+        return 3;
+    }
+    else if (status.contain("Final score"))
+    {
+        return 9;
+    }
+    else
+    {
+        return 5;
+    }
+}
 bool getMatch(int id)
 {
     shtml sh,t,n,nh,nh2;
@@ -216,31 +243,7 @@ bool getMatch(int id)
     t.retainTagByName("div");
     n = t.cutTagByName("div");
     n.retainTagByName("span");
-    if (n.contain("Full-time"))
-    {
-        status=4;
-    }
-    else if (n.contain("Match"))
-    {
-        status=0;
-        return true;
-    }
-    else if (n.contain("First Half"))
-    {
-        status=1;
-    }
-    else if (n.contain("Second Half"))
-    {
-        status=2;
-    }
-    else if (n.contain("Final score"))
-    {
-        status=5;
-    }
-    else
-    {
-        status=3;
-    }
+    status = parseStatus(n);
     if (DEBUG)
         cout<<"Status:"<<status<<endl;
     t.retainTagByName("p");
@@ -382,6 +385,10 @@ bool getMatch(int id)
     //cout<<"End of get data"<<endl;
     return true;
 }
+void getTable(string sLeague)
+{
+    cout<<"Get table "<<sLeague<<endl;
+}
 int main(int argc, char** argv)
 {
     //int iMatch;
@@ -398,10 +405,15 @@ int main(int argc, char** argv)
             getMatch(mid);
             sleep(3);
         }
+        if (argc>2)
+        {
+            getTable(argv[2]);
+        }
+
     }
     else
     {
-        cout<<"Usage: gmatch <match_id> "<<endl;
+        cout<<"Usage: gmatch <match_id> [<league>] "<<endl;
         cout<<"by Tran Huu Nam, huunam0@gmail.com, 2012"<<endl;
     }
 }
