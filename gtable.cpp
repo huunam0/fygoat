@@ -138,31 +138,32 @@ int init_mysql() {
 }
 void addTeam(string tid, string tname, int type)
 {
-    char sql[500];
+    char sql[1000];
     if (tid.empty())
     {
-        if (type)
+		return;        
+		if (type)
         {
-            sprintf(sql,"INSERT INTO `f_teams` (`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_hw`,`team_hd`,`team_hl`,`team_hf`,`team_ha`,`team_aw`,`team_ad`,`team_al`,`team_af`,`team_aa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d');",tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts);
+            sprintf(sql,"INSERT INTO `f_teams` (`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_hw`,`team_hd`,`team_hl`,`team_hf`,`team_ha`,`team_aw`,`team_ad`,`team_al`,`team_af`,`team_aa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d');",tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts);
         }
         else
         {
-            sprintf(sql,"INSERT INTO `f_teams` (`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d');",tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,gd,pts);
+            sprintf(sql,"INSERT INTO `f_teams` (`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d');",tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,gd,pts);
         }
     }
     else
     {
         if (type)
         {
-            sprintf(sql,"INSERT INTO `f_teams` (`team_id`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_hw`,`team_hd`,`team_hl`,`team_hf`,`team_ha`,`team_aw`,`team_ad`,`team_al`,`team_af`,`team_aa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d');",tid.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts);
+            sprintf(sql,"INSERT IGNORE INTO `f_teams` (`team_id`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_hw`,`team_hd`,`team_hl`,`team_hf`,`team_ha`,`team_aw`,`team_ad`,`team_al`,`team_af`,`team_aa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d');",tid.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts);
         }
         else
         {
-            sprintf(sql,"INSERT INTO `f_teams` (`team_id`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d');",tid.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,gd,pts);
+            sprintf(sql,"INSERT IGNORE INTO `f_teams` (`team_id`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d');",tid.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,gd,pts);
         }
     }
-    cout<<sql<<endl;
-    //executesql(sql);
+    //cout<<"Chay sql"<<endl;
+    executesql(sql);
 }
 
 void getTable(string sLeague)
@@ -198,7 +199,7 @@ void getTable(string sLeague)
         group=n.getBetween("Live_false_group_","\"");
         if (!group.empty())
         {
-            cout<<"Group "<<group<<endl;
+            //cout<<"Group "<<group<<endl;
             n=t.cutTagByName("thead");
             if (n.contain("Overall")) tabletype=1;
             else tabletype=2;
@@ -258,6 +259,7 @@ void getTable(string sLeague)
                 pts=nh.toInt();
                 //cout<<pos<<"/"<<teamid<<"/"<<teamname<<"/"<<play<<"/"<<ow<<"/"<<od<<"/"<<ol<<"/"<<of<<"/"<<oa<<"/"<<hw<<"/"<<hd<<"/"<<hl<<"/"<<hf<<"/"<<ha<<"/"<<aw<<"/"<<ad<<"/"<<al<<"/"<<af<<"/"<<aa<<"/"<<gd<<"/"<<pts<<endl;
                 addTeam(teamid,teamname,tabletype);
+                //cout<<"Continue"<<endl;
                 n=t.cutTagByName("tr");
             }
         }
@@ -270,6 +272,8 @@ int main(int argc, char** argv)
     if (argc>1)
     {
         tleague = argv[1];
+        init_mysql_conf();
+        init_mysql();
         getTable(argv[1]);
     }
 	else

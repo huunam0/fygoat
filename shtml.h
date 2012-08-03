@@ -15,6 +15,7 @@ class shtml
         string getAttr();
         void viewContent();
         string getBetween(string sFrom, string sTo, int iIndex=1);
+        string getBetweenAttr(string sFrom, string sTo, int iIndex=1);
         //string getPairBetween(string sFrom, string sTo,int iIndex=1);
         string getPairBetween(string sFrom, string sTo,int iIndex=1);
         int getLastPairBetween(string sFrom, string sTo,int iIndex=1);

@@ -78,6 +78,7 @@ DROP TABLE IF EXISTS `f_matches`;
 CREATE TABLE `f_matches` (
   `match_id` int(11) unsigned NOT NULL,
   `league_id` varchar(40) NOT NULL,
+  `group` varchar(1) DEFAULT NULL,
   `hteam` int(11) unsigned NOT NULL,
   `ateam` int(11) unsigned NOT NULL,
   `status` smallint(2) NOT NULL DEFAULT '0',
@@ -99,8 +100,7 @@ CREATE TABLE `f_matches` (
   `hpossession` tinyint(1) DEFAULT NULL,
   `apossession` tinyint(1) DEFAULT NULL,
   `match_date` datetime DEFAULT NULL,
-  `date_view` datetime DEFAULT NULL,
-  `mupdate` datetime DEFAULT NULL,
+  `order` smallint(2) DEFAULT 1,
   PRIMARY KEY (`match_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -131,7 +131,7 @@ CREATE TABLE `f_params` (
 --
 
 /*!40000 ALTER TABLE `f_params` DISABLE KEYS */;
-INSERT INTO `f_params` (`p_name`,`p_value`) VALUES ('dbversion','1.0');
+INSERT INTO `f_params` (`p_name`,`p_value`) VALUES ('dbversion','2.0');
 /*!40000 ALTER TABLE `f_params` ENABLE KEYS */;
 
 
@@ -143,7 +143,7 @@ DROP TABLE IF EXISTS `f_teams`;
 CREATE TABLE `f_teams` (
   `team_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `team_name` varchar(30) NOT NULL,
-  `team_group` smallint(2) DEFAULT 1,
+  `team_group` varchar(1) DEFAULT NULL,
   `team_league` varchar(20) DEFAULT NULL,
   `team_pos` smallint(2) DEFAULT NULL,
   `team_op` smallint(2) DEFAULT NULL,
@@ -164,7 +164,6 @@ CREATE TABLE `f_teams` (
   `team_aa` smallint(2) DEFAULT NULL,
   `team_gd` smallint(2) DEFAULT NULL,
   `team_pts` smallint(2) DEFAULT NULL,
-  `team_date` datetime DEFAULT NULL,
   PRIMARY KEY (`team_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=100000 DEFAULT CHARSET=utf8;
 
