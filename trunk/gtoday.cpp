@@ -12,7 +12,8 @@ static char db_name  [BUFFER_SIZE];
 static char f_home  [BUFFER_SIZE];
 static int port_number;
 static int DEBUG=1;
-
+#define LOCKFILE "/var/run/footygoat.pid"
+#define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 static MYSQL *conn;
 
 string  teamname,group;
@@ -35,10 +36,18 @@ int iNo=0;
 bool isFirstTime = true;
 int sleep_time = 10;
 int day, month, year, day2, month2, year2;
-string momment;
+string momment;//moment of a match
 int stat0,stat1;
-bool bEOM;
+bool bEOM;//end of month
 
+//For daemon start:
+static bool STOP=false;
+void call_for_exit(int s)
+{
+   STOP=true;
+   printf("Stopping footygoat...\n");
+}
+//Doc file cau hinh
 int after_equal(char * c){
 	int i=0;
 	for(;c[i]!='\0'&&c[i]!='=';i++);
@@ -92,6 +101,7 @@ void write_log(const char *fmt, ...)
 	fclose(fp);
 
 }
+//Khoi tao mysql
 bool init_mysql_conf()
 {
 	FILE *fp=NULL;
@@ -155,19 +165,20 @@ int init_mysql() {
         return false;
 	return true;
 }
+//Xu li chinh
 void getTable(string sLeague)
 {
     //cout<<"Get table "<<sLeague<<endl;
     char cmd[200];
     sprintf(cmd,"%sgtable %s &",f_home,sLeague.c_str());
-    cout<<cmd<<endl;
+    //cout<<cmd<<endl;
     system(cmd);
 }
 void addLeague(string lid, string lname)
 {
     char sql[500];
     sprintf(sql,"INSERT IGNORE INTO f_leagues (`league_id`,`league_name`) VALUE ('%s','%s')",lid.c_str(),lname.c_str());
-    cout<<sql<<endl;
+    //cout<<sql<<endl;
     executesql(sql);
     getTable(lid);
 }
@@ -175,7 +186,7 @@ void addMatch(int mid, string league,string group,int hteam, int ateam,int statu
 {
     char sql[500];
     sprintf(sql,"INSERT IGNORE INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d",mid,league.c_str(),group.c_str(),hteam,ateam,status,hscore,ascore,iNo,year2,month2,day2,momment.c_str(),hteam,ateam);
-    cout<<sql<<endl;
+    ///cout<<sql<<endl;
     executesql(sql);
 
 }
@@ -183,7 +194,7 @@ void addMatch(int iIndex)
 {
     char sql[500];
     sprintf(sql,"INSERT IGNORE INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d",matchs[iIndex].mid,matchs[iIndex].league.c_str(),matchs[iIndex].group.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam,matchs[iIndex].status,matchs[iIndex].hgoal,matchs[iIndex].agoal,iIndex,year2,month2,day2,momment.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam);
-    cout<<iIndex<<"::>"<<sql<<endl;
+    ///cout<<iIndex<<"::>"<<sql<<endl;
     executesql(sql);
 
 }
@@ -341,7 +352,7 @@ void getMatch(int mId)
 {
     char cmd[200];
     sprintf(cmd,"%sgmatch %d &",f_home,mId);
-    cout<<cmd<<endl;
+    //cout<<cmd<<endl;
     system(cmd);
 
 }
@@ -498,19 +509,62 @@ void deleteTimeline()
     char sql[]="delete  from `f_timeline`;";
     executesql(sql);
 }
+//For daemon:
+bool already_running()
+{
+	int fd;
+	char buf[16];
+	fd = open(LOCKFILE, O_RDWR|O_CREAT, LOCKMODE);
+	if (fd < 0)
+    {
+		write_log("can't open %s: %s", LOCKFILE, strerror(errno));
+		return true;
+	}
+	if (lockfile(fd) < 0)
+    {
+		if (errno == EACCES || errno == EAGAIN)
+		{
+			close(fd);
+			return true;
+		}
+		write_log("can't lock %s: %s", LOCKFILE, strerror(errno));
+		return true;
+	}
+	ftruncate(fd, 0);
+	sprintf(buf,"%d", getpid());
+	write(fd,buf,strlen(buf)+1);
+	return false;
+}
+bool daemon_init(void)
+ {
+     umask(0); /* clear file mode creation mask */
+     close(0); /* close stdin */
+     close(1); /* close stdout */
+     close(2); /* close stderr */
+     return(true);
+}
 int main(int argc, char** argv)
 {
     string sDate;
     if (argc>1) sDate=string(argv[1]);
+    if (!DEBUG) daemon_init();
+    if (already_running())
+    {
+        write_log("Footygoat is already running!")
+        return 1;
+    }
     init_mysql_conf();
     init_mysql();
-    while (true)
+    signal(SIGQUIT,call_for_exit);
+	signal(SIGKILL,call_for_exit);
+	signal(SIGTERM,call_for_exit);
+    while (!STOP)
     {
         //cout<<"Begin get list of match "<<endl;
         getToday(sDate);
         isFirstTime=false;
         sleep_time=(stat0==0?3600:10);
-        cout<<"wait "<<sleep_time<<"seconds..."<<endl;
+        //cout<<"wait "<<sleep_time<<"seconds..."<<endl;
         if (stat1==0)
         {
             deleteTimeline();
