@@ -233,7 +233,7 @@ int parseStatus( shtml status)
     }
     else
     {
-        return 5;
+        return 1;
     }
 }
 bool getMatch(int id)
