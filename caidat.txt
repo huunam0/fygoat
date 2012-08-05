@@ -2,5 +2,9 @@ Make directory /etc/footygoat/
 copy file footygoat.conf to /etc/footygoat/
 Make directory /var/log/footygoat/
 Chmod +write for this directory
-Compile All
+Compile gmatch
+compile gtable
+compile gtoday
+create directory  /usr/bin/footygoat/
+copy gmatch,gtable,gtoday to /usr/bin/footygoat/
 

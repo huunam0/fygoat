@@ -82,7 +82,7 @@ CREATE TABLE `f_matches` (
   `hteam` int(11) unsigned NOT NULL,
   `ateam` int(11) unsigned NOT NULL,
   `status` smallint(2) NOT NULL DEFAULT '0',
-  `status_ex` varchar(20) DEFAULT NULL,
+  `minutes` smallint(2) DEFAULT 0,
   `hgoals` tinyint(1) DEFAULT NULL,
   `agoals` tinyint(1) DEFAULT NULL,
   `h1goals` tinyint(1) DEFAULT NULL,
