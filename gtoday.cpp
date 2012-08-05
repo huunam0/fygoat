@@ -3,6 +3,10 @@
 #include <string.h>
 #include "shtml.h"
 #include <stdarg.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <signal.h>
+#include <errno.h>
 
 #define BUFFER_SIZE 1024
 static char host_name[BUFFER_SIZE];
@@ -34,6 +38,7 @@ Fmatch matchs[mmax];
 int mm;
 int iNo=0;
 bool isFirstTime = true;
+bool isTimeLineFull=true;
 int sleep_time = 10;
 int day, month, year, day2, month2, year2;
 string momment;//moment of a match
@@ -135,7 +140,7 @@ bool init_mysql_conf()
 }
 bool executesql(const char * sql)
 {
-    if (DEBUG) cout<<sql<<endl;
+    //if (DEBUG) cout<<sql<<endl;
 	if (mysql_real_query(conn,sql,strlen(sql)))
     {
 		//sleep(20);
@@ -447,6 +452,7 @@ void getToday(string sDay="")
                     nh=n.cutTagByName("td");
                     status=nh.getText();
                     iStatus=parseStatus(status);
+                    if (DEBUG) cout<<"Match "<<matchid<<" has status "<<iStatus<<endl;
                     if (iStatus==0) stat0++;
                     if (iStatus<7) stat1++;
                     if (isFirstTime)
@@ -508,8 +514,19 @@ void deleteTimeline()
 {
     char sql[]="delete  from `f_timeline`;";
     executesql(sql);
+    char sql2[]="ALTER TABLE f_timeline AUTO_INCREMENT = 1;";
+    executesql(sql2);
 }
 //For daemon:
+int lockfile(int fd)
+{
+	struct flock fl;
+	fl.l_type = F_WRLCK;
+	fl.l_start = 0;
+	fl.l_whence = SEEK_SET;
+	fl.l_len = 0;
+	return (fcntl(fd,F_SETLK,&fl));
+}
 bool already_running()
 {
 	int fd;
@@ -550,7 +567,7 @@ int main(int argc, char** argv)
     if (!DEBUG) daemon_init();
     if (already_running())
     {
-        write_log("Footygoat is already running!")
+        write_log("Footygoat is already running!");
         return 1;
     }
     init_mysql_conf();
@@ -565,9 +582,17 @@ int main(int argc, char** argv)
         isFirstTime=false;
         sleep_time=(stat0==0?3600:10);
         //cout<<"wait "<<sleep_time<<"seconds..."<<endl;
-        if (stat1==0)
+        if ((stat1==0)  )
         {
-            deleteTimeline();
+            if (isTimeLineFull)
+            {
+                deleteTimeline();
+                isTimeLineFull=false;
+            }
+        }
+        else
+        {
+            isTimeLineFull=true;
         }
         sleep(sleep_time);
     }
