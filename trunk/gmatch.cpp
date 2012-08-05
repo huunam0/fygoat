@@ -14,10 +14,12 @@ static int DEBUG=0;
 
 static MYSQL *conn;
 
-int m[2][8];
+int m[2][10];
 int status=0;
 int mid=0;
 bool isFirstTime=true;
+int minutes=0;
+
 int after_equal(char * c){
 	int i=0;
 	for(;c[i]!='\0'&&c[i]!='=';i++);
@@ -140,7 +142,8 @@ void emitEvent(int iIndex, int iValue, int iTeam)
     sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iIndex,iValue,iTeam,mid);
     executesql(sql);
     string t,field;
-    t=(iTeam==1?"a":"h");
+    if (iIndex<8)
+        t=(iTeam==1?"a":"h");
     switch (iIndex)
     {
     case 0:
@@ -167,6 +170,12 @@ void emitEvent(int iIndex, int iValue, int iTeam)
     case 7:
         field="possession";
         break;
+    case 8:
+        field="minutes";
+        break;
+    case 9:
+        field="status";
+        break;
     }
     if (!field.empty())
     {
@@ -176,16 +185,24 @@ void emitEvent(int iIndex, int iValue, int iTeam)
     }
 
 }
+void setEvent(int iEvent,int iValue=0)
+{
+    char sql[300];
+    sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
+    executesql(sql);
+
+}
 void setValue(int iIndex, int iValue, int iTeam)
 {
-    if ( (isFirstTime) || ((m[iTeam][iIndex]<iValue)&&(iIndex<7)) || ((m[iTeam][iIndex]!=iValue)&&(iIndex==7)))
+    if ( (isFirstTime) || ((m[iTeam][iIndex]<iValue)&&(iIndex!=7)) || ((m[iTeam][iIndex]!=iValue)&&(iIndex==7)))
     {
         m[iTeam][iIndex]=iValue;
         emitEvent(iIndex,iValue,iTeam);
     }
 }
-int parseStatus(const shtml status)
+int parseStatus( shtml status)
 {
+    //int v = status
     if (status.contain("Full-time"))
     {
         return 7;
@@ -198,13 +215,21 @@ int parseStatus(const shtml status)
     {
         return 1;
     }
+    else if (status.contain("Half-time"))
+    {
+        return 2;
+    }
     else if (status.contain("Second Half"))
     {
         return 3;
     }
     else if (status.contain("Final score"))
     {
-        return 9;
+        if (status.contain("after extra time"))
+        {
+            return 8;
+        }
+        else return 9;
     }
     else
     {
@@ -242,8 +267,17 @@ bool getMatch(int id)
     t=sh.cutTagByName("div",2);
     t.retainTagByName("div");
     n = t.cutTagByName("div");
+
+    status = parseStatus(n.cutTagByName("span"));
+    setValue(9,status,0);
     n.retainTagByName("span");
-    status = parseStatus(n);
+    if (!n.containAttr("display:none;"))
+    {
+        n.retainBetween("-","'");
+        n.trim();
+        minutes=n.toInt();
+        setValue(8,minutes,0);
+    }
     if (DEBUG)
         cout<<"Status:"<<status<<endl;
     t.retainTagByName("p");
@@ -400,11 +434,13 @@ int main(int argc, char** argv)
 
         mid = atoi(argv[1]);
         getMatch(mid);
-        while (status<4)
+        if (status>0) setEvent(10);
+        while (status<7)
         {
             getMatch(mid);
             sleep(3);
         }
+        setEvent(12);
         if (argc>2)
         {
             getTable(argv[2]);

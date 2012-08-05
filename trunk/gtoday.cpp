@@ -9,6 +9,7 @@ static char host_name[BUFFER_SIZE];
 static char user_name[BUFFER_SIZE];
 static char password [BUFFER_SIZE];
 static char db_name  [BUFFER_SIZE];
+static char f_home  [BUFFER_SIZE];
 static int port_number;
 static int DEBUG=1;
 
@@ -33,9 +34,10 @@ int mm;
 int iNo=0;
 bool isFirstTime = true;
 int sleep_time = 10;
-int day, month, year;
+int day, month, year, day2, month2, year2;
 string momment;
-int stat0;
+int stat0,stat1;
+bool bEOM;
 
 int after_equal(char * c){
 	int i=0;
@@ -110,6 +112,7 @@ bool init_mysql_conf()
             read_buf(buf, "F_PASSWORD",password);
             read_buf(buf, "F_DB_NAME",db_name);
             read_int(buf , "F_PORT_NUMBER", &port_number);
+            read_buf(buf , "F_HOME", f_home);
         }
 		return true;
 	//	fclose(fp);
@@ -152,29 +155,58 @@ int init_mysql() {
         return false;
 	return true;
 }
-void getTabble(string sLeague)
+void getTable(string sLeague)
 {
-    cout<<"Get table  "<<sLeague<<endl;
+    //cout<<"Get table "<<sLeague<<endl;
+    char cmd[200];
+    sprintf(cmd,"%sgtable %s &",f_home,sLeague.c_str());
+    cout<<cmd<<endl;
+    system(cmd);
 }
 void addLeague(string lid, string lname)
 {
     char sql[500];
-    sprintf(sql,"INSERT IGNORE INTO f_leagues (`league_id`,`league_name`) VALUE (`%s`,`%s`)",lid.c_str(),lname.c_str());
+    sprintf(sql,"INSERT IGNORE INTO f_leagues (`league_id`,`league_name`) VALUE ('%s','%s')",lid.c_str(),lname.c_str());
+    cout<<sql<<endl;
     executesql(sql);
     getTable(lid);
 }
-void addMatch(int mid, string league,int group,int hteam, int ateam,int status=0, int hscore=0, int ascore=0)
+void addMatch(int mid, string league,string group,int hteam, int ateam,int status=0, int hscore=0, int ascore=0)
 {
     char sql[500];
-    sprintf(sql,"INSERT INTO f_matchs (match_id,league,group,hteam,ateam,status,hgoals,agoals,`order`) VALUE ('%d','%s','%d',%d','%d','%d','%d','%d',%d) ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d",mid,league.c_str(),group,hteam,ateam,status,hscore,ascore,iNo,hteam,ateam);
-
+    sprintf(sql,"INSERT IGNORE INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d",mid,league.c_str(),group.c_str(),hteam,ateam,status,hscore,ascore,iNo,year2,month2,day2,momment.c_str(),hteam,ateam);
+    cout<<sql<<endl;
     executesql(sql);
+
+}
+void addMatch(int iIndex)
+{
+    char sql[500];
+    sprintf(sql,"INSERT IGNORE INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d",matchs[iIndex].mid,matchs[iIndex].league.c_str(),matchs[iIndex].group.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam,matchs[iIndex].status,matchs[iIndex].hgoal,matchs[iIndex].agoal,iIndex,year2,month2,day2,momment.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam);
+    cout<<iIndex<<"::>"<<sql<<endl;
+    executesql(sql);
+
+}
+void addTeam(int teamid, string tname, string league,string group)
+{
+
 }
 int parseStatus(string status)
 {
     shtml sh(status);
     momment="00:00";
-    if (sh.contain("FT"))
+    day2=day;
+    month2=month;
+    year2=year;
+    if (sh.contain("AET"))
+    {
+        return 8;
+    }
+    else if (sh.contain("FT-Pens"))
+    {
+        return 9;
+    }
+    else if (sh.contain("FT"))
     {
         return 7;
     }
@@ -196,6 +228,25 @@ int parseStatus(string status)
         {
             int v=status.find(":");
             momment=status.substr(v-2,5);
+            if (sh.contain(","))
+            {
+                if (bEOM)
+                {
+                    day2=1;
+                    month2++;
+                    if (month2>12)
+                    {
+                        month2=1;
+                        year2++;
+                    }
+                }
+                else
+                {
+                    day2++;
+                }
+
+
+            }
         }
 
         return 0;
@@ -209,21 +260,25 @@ int parseStatus(string status)
         {
             v=1;
         }
-        else
+        else if (iMinute<91)
         {
             v=3;
         }
-        if (sh.contain("+")) v++;
+        else
+        {
+            v=4;
+        }
+        //if (sh.contain("+")) v++;
         return v;
     }
     else
     {
-        return 5;
+        return 0;
     }
 }
 void parseDate(string sDate)
 {
-    cout<<"Parse "<<sDate;
+    //cout<<"Parse "<<sDate;
     shtml sh(sDate);
     shtml st(sh.cutBetween(",",","));
     if (st.contain("Jan"))
@@ -274,24 +329,28 @@ void parseDate(string sDate)
     {
         month=12;
     }
-    cout<<", month:"<<month;
+    //cout<<", month:"<<month;
     st.deleteTo(" ",2);
     day = st.toInt();
-    cout<<", day:"<<day;
+    //cout<<", day:"<<day;
     sh.deleteTo(" ");
     year = sh.toInt();
-    cout<<", year:"<<year<<endl;
+    //cout<<", year:"<<year<<endl;
 }
 void getMatch(int mId)
 {
-    cout<<"Begin get match "<<mId<<endl;
+    char cmd[200];
+    sprintf(cmd,"%sgmatch %d &",f_home,mId);
+    cout<<cmd<<endl;
+    system(cmd);
+
 }
 void getToday(string sDay="")
 {
     shtml m,t,n,nh;
     string status,hteam,ateam,score,league,gid,group,hname,aname, cday;
     int v, iStatus, hscore, ascore;
-    bool bEOM;
+
     //m.loadfromfile("scores2.htm");
     if (sDay.empty())
     {
@@ -304,7 +363,7 @@ void getToday(string sDay="")
     m.removeBetween("<!--","-->",-1);
     t=m.cutTagByName("div");
     iNo=0;
-    stat0=0;
+    stat0=stat1=0;
     while (!t.isEmpty())
     {
         if (t.containAttr("bg-elements"))
@@ -320,7 +379,12 @@ void getToday(string sDay="")
     cday=m.getBetween("id=\"currentDate\"","</ul>");
     t.setContent(cday);
     cday=t.getBetween(">","<");
-    if (!isFirstTime) isFirstTime=(cday!=sToday);
+    if (!isFirstTime)
+    {
+        //cout<<cday<<" ::: "<<sToday<<endl;
+        isFirstTime=(cday!=sToday);
+    }
+    sToday=cday;
     if (isFirstTime)
     {
         t.deleteTo("<");
@@ -328,7 +392,7 @@ void getToday(string sDay="")
         bEOM = t.contain(" 1 ");
         parseDate(cday);
     }
-    cout<<"Today is "<<cday<<" End of month:"<<bEOM<<" - "<<day<<month<<year<<endl;
+    //cout<<"Today is "<<cday<<" End of month:"<<bEOM<<" - "<<day<<month<<year<<endl;
 
     m.retainTagByName("div",2);
     m.retainTagByName("div");
@@ -373,6 +437,7 @@ void getToday(string sDay="")
                     status=nh.getText();
                     iStatus=parseStatus(status);
                     if (iStatus==0) stat0++;
+                    if (iStatus<7) stat1++;
                     if (isFirstTime)
                     {
                         nh=n.cutTagByName("td");
@@ -396,8 +461,9 @@ void getToday(string sDay="")
                         matchs[iNo].ateam=atoi(ateam.c_str());
                         matchs[iNo].hgoal=hscore;
                         matchs[iNo].agoal=ascore;
+                        addMatch(iNo);
                         if (iStatus>0) getMatch(matchid);
-                        cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", hteam="<<hteam<<", ateam="<<ateam<<", hscore="<<hscore<<", ascore="<<ascore<<", Satus="<<iStatus<<endl;
+                        //cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", hteam="<<hteam<<", ateam="<<ateam<<", hscore="<<hscore<<", ascore="<<ascore<<", Satus="<<iStatus<<endl;
                     }
                     else
                     {
@@ -427,16 +493,28 @@ void getToday(string sDay="")
     }
     //m.viewContent();
 }
-
+void deleteTimeline()
+{
+    char sql[]="delete  from `f_timeline`;";
+    executesql(sql);
+}
 int main(int argc, char** argv)
 {
     string sDate;
     if (argc>1) sDate=string(argv[1]);
+    init_mysql_conf();
+    init_mysql();
     while (true)
     {
+        //cout<<"Begin get list of match "<<endl;
         getToday(sDate);
+        isFirstTime=false;
         sleep_time=(stat0==0?3600:10);
         cout<<"wait "<<sleep_time<<"seconds..."<<endl;
+        if (stat1==0)
+        {
+            deleteTimeline();
+        }
         sleep(sleep_time);
     }
 
