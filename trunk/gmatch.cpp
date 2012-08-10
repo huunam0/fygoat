@@ -59,7 +59,13 @@ void write_log(const char *fmt, ...)
 {
 	va_list         ap;
 	char            buffer[4096];
-	sprintf(buffer,"/var/log/footygoat/match.log");
+	char times[20];
+    struct tm *sTm;
+    time_t now = time (0);
+    sTm = gmtime (&now);
+    strftime (times, sizeof(times), "%Y-%m-%d %H:%M:%S", sTm);
+
+	sprintf(buffer,"/var/log/footygoat/today.log");
 	FILE *fp = fopen(buffer, "a+");
 	if (fp==NULL)
     {
@@ -67,7 +73,7 @@ void write_log(const char *fmt, ...)
 		 system("pwd");
 	}va_start(ap, fmt);
 	vsprintf(buffer, fmt, ap);
-	fprintf(fp,"%s\n",buffer);
+	fprintf(fp,"%s \t %s\n",times,buffer);
 	if (DEBUG) printf("%s\n",buffer);
 	va_end(ap);
 	fclose(fp);
@@ -271,7 +277,7 @@ bool getMatch(int id)
     status = parseStatus(n.cutTagByName("span"));
     setValue(9,status,0);
     n.retainTagByName("span");
-    if (!n.containAttr("display:none;"))
+    if (n.contain("'"))
     {
         n.retainBetween("-","'");
         n.trim();
