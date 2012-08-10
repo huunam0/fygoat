@@ -15,7 +15,7 @@ static char password [BUFFER_SIZE];
 static char db_name  [BUFFER_SIZE];
 static char f_home  [BUFFER_SIZE];
 static int port_number;
-static int DEBUG=1;
+static bool DEBUG=false;
 #define LOCKFILE "/var/run/footygoat.pid"
 #define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 static MYSQL *conn;
@@ -45,6 +45,10 @@ string momment;//moment of a match
 int stat0,stat1;
 bool bEOM;//end of month
 
+string removeQuot(string s)
+{
+    //return r.replace("'","\'");
+}
 //For daemon start:
 static bool STOP=false;
 void call_for_exit(int s)
@@ -92,6 +96,12 @@ void write_log(const char *fmt, ...)
 {
 	va_list         ap;
 	char            buffer[4096];
+	char times[20];
+    struct tm *sTm;
+    time_t now = time (0);
+    sTm = gmtime (&now);
+    strftime (times, sizeof(times), "%Y-%m-%d %H:%M:%S", sTm);
+
 	sprintf(buffer,"/var/log/footygoat/today.log");
 	FILE *fp = fopen(buffer, "a+");
 	if (fp==NULL)
@@ -100,7 +110,31 @@ void write_log(const char *fmt, ...)
 		 system("pwd");
 	}va_start(ap, fmt);
 	vsprintf(buffer, fmt, ap);
-	fprintf(fp,"%s\n",buffer);
+	fprintf(fp,"%s \t %s\n",times,buffer);
+	if (DEBUG) printf("%s\n",buffer);
+	va_end(ap);
+	fclose(fp);
+
+}
+void write_log_call(const char *fmt, ...)
+{
+	va_list         ap;
+	char            buffer[4096];
+	char times[20];
+    struct tm *sTm;
+    time_t now = time (0);
+    sTm = gmtime (&now);
+    strftime (times, sizeof(times), "%Y-%m-%d %H:%M:%S", sTm);
+
+	sprintf(buffer,"/var/log/footygoat/calls.log");
+	FILE *fp = fopen(buffer, "a+");
+	if (fp==NULL)
+    {
+		 fprintf(stderr,"openfile error!\n");
+		 system("pwd");
+	}va_start(ap, fmt);
+	vsprintf(buffer, fmt, ap);
+	fprintf(fp,"%s \t %s\n",times,buffer);
 	if (DEBUG) printf("%s\n",buffer);
 	va_end(ap);
 	fclose(fp);
@@ -175,8 +209,8 @@ void getTable(string sLeague)
 {
     //cout<<"Get table "<<sLeague<<endl;
     char cmd[200];
+    write_log_call("Get table %s ",sLeague.c_str());
     sprintf(cmd,"%sgtable %s &",f_home,sLeague.c_str());
-    //cout<<cmd<<endl;
     system(cmd);
 }
 void addLeague(string lid, string lname)
@@ -356,6 +390,7 @@ void parseDate(string sDate)
 void getMatch(int mId)
 {
     char cmd[200];
+    write_log_call("Get Match %d ",mId);
     sprintf(cmd,"%sgmatch %d &",f_home,mId);
     //cout<<cmd<<endl;
     system(cmd);
@@ -425,6 +460,7 @@ void getToday(string sDay="")
                 gid.clear();
                 group.clear();
                 n=t.getTagByName("a");
+                //t.viewContent();
                 nh.setContent(n.getAttr());
                 nh.retainBetween("league","\"");
                 if (nh.contain("/"))
@@ -437,6 +473,8 @@ void getToday(string sDay="")
                 }
                 //n  = t.getTagByOrder(1);
                 //if (DEBUG)cout<<"League: "<<nh.getContent()<<" : "<<n.getText()<<endl;
+                n.replace("'","\\'",-1);
+                //n.viewContent();
                 league=nh.getContent();
                 addLeague(league,n.getText());
             }
@@ -484,8 +522,9 @@ void getToday(string sDay="")
                     }
                     else
                     {
-                        if ((iStatus>1) && (matchs[iNo].status==1))
+                        if ((iStatus>0) && (matchs[iNo].status<=0))
                         {
+                            matchs[iNo].status=iStatus;
                             getMatch(matchs[iNo].mid);
                         }
                     }
@@ -512,6 +551,7 @@ void getToday(string sDay="")
 }
 void deleteTimeline()
 {
+    write_log_call("Empty timeline...");
     char sql[]="delete  from `f_timeline`;";
     executesql(sql);
     char sql2[]="ALTER TABLE f_timeline AUTO_INCREMENT = 1;";
@@ -554,6 +594,7 @@ bool already_running()
 }
 bool daemon_init(void)
  {
+     setsid();
      umask(0); /* clear file mode creation mask */
      close(0); /* close stdin */
      close(1); /* close stdout */
@@ -564,6 +605,18 @@ int main(int argc, char** argv)
 {
     string sDate;
     if (argc>1) sDate=string(argv[1]);
+    if (sDate.find("debug")!=string::npos)
+    {
+        DEBUG=true;
+        if (argc>2)
+            sDate=string(argv[2]);
+        else
+            sDate="";
+    }
+    else
+    {
+        if (argc>2) DEBUG=true;
+    }
     if (!DEBUG) daemon_init();
     if (already_running())
     {
@@ -575,6 +628,7 @@ int main(int argc, char** argv)
     signal(SIGQUIT,call_for_exit);
 	signal(SIGKILL,call_for_exit);
 	signal(SIGTERM,call_for_exit);
+	write_log_call("Starting...");
     while (!STOP)
     {
         //cout<<"Begin get list of match "<<endl;
@@ -596,6 +650,6 @@ int main(int argc, char** argv)
         }
         sleep(sleep_time);
     }
-
+    write_log_call("Stoping...");
     return 0;
 }

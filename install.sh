@@ -16,12 +16,6 @@ sudo yum -y update
 sudo yum -y install php httpd php-mysql mysql-server php-xml php-gd gcc-c++  mysql-devel php-mbstring glibc-static
 
 
-#create user and homedir
-sudo useradd -m -u 1536 footygoat
-#judge
-
-
-
 #compile and install the core
 make gmatch
 make gtable
@@ -32,12 +26,12 @@ sudo cp gtoday /usr/bin
 
 #create work dir set default conf
 sudo    mkdir /etc/footygoat
-sudo cp judge.conf /etc/footygoat
+sudo cp footygoat.conf /etc/footygoat
 sudo    mkdir /var/log/footygoat
 sudo chmod -R 777 /var/log/footygoat
 
 
-#boot up judged
+#boot up footygoat
 sudo cp footygoat /etc/init.d/footygoat
 sudo chmod +x  /etc/init.d/footygoat
 sudo ln -s /etc/init.d/footygoat /etc/rc3.d/S93footygoat

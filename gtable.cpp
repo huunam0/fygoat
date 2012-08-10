@@ -60,7 +60,13 @@ void write_log(const char *fmt, ...)
 {
 	va_list         ap;
 	char            buffer[4096];
-	sprintf(buffer,"/var/log/footygoat/table.log");
+	char times[20];
+    struct tm *sTm;
+    time_t now = time (0);
+    sTm = gmtime (&now);
+    strftime (times, sizeof(times), "%Y-%m-%d %H:%M:%S", sTm);
+
+	sprintf(buffer,"/var/log/footygoat/today.log");
 	FILE *fp = fopen(buffer, "a+");
 	if (fp==NULL)
     {
@@ -68,7 +74,7 @@ void write_log(const char *fmt, ...)
 		 system("pwd");
 	}va_start(ap, fmt);
 	vsprintf(buffer, fmt, ap);
-	fprintf(fp,"%s\n",buffer);
+	fprintf(fp,"%s \t %s\n",times,buffer);
 	if (DEBUG) printf("%s\n",buffer);
 	va_end(ap);
 	fclose(fp);
@@ -141,7 +147,7 @@ void addTeam(string tid, string tname, int type)
     char sql[1000];
     if (tid.empty())
     {
-		return;        
+		return;
 		if (type)
         {
             sprintf(sql,"INSERT INTO `f_teams` (`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_hw`,`team_hd`,`team_hl`,`team_hf`,`team_ha`,`team_aw`,`team_ad`,`team_al`,`team_af`,`team_aa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d');",tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts);
@@ -212,6 +218,7 @@ void getTable(string sLeague)
                 nh=n.cutTagByName("td");
                 nh=n.cutTagByName("td");
                 if (nh.containTag("a")) nh.retainTagByName("a");
+                nh.replace("'","\\'",-1);
                 teamname = nh.getContent();
                 nh.setContent(nh.getAttr());
                 teamid = nh.getBetween("/id/","/");
