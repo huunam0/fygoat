@@ -99,6 +99,8 @@ CREATE TABLE `f_matches` (
   `acorner` smallint(2) DEFAULT NULL,
   `hpossession` tinyint(1) DEFAULT NULL,
   `apossession` tinyint(1) DEFAULT NULL,
+  `hpenalty` tinyint(1) DEFAULT NULL,
+  `apenalty` tinyint(1) DEFAULT NULL,
   `match_date` datetime DEFAULT NULL,
   `order` smallint(2) DEFAULT 1,
   PRIMARY KEY (`match_id`)
