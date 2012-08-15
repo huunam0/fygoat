@@ -239,7 +239,9 @@ void addMatch(int iIndex)
 }
 void addTeam(int teamid, string tname, string league,string group)
 {
-
+    char sql[200];
+    sprintf(sql,"INSERT INTO f_teams (team_id,team_name,team_league,team_group) VALUE (%d,'%s','%s','%s');",teamid,tname.c_str(),league.c_str(),group.c_str());
+    executesql(sql);
 }
 int parseStatus(string status)
 {
@@ -399,8 +401,9 @@ void getMatch(int mId)
 void getToday(string sDay="")
 {
     shtml m,t,n,nh;
-    string status,hteam,ateam,score,league,gid,group,hname,aname, cday;
+    string status,hteam,ateam,score,league,league_name,gid,group,hname,aname, cday;
     int v, iStatus, hscore, ascore;
+    bool noId;
 
     //m.loadfromfile("scores2.htm");
     if (sDay.empty())
@@ -476,7 +479,8 @@ void getToday(string sDay="")
                 n.replace("'","\\'",-1);
                 //n.viewContent();
                 league=nh.getContent();
-                addLeague(league,n.getText());
+                league_name=n.getText();
+                //addLeague(league,n.getText());
             }
             t.retainTagByName("table");
             n=t.cutTagByName("tr");
@@ -497,8 +501,13 @@ void getToday(string sDay="")
                     {
                         nh=n.cutTagByName("td");
                         hname=nh.getText();
+                        noId=nh.contain("href");
                         nh.setContent(nh.getAttr());
                         hteam=nh.getBetween("teamId-","\"");
+                        if (noId)
+                        {
+                            addTeam(hteam,hname,league,group);
+                        }
                         nh=n.cutTagByName("td");
                         nh.replace("&nbsp;","",-1);
                         hscore = nh.toInt();
@@ -506,8 +515,13 @@ void getToday(string sDay="")
                         ascore = nh.toInt();
                         nh=n.cutTagByName("td");
                         aname=nh.getText();
+                        noId=nh.contain("href");
                         nh.setContent(nh.getAttr());
                         ateam=nh.getBetween("teamId-","\"");
+                        if (noId)
+                        {
+                            addTeam(ateam,aname,league,group);
+                        }
                         //cout<<iNo<<" Status "<<status<<"/"<<iStatus<<". Home:"<<hteam<<". Score:"<<hscore<<ascore<<". Away:"<<ateam<<endl;
                         matchs[iNo].mid=matchid;
                         matchs[iNo].league=league;
@@ -540,6 +554,10 @@ void getToday(string sDay="")
                     nh.setContent(nh.getAttr());
                     gid=nh.getBetween("/groupId/","\"");
                     //cout<<"Group "<<gid<<":"<<group<<endl;
+                }
+                if (isFirstTime)
+                {
+                    addLeague(league,n.getText());
                 }
                 n=t.cutTagByName("tr");
             }

@@ -161,11 +161,11 @@ void addTeam(string tid, string tname, int type)
     {
         if (type)
         {
-            sprintf(sql,"INSERT IGNORE INTO `f_teams` (`team_id`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_hw`,`team_hd`,`team_hl`,`team_hf`,`team_ha`,`team_aw`,`team_ad`,`team_al`,`team_af`,`team_aa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d');",tid.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts);
+            sprintf(sql,"INSERT INTO `f_teams` (`team_id`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_hw`,`team_hd`,`team_hl`,`team_hf`,`team_ha`,`team_aw`,`team_ad`,`team_al`,`team_af`,`team_aa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d') ON DUPLICATE KEY UPDATE team_group='%s',team_league='%s',team_pos='%d',team_op=%d,team_ow=%d,team_od=%d,team_ol=%d,team_of=%d,team_oa=%d,team_hw=%d,team_hd=%d,team_hl=%d,team_hf=%d,team_ha=%d,team_aw=%d,team_ad=%d,team_al=%d,team_af=%d,team_aa=%d,team_gd=%d,team_pts=%d;",tid.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts,group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts);
         }
         else
         {
-            sprintf(sql,"INSERT IGNORE INTO `f_teams` (`team_id`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d');",tid.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,gd,pts);
+            sprintf(sql,"INSERT INTO `f_teams` (`team_id`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d') ON DUPLICATE KEY UPDATE team_group='%s',team_league='%s',team_pos='%d',team_op=%d,team_ow=%d,team_od=%d,team_ol=%d,team_of=%d,team_oa=%d,team_gd=%d,team_pts=%d;",tid.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,gd,pts,group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,gd,pts);
         }
     }
     //cout<<"Chay sql"<<endl;
