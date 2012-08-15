@@ -166,6 +166,7 @@ CREATE TABLE `f_teams` (
   `team_aa` smallint(2) DEFAULT NULL,
   `team_gd` smallint(2) DEFAULT NULL,
   `team_pts` smallint(2) DEFAULT NULL,
+  `team_date` datetime DEFAULT NULL,
   PRIMARY KEY (`team_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=100000 DEFAULT CHARSET=utf8;
 
