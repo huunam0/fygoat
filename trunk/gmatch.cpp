@@ -65,7 +65,7 @@ void write_log(const char *fmt, ...)
     sTm = gmtime (&now);
     strftime (times, sizeof(times), "%Y-%m-%d %H:%M:%S", sTm);
 
-	sprintf(buffer,"/var/log/footygoat/today.log");
+	sprintf(buffer,"/var/log/footygoat/match.log");
 	FILE *fp = fopen(buffer, "a+");
 	if (fp==NULL)
     {

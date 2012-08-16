@@ -66,7 +66,7 @@ void write_log(const char *fmt, ...)
     sTm = gmtime (&now);
     strftime (times, sizeof(times), "%Y-%m-%d %H:%M:%S", sTm);
 
-	sprintf(buffer,"/var/log/footygoat/today.log");
+	sprintf(buffer,"/var/log/footygoat/table.log");
 	FILE *fp = fopen(buffer, "a+");
 	if (fp==NULL)
     {
@@ -150,22 +150,22 @@ void addTeam(string tid, string tname, int type)
 		return;
 		if (type)
         {
-            sprintf(sql,"Update f_teams set team_pos=%d,`team_op`=%d,`team_ow`=%d,`team_od`=%d,`team_ol`=%d,`team_of`=%d,`team_oa`=%d,`team_hw`=%d,`team_hd`=%d,`team_hl`=%d,`team_hf`=%d,`team_ha`=%d,`team_aw`=%d,`team_ad`=%d,`team_al`=%d,`team_af`=%d,`team_aa`=%d,`team_gd`=%d,`team_pts`=%d,team_updated=1 where team_league='%s' and team_name='%s'",pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts,tleague.c_str(),tname.c_str());
+            sprintf(sql,"Update f_teams set team_pos=%d,`team_op`=%d,`team_ow`=%d,`team_od`=%d,`team_ol`=%d,`team_of`=%d,`team_oa`=%d,`team_hw`=%d,`team_hd`=%d,`team_hl`=%d,`team_hf`=%d,`team_ha`=%d,`team_aw`=%d,`team_ad`=%d,`team_al`=%d,`team_af`=%d,`team_aa`=%d,`team_gd`=%d,`team_pts`=%d,team_updated=1,team_date=NOW() where team_league='%s' and team_name='%s'",pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts,tleague.c_str(),tname.c_str());
         }
         else
         {
-            sprintf(sql,"Update f_teams set `team_pos`=%d,`team_op`=%d,`team_ow`=%d,`team_od`=%d,`team_ol`=%d,`team_of`=%d,`team_oa`=%d,`team_gd`=%d,`team_pts`=%d,team_updated=1 where team_league='%s' and team_name='%s'",pos,play,ow,od,ol,of,oa,gd,pts,tleague.c_str(),tname.c_str());
+            sprintf(sql,"Update f_teams set `team_pos`=%d,`team_op`=%d,`team_ow`=%d,`team_od`=%d,`team_ol`=%d,`team_of`=%d,`team_oa`=%d,`team_gd`=%d,`team_pts`=%d,team_updated=1,team_date=NOW() where team_league='%s' and team_name='%s'",pos,play,ow,od,ol,of,oa,gd,pts,tleague.c_str(),tname.c_str());
         }
     }
     else
     {
         if (type)
         {
-            sprintf(sql,"INSERT INTO `f_teams` (`team_id`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_hw`,`team_hd`,`team_hl`,`team_hf`,`team_ha`,`team_aw`,`team_ad`,`team_al`,`team_af`,`team_aa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d') ON DUPLICATE KEY UPDATE team_group='%s',team_league='%s',team_pos='%d',team_op=%d,team_ow=%d,team_od=%d,team_ol=%d,team_of=%d,team_oa=%d,team_hw=%d,team_hd=%d,team_hl=%d,team_hf=%d,team_ha=%d,team_aw=%d,team_ad=%d,team_al=%d,team_af=%d,team_aa=%d,team_gd=%d,team_pts=%d;",tid.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts,group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts);
+            sprintf(sql,"INSERT INTO `f_teams` (`team_id`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_hw`,`team_hd`,`team_hl`,`team_hf`,`team_ha`,`team_aw`,`team_ad`,`team_al`,`team_af`,`team_aa`,`team_gd`,`team_pts`,team_date) VALUES ('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d',NOW()) ON DUPLICATE KEY UPDATE team_group='%s',team_league='%s',team_pos='%d',team_op=%d,team_ow=%d,team_od=%d,team_ol=%d,team_of=%d,team_oa=%d,team_hw=%d,team_hd=%d,team_hl=%d,team_hf=%d,team_ha=%d,team_aw=%d,team_ad=%d,team_al=%d,team_af=%d,team_aa=%d,team_gd=%d,team_pts=%d,team_date=NOW();",tid.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts,group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts);
         }
         else
         {
-            sprintf(sql,"INSERT INTO `f_teams` (`team_id`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d') ON DUPLICATE KEY UPDATE team_group='%s',team_league='%s',team_pos='%d',team_op=%d,team_ow=%d,team_od=%d,team_ol=%d,team_of=%d,team_oa=%d,team_gd=%d,team_pts=%d;",tid.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,gd,pts,group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,gd,pts);
+            sprintf(sql,"INSERT INTO `f_teams` (`team_id`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_gd`,`team_pts`,team_date) VALUES ('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d',NOW()) ON DUPLICATE KEY UPDATE team_group='%s',team_league='%s',team_pos='%d',team_op=%d,team_ow=%d,team_od=%d,team_ol=%d,team_of=%d,team_oa=%d,team_gd=%d,team_pts=%d,team_date=NOW();",tid.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,gd,pts,group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,gd,pts);
         }
     }
     //cout<<"Chay sql"<<endl;
@@ -174,7 +174,7 @@ void addTeam(string tid, string tname, int type)
 void resetTable(string sLeague, string tids)
 {
     char sql[500];
-    sprintf(sql,"update f_teams set team_updated=0 where team_league='%s' and team_id not in (%s)",sLeague.c_str(),tids.c_str());
+    sprintf(sql,"update f_teams set team_updated=0,team_date=NOW() where team_league='%s' and team_id not in (%s)",sLeague.c_str(),tids.c_str());
     executesql(sql);
 }
 void getTable(string sLeague)
@@ -271,7 +271,11 @@ void getTable(string sLeague)
                 nh=n.cutTagByName("td");
                 pts=nh.toInt();
                 //cout<<pos<<"/"<<teamid<<"/"<<teamname<<"/"<<play<<"/"<<ow<<"/"<<od<<"/"<<ol<<"/"<<of<<"/"<<oa<<"/"<<hw<<"/"<<hd<<"/"<<hl<<"/"<<hf<<"/"<<ha<<"/"<<aw<<"/"<<ad<<"/"<<al<<"/"<<af<<"/"<<aa<<"/"<<gd<<"/"<<pts<<endl;
-                teamlist+=","+teamid;
+                if (!teamid.empty())
+                {
+                    teamlist+=","+teamid;
+                }
+
                 addTeam(teamid,teamname,tabletype);
                 //cout<<"Continue"<<endl;
                 n=t.cutTagByName("tr");
