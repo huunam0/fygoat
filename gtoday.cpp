@@ -182,16 +182,7 @@ bool executesql(const char * sql)
 	else
 	    return true;
 }
-bool executesql2(const char * sql, int len)
-{
-	if (mysql_real_query(conn,sql,len))
-    {
-		write_log("Error in sql %s:%s",sql,mysql_error(conn));
-		return false;
-	}
-	else
-	    return true;
-}
+
 int init_mysql() {
     if(conn==NULL)
     {
@@ -247,17 +238,11 @@ void addMatch(int iIndex)
 void addTeam(int teamid, string tname, string league,string group)
 {
     char sql[200];
-    sprintf(sql,"INSERT IGNORE INTO f_teams (team_id,team_name,team_league,team_group) VALUE (%d,'%s','%s','%s');",teamid,tname.c_str(),league.c_str(),group.c_str());
-    write_log("Add new team %d %s",teamid,tname.c_str());
+    sprintf(sql,"INSERT INTO f_teams (team_id,team_name,team_league,team_group,team_date) VALUE (%d,'%s','%s','%s',NOW()) ON DUPLICATE KEY UPDATE team_name='%s',team_league='%s',team_group='%s',team_date=NOW();",teamid,tname.c_str(),league.c_str(),group.c_str(),tname.c_str(),league.c_str(),group.c_str());
+    //write_log("Add new team %d %s",teamid,tname.c_str());
     executesql(sql);
 }
-void addTeam2(int teamid, string tname, string league,string group)
-{
-    char sql[200];
-    sprintf(sql,"INSERT IGNORE INTO f_teams (team_id,team_name,team_league,team_group) VALUE (%d,'%s','%s','%s');",teamid,tname.c_str(),league.c_str(),group.c_str());
-    write_log("Add new team %d %s",teamid,tname.c_str());
-    executesql2(sql,200);
-}
+
 int parseStatus(string status)
 {
     shtml sh(status);
