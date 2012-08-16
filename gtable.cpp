@@ -150,11 +150,11 @@ void addTeam(string tid, string tname, int type)
 		return;
 		if (type)
         {
-            sprintf(sql,"INSERT INTO `f_teams` (`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_hw`,`team_hd`,`team_hl`,`team_hf`,`team_ha`,`team_aw`,`team_ad`,`team_al`,`team_af`,`team_aa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d');",tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts);
+            sprintf(sql,"Update f_teams set team_pos=%d,`team_op`=%d,`team_ow`=%d,`team_od`=%d,`team_ol`=%d,`team_of`=%d,`team_oa`=%d,`team_hw`=%d,`team_hd`=%d,`team_hl`=%d,`team_hf`=%d,`team_ha`=%d,`team_aw`=%d,`team_ad`=%d,`team_al`=%d,`team_af`=%d,`team_aa`=%d,`team_gd`=%d,`team_pts`=%d,team_updated=1 where team_league='%s' and team_name='%s'",pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts,tleague.c_str(),tname.c_str());
         }
         else
         {
-            sprintf(sql,"INSERT INTO `f_teams` (`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_gd`,`team_pts`) VALUES ('%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d');",tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,gd,pts);
+            sprintf(sql,"Update f_teams set `team_pos`=%d,`team_op`=%d,`team_ow`=%d,`team_od`=%d,`team_ol`=%d,`team_of`=%d,`team_oa`=%d,`team_gd`=%d,`team_pts`=%d,team_updated=1 where team_league='%s' and team_name='%s'",pos,play,ow,od,ol,of,oa,gd,pts,tleague.c_str(),tname.c_str());
         }
     }
     else
@@ -171,10 +171,16 @@ void addTeam(string tid, string tname, int type)
     //cout<<"Chay sql"<<endl;
     executesql(sql);
 }
-
+void resetTable(string sLeague, string tids)
+{
+    char sql[500];
+    sprintf(sql,"update f_teams set team_updated=0 where team_league='%s' and team_id not in (%s)",sLeague.c_str(),tids.c_str());
+    executesql(sql);
+}
 void getTable(string sLeague)
 {
     shtml m,t,n,nh;
+    string teamlist="0";
     //m.loadfromfile("tables.htm");
 	m.loadFromURL((string("http://soccernet.espn.go.com/tables?league=")+sLeague).c_str());
     m.removeBetween("<!--","-->",-1);
@@ -208,7 +214,7 @@ void getTable(string sLeague)
             //cout<<"Group "<<group<<endl;
             n=t.cutTagByName("thead");
             if (n.contain("Overall")) tabletype=1;
-            else tabletype=2;
+            else tabletype=0;
             //t.retainTagByName("tbody");
             n=t.cutTagByName("tr");
             while (!n.isEmpty())
@@ -265,6 +271,7 @@ void getTable(string sLeague)
                 nh=n.cutTagByName("td");
                 pts=nh.toInt();
                 //cout<<pos<<"/"<<teamid<<"/"<<teamname<<"/"<<play<<"/"<<ow<<"/"<<od<<"/"<<ol<<"/"<<of<<"/"<<oa<<"/"<<hw<<"/"<<hd<<"/"<<hl<<"/"<<hf<<"/"<<ha<<"/"<<aw<<"/"<<ad<<"/"<<al<<"/"<<af<<"/"<<aa<<"/"<<gd<<"/"<<pts<<endl;
+                teamlist+=","+teamid;
                 addTeam(teamid,teamname,tabletype);
                 //cout<<"Continue"<<endl;
                 n=t.cutTagByName("tr");
@@ -273,6 +280,7 @@ void getTable(string sLeague)
         t=m.cutTagByName("div");
     }
     //m.viewContent();
+    resetTable(sLeague, teamlist);
 }
 int main(int argc, char** argv)
 {
