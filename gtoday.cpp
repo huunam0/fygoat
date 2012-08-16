@@ -205,7 +205,7 @@ int init_mysql() {
 //Xu li chinh
 void getTable(string sLeague)
 {
-    //cout<<"Get table "<<sLeague<<endl;
+    if (DEBUG) cout<<"Get table "<<sLeague<<endl;
     char cmd[200];
     write_log_call("Get table %s ",sLeague.c_str());
     sprintf(cmd,"%sgtable %s &",f_home,sLeague.c_str());
@@ -215,7 +215,7 @@ void addLeague(string lid, string lname)
 {
     char sql[500];
     sprintf(sql,"INSERT IGNORE INTO f_leagues (`league_id`,`league_name`) VALUE ('%s','%s')",lid.c_str(),lname.c_str());
-    //cout<<sql<<endl;
+    if (DEBUG) cout<<"Add league "<<lid<<" / "<<lname<<endl;
     executesql(sql);
     getTable(lid);
 }
@@ -235,10 +235,10 @@ void addMatch(int iIndex)
     executesql(sql);
 
 }
-void addTeam(int teamid, string tname, string league,string group)
+void addTeam(string teamid, string tname, string league,string group)
 {
-    char sql[200];
-    sprintf(sql,"INSERT INTO f_teams (team_id,team_name,team_league,team_group,team_date) VALUE (%d,'%s','%s','%s',NOW()) ON DUPLICATE KEY UPDATE team_name='%s',team_league='%s',team_group='%s',team_date=NOW();",teamid,tname.c_str(),league.c_str(),group.c_str(),tname.c_str(),league.c_str(),group.c_str());
+    char sql[500];
+    sprintf(sql,"INSERT INTO f_teams (team_id,team_name,team_league,team_group,team_date,team_updated) VALUE (%s,'%s','%s','%s',NOW(),0) ON DUPLICATE KEY UPDATE team_name='%s',team_league='%s',team_group='%s',team_date=NOW(),team_updated=0;",teamid.c_str(),tname.c_str(),league.c_str(),group.c_str(),tname.c_str(),league.c_str(),group.c_str());
     //write_log("Add new team %d %s",teamid,tname.c_str());
     executesql(sql);
 }
@@ -433,9 +433,10 @@ void getToday(string sDay="")
     cday=m.getBetween("id=\"currentDate\"","</ul>");
     t.setContent(cday);
     cday=t.getBetween(">","<");
+    if (DEBUG) cout<<cday<<" ::: "<<sToday<<endl;
     if (!isFirstTime)
     {
-        //cout<<cday<<" ::: "<<sToday<<endl;
+
         isFirstTime=(cday!=sToday);
     }
     sToday=cday;
@@ -458,6 +459,7 @@ void getToday(string sDay="")
     {
         if (t.containAttr("group-set"))
         {
+            if (DEBUG) cout<<"Begin get league "<<endl;
             if (isFirstTime)
             {
                 gid.clear();
@@ -486,7 +488,7 @@ void getToday(string sDay="")
             n=t.cutTagByName("tr");
             while (!n.isEmpty())
             {
-
+                if (DEBUG) cout<<"Begin get match "<<endl;
                 if (n.containAttr("gamebox"))
                 {
                     //cout<<n.getAttr()<<endl;
@@ -505,9 +507,10 @@ void getToday(string sDay="")
                         noId=nh.contain("href");
                         nh.setContent(nh.getAttr());
                         hteam=nh.getBetween("teamId-","\"");
-                        if (!noId)
+                        if (DEBUG) cout<<"Home: "<<hteam<<" / "<<hname<<endl;
+                        //if (!noId)
                         {
-                            addTeam(atoi(hteam.c_str()),hname,league,group);
+                            addTeam(hteam,hname,league,group);
                         }
                         nh=n.cutTagByName("td");
                         nh.replace("&nbsp;","",-1);
@@ -520,9 +523,10 @@ void getToday(string sDay="")
                         noId=nh.contain("href");
                         nh.setContent(nh.getAttr());
                         ateam=nh.getBetween("teamId-","\"");
-                        if (!noId)
+                        if (DEBUG) cout<<"AWAY "<<ateam<<" / "<<aname<<endl;
+                        //if (!noId)
                         {
-                            addTeam(atoi(ateam.c_str()),aname,league,group);
+                            addTeam(ateam,aname,league,group);
                         }
                         //cout<<iNo<<" Status "<<status<<"/"<<iStatus<<". Home:"<<hteam<<". Score:"<<hscore<<ascore<<". Away:"<<ateam<<endl;
                         matchs[iNo].mid=matchid;
@@ -534,7 +538,7 @@ void getToday(string sDay="")
                         matchs[iNo].agoal=ascore;
                         addMatch(iNo);
                         if (iStatus>0) getMatch(matchid);
-                        //cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", hteam="<<hteam<<", ateam="<<ateam<<", hscore="<<hscore<<", ascore="<<ascore<<", Satus="<<iStatus<<endl;
+                        if (DEBUG) cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", hteam="<<hteam<<", ateam="<<ateam<<", hscore="<<hscore<<", ascore="<<ascore<<", Satus="<<iStatus<<endl;
                     }
                     else
                     {
@@ -554,6 +558,7 @@ void getToday(string sDay="")
                 }
                 else if (isFirstTime)
                 {
+                    if (DEBUG) cout<<"GET  group "<<endl;
                     nh=n.getTagByName("a");
                     //gid=nh.getAttr();
                     group=nh.getText();
@@ -561,16 +566,18 @@ void getToday(string sDay="")
                     nh.setContent(nh.getAttr());
                     gid=nh.getBetween("/groupId/","\"");
                     //cout<<"Group "<<gid<<":"<<group<<endl;
+                    if (DEBUG) cout<<"GET  group "<<gid<<" / "<<group<<endl;
                 }
-
+                if (DEBUG) cout<<"GET  next match "<<endl;
                 n=t.cutTagByName("tr");
             }
             if (isFirstTime)
             {
-                addLeague(league,n.getText());
+                addLeague(league,league_name);
             }
+            if (DEBUG) cout<<"End get league "<<endl;
         }
-
+        if (DEBUG) cout<<"Get NEXT league "<<endl;
         t=m.cutTagByName("div");
     }
     //m.viewContent();
