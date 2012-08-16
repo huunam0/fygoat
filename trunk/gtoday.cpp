@@ -174,12 +174,19 @@ bool init_mysql_conf()
 }
 bool executesql(const char * sql)
 {
-    //if (DEBUG) cout<<sql<<endl;
 	if (mysql_real_query(conn,sql,strlen(sql)))
     {
-		//sleep(20);
 		write_log("Error in sql %s:%s",sql,mysql_error(conn));
-		//conn=NULL;
+		return false;
+	}
+	else
+	    return true;
+}
+bool executesql2(const char * sql, int len)
+{
+	if (mysql_real_query(conn,sql,len))
+    {
+		write_log("Error in sql %s:%s",sql,mysql_error(conn));
 		return false;
 	}
 	else
@@ -240,8 +247,16 @@ void addMatch(int iIndex)
 void addTeam(int teamid, string tname, string league,string group)
 {
     char sql[200];
-    sprintf(sql,"INSERT INTO f_teams (team_id,team_name,team_league,team_group) VALUE (%d,'%s','%s','%s');",teamid,tname.c_str(),league.c_str(),group.c_str());
+    sprintf(sql,"INSERT IGNORE INTO f_teams (team_id,team_name,team_league,team_group) VALUE (%d,'%s','%s','%s');",teamid,tname.c_str(),league.c_str(),group.c_str());
+    write_log("Add new team %d %s",teamid,tname.c_str());
     executesql(sql);
+}
+void addTeam2(int teamid, string tname, string league,string group)
+{
+    char sql[200];
+    sprintf(sql,"INSERT IGNORE INTO f_teams (team_id,team_name,team_league,team_group) VALUE (%d,'%s','%s','%s');",teamid,tname.c_str(),league.c_str(),group.c_str());
+    write_log("Add new team %d %s",teamid,tname.c_str());
+    executesql2(sql,200);
 }
 int parseStatus(string status)
 {
@@ -500,13 +515,14 @@ void getToday(string sDay="")
                     if (isFirstTime)
                     {
                         nh=n.cutTagByName("td");
+                        nh.replace("'","\\'",-1);
                         hname=nh.getText();
                         noId=nh.contain("href");
                         nh.setContent(nh.getAttr());
                         hteam=nh.getBetween("teamId-","\"");
-                        if (noId)
+                        if (!noId)
                         {
-                            addTeam(hteam,hname,league,group);
+                            addTeam(atoi(hteam.c_str()),hname,league,group);
                         }
                         nh=n.cutTagByName("td");
                         nh.replace("&nbsp;","",-1);
@@ -514,13 +530,14 @@ void getToday(string sDay="")
                         nh.deleteTo("-");
                         ascore = nh.toInt();
                         nh=n.cutTagByName("td");
+                        nh.replace("'","\\'",-1);
                         aname=nh.getText();
                         noId=nh.contain("href");
                         nh.setContent(nh.getAttr());
                         ateam=nh.getBetween("teamId-","\"");
-                        if (noId)
+                        if (!noId)
                         {
-                            addTeam(ateam,aname,league,group);
+                            addTeam(atoi(ateam.c_str()),aname,league,group);
                         }
                         //cout<<iNo<<" Status "<<status<<"/"<<iStatus<<". Home:"<<hteam<<". Score:"<<hscore<<ascore<<". Away:"<<ateam<<endl;
                         matchs[iNo].mid=matchid;
@@ -541,6 +558,11 @@ void getToday(string sDay="")
                             matchs[iNo].status=iStatus;
                             getMatch(matchs[iNo].mid);
                         }
+                        else if ((iStatus>=7) && (matchs[iNo].status<7))
+                        {
+                            matchs[iNo].status=iStatus;
+                            getTable(league);
+                        }
                     }
 
                     iNo++;
@@ -555,11 +577,12 @@ void getToday(string sDay="")
                     gid=nh.getBetween("/groupId/","\"");
                     //cout<<"Group "<<gid<<":"<<group<<endl;
                 }
-                if (isFirstTime)
-                {
-                    addLeague(league,n.getText());
-                }
+
                 n=t.cutTagByName("tr");
+            }
+            if (isFirstTime)
+            {
+                addLeague(league,n.getText());
             }
         }
 
