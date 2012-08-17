@@ -177,7 +177,7 @@ void emitEvent(int iIndex, int iValue, int iTeam)
         field="possession";
         break;
     case 8:
-        field="minutes";
+        field=" ";
         break;
     case 9:
         field="status";
@@ -252,7 +252,7 @@ bool getMatch(int id)
     //sprintf(url,"http://soccernet.espn.go.com/match?id=%d&cc=4716",id);
     if (DEBUG)
         cout<<"Loading from "<<url<<endl;
-    sh.loadFromURL(url);
+    if(!sh.loadFromURL(url)) return false;
     if (sh.isEmpty()) return false;
     sh.removeBetween("<!--","-->",-1);
     t=sh.cutTagByName("div");
@@ -277,6 +277,7 @@ bool getMatch(int id)
     status = parseStatus(n.cutTagByName("span"));
     setValue(9,status,0);
     n.retainTagByName("span");
+    //if (n.contain("'")&&(!n.contain("display:none;")))
     if (n.contain("'"))
     {
         n.retainBetween("-","'");
@@ -439,14 +440,15 @@ int main(int argc, char** argv)
         init_mysql();
 
         mid = atoi(argv[1]);
+        setEvent(10);
         getMatch(mid);
-        if (status>0) setEvent(10);
+        //if (status>0) setEvent(10);
         while (status<7)
         {
             getMatch(mid);
             sleep(3);
         }
-        setEvent(12);
+        setEvent(12,status);
         if (argc>2)
         {
             getTable(argv[2]);

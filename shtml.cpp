@@ -651,7 +651,7 @@ bool shtml::loadFromURL(const string sUrl)
     FILE *in;
     char buff[1024];
     char command[250];
-    sprintf(command,"%s '%s'","wget -q -O - ",sUrl.c_str());
+    sprintf(command,"wget -q -O -  '%s' | iconv -f iso-8859-1 -t utf-8",sUrl.c_str());
     //cout<<"Load from "<<sUrl<<endl;
     htm.clear();
     if(!(in = popen(command, "r")))
