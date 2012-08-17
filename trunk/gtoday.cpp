@@ -246,7 +246,7 @@ void addTeam(string teamid, string tname, string league,string group)
 int parseStatus(string status)
 {
     shtml sh(status);
-    momment="00:00";
+    momment="07:00";
     day2=day;
     month2=month;
     year2=year;
@@ -403,20 +403,23 @@ void getToday(string sDay="")
     shtml m,t,n,nh;
     string status,hteam,ateam,score,league,league_name,gid,group,hname,aname, cday;
     int v, iStatus, hscore, ascore;
-    bool noId;
+    bool noId,bRet;
 
     //m.loadfromfile("scores2.htm");
+    stat1=100;
+    iNo=0;
     if (sDay.empty())
     {
-        m.loadFromURL("http://soccernet.espn.go.com/scores?cc=4716");
+        bRet=m.loadFromURL("http://soccernet.espn.go.com/scores?cc=4716");
     }
     else
     {
-        m.loadFromURL((string("http://soccernet.espn.go.com/scores?date=")+sDay+string("&cc=4716&league=all")).c_str());
+        bRet=m.loadFromURL((string("http://soccernet.espn.go.com/scores?date=")+sDay+string("&cc=4716&league=all")).c_str());
     }
+    if (!bRet) return;
     m.removeBetween("<!--","-->",-1);
     t=m.cutTagByName("div");
-    iNo=0;
+
     stat0=stat1=0;
     while (!t.isEmpty())
     {
@@ -498,7 +501,7 @@ void getToday(string sDay="")
                     iStatus=parseStatus(status);
                     if (DEBUG) cout<<"Match "<<matchid<<" has status "<<iStatus<<endl;
                     if (iStatus==0) stat0++;
-                    if (iStatus<7) stat1++;
+                    if ((iStatus<7)&&((iStatus>=0))) stat1++;
                     if (isFirstTime)
                     {
                         nh=n.cutTagByName("td");

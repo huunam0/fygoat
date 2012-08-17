@@ -183,7 +183,7 @@ void getTable(string sLeague)
     shtml m,t,n,nh;
     string teamlist="0";
     //m.loadfromfile("tables.htm");
-	m.loadFromURL((string("http://soccernet.espn.go.com/tables?league=")+sLeague).c_str());
+	if (!m.loadFromURL((string("http://soccernet.espn.go.com/tables?league=")+sLeague).c_str())) return;
     m.removeBetween("<!--","-->",-1);
     t=m.cutTagByName("div");
     while (!t.isEmpty())
