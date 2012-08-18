@@ -110,11 +110,7 @@ CREATE TABLE `f_matches` (
 -- Data for Table `f_matches`
 --
 
-/*!40000 ALTER TABLE `f_matches` DISABLE KEYS */;
-INSERT INTO `f_matches` (`match_id`,`league_id`,`hteam`,`ateam`,`status`,`status_ex`,`hgoals`,`agoals`,`h1goals`,`a1goals`,`hreds`,`areds`,`hyellows`,`ayellows`,`hshots`,`ashots`,`hgshots`,`agshots`,`hcorner`,`acorner`,`hpossession`,`apossession`,`match_date`,`date_view`,`mupdate`) VALUES ('350120','abc','12','13','0','','2','3','0','0','0','0','3','1','0','0','0','0','0','0','0','0','0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00');
-INSERT INTO `f_matches` (`match_id`,`league_id`,`hteam`,`ateam`,`status`,`status_ex`,`hgoals`,`agoals`,`h1goals`,`a1goals`,`hreds`,`areds`,`hyellows`,`ayellows`,`hshots`,`ashots`,`hgshots`,`agshots`,`hcorner`,`acorner`,`hpossession`,`apossession`,`match_date`,`date_view`,`mupdate`) VALUES ('349369','abc','15','16','0','','3','0','0','0','0','0','0','2','0','0','0','0','0','0','0','0','0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00');
-INSERT INTO `f_matches` (`match_id`,`league_id`,`hteam`,`ateam`,`status`,`status_ex`,`hgoals`,`agoals`,`h1goals`,`a1goals`,`hreds`,`areds`,`hyellows`,`ayellows`,`hshots`,`ashots`,`hgshots`,`agshots`,`hcorner`,`acorner`,`hpossession`,`apossession`,`match_date`,`date_view`,`mupdate`) VALUES ('350522','abc','123','124','0','','2','2','0','0','0','0','2','5','0','0','0','0','0','0','0','0','0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00');
-/*!40000 ALTER TABLE `f_matches` ENABLE KEYS */;
+
 
 
 --
