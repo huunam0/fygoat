@@ -221,7 +221,7 @@ void addLeague(string lid, string lname)
 }
 void addMatch(int mid, string league,string group,int hteam, int ateam,int status=0, int hscore=0, int ascore=0)
 {
-    char sql[500];
+    char sql[900];
     sprintf(sql,"INSERT IGNORE INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d",mid,league.c_str(),group.c_str(),hteam,ateam,status,hscore,ascore,iNo,year2,month2,day2,momment.c_str(),hteam,ateam);
     ///cout<<sql<<endl;
     executesql(sql);
@@ -229,7 +229,7 @@ void addMatch(int mid, string league,string group,int hteam, int ateam,int statu
 }
 void addMatch(int iIndex)
 {
-    char sql[500];
+    char sql[900];
     sprintf(sql,"INSERT IGNORE INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d",matchs[iIndex].mid,matchs[iIndex].league.c_str(),matchs[iIndex].group.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam,matchs[iIndex].status,matchs[iIndex].hgoal,matchs[iIndex].agoal,iIndex,year2,month2,day2,momment.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam);
     ///cout<<iIndex<<"::>"<<sql<<endl;
     executesql(sql);
@@ -237,7 +237,7 @@ void addMatch(int iIndex)
 }
 void addTeam(string teamid, string tname, string league,string group)
 {
-    char sql[500];
+    char sql[900];
     sprintf(sql,"INSERT INTO f_teams (team_id,team_name,team_league,team_group,team_date,team_updated) VALUE (%s,'%s','%s','%s',NOW(),0) ON DUPLICATE KEY UPDATE team_name='%s',team_league='%s',team_group='%s',team_date=NOW(),team_updated=0;",teamid.c_str(),tname.c_str(),league.c_str(),group.c_str(),tname.c_str(),league.c_str(),group.c_str());
     //write_log("Add new team %d %s",teamid,tname.c_str());
     executesql(sql);
