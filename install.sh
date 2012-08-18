@@ -17,6 +17,7 @@ sudo yum -y install php httpd php-mysql mysql-server php-xml php-gd gcc-c++  mys
 
 
 #compile and install the core
+rm -f gtoday gtable gmatch
 make gmatch
 make gtable
 make gtoday
