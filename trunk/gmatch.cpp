@@ -177,7 +177,7 @@ void emitEvent(int iIndex, int iValue, int iTeam)
         field="possession";
         break;
     case 8:
-        field=" ";
+        field="minutes";
         break;
     case 9:
         field="status";
@@ -278,7 +278,7 @@ bool getMatch(int id)
     setValue(9,status,0);
     n.retainTagByName("span");
     //if (n.contain("'")&&(!n.contain("display:none;")))
-    if (n.contain("'"))
+    if (((status==1) || (status==3)) && n.contain("'"))
     {
         n.retainBetween("-","'");
         n.trim();

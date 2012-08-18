@@ -33,7 +33,7 @@ struct Fmatch
     int status;
     int hgoal, agoal;
 };
-const int mmax=150;
+const int mmax=200;
 Fmatch matchs[mmax];
 int mm;
 int iNo=0;
