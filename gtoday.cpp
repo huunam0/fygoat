@@ -558,6 +558,11 @@ void getToday(string sDay="")
                     }
 
                     iNo++;
+                    if (iNo>=mmax)
+                    {
+                        write_log_call("Over the maximum of matches");
+                        return;
+                    }
                 }
                 else if (isFirstTime)
                 {
