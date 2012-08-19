@@ -45,10 +45,7 @@ string momment;//moment of a match
 int stat0,stat1;
 bool bEOM;//end of month
 
-string removeQuot(string s)
-{
-    //return r.replace("'","\'");
-}
+
 //For daemon start:
 static bool STOP=false;
 void call_for_exit(int s)
@@ -445,6 +442,7 @@ void getToday(string sDay="")
     sToday=cday;
     if (isFirstTime)
     {
+        //
         t.deleteTo("<");
         t.retainBetween("\"","\"");
         bEOM = t.contain(" 1 ");
@@ -532,6 +530,7 @@ void getToday(string sDay="")
                             addTeam(ateam,aname,league,group);
                         }
                         //cout<<iNo<<" Status "<<status<<"/"<<iStatus<<". Home:"<<hteam<<". Score:"<<hscore<<ascore<<". Away:"<<ateam<<endl;
+                        matchs[iNo].status=iStatus;
                         matchs[iNo].mid=matchid;
                         matchs[iNo].league=league;
                         matchs[iNo].group=group;
@@ -593,10 +592,10 @@ void getToday(string sDay="")
 void deleteTimeline()
 {
     write_log_call("Empty timeline...");
-    char sql[]="delete  from `f_timeline`;";
+    char sql[]="delete  from `f_timeline` where RAND()>0.9;";
     executesql(sql);
-    char sql2[]="ALTER TABLE f_timeline AUTO_INCREMENT = 1;";
-    executesql(sql2);
+    //char sql2[]="ALTER TABLE f_timeline AUTO_INCREMENT = 1;";
+    //executesql(sql2);
 }
 //For daemon:
 int lockfile(int fd)
