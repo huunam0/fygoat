@@ -430,7 +430,14 @@ bool getMatch(int id)
 }
 void getTable(string sLeague)
 {
-    cout<<"Get table "<<sLeague<<endl;
+    if (DEBUG) cout<<"Get table (X) "<<sLeague<<endl;
+}
+void deleteTimeline(int maid)
+{
+    write_log_call("Empty timeline...");
+    char sql[200];
+    sprintf(sql, "delete  from `f_timeline` where `match`='%d';",maid);
+    executesql(sql);
 }
 int main(int argc, char** argv)
 {
@@ -450,6 +457,7 @@ int main(int argc, char** argv)
             getMatch(mid);
             sleep(3);
         }
+        deleteTimeline(mid);
         setEvent(12,status);
         if (argc>2)
         {
