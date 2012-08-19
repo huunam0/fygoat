@@ -434,7 +434,7 @@ void getTable(string sLeague)
 }
 void deleteTimeline(int maid)
 {
-    write_log_call("Empty timeline...");
+    write_log_call("Empty timeline for %d",maid);
     char sql[200];
     sprintf(sql, "delete  from `f_timeline` where `match`='%d';",maid);
     executesql(sql);
