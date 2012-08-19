@@ -188,108 +188,15 @@ CREATE TABLE `f_timeline` (
   `match` int(10) DEFAULT NULL,
   `date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `lam2lan` (`event`,`value`,`team`,`match`)
-) ENGINE=MyISAM AUTO_INCREMENT=95 DEFAULT CHARSET=utf8;
+  UNIQUE KEY `lam2lan` (`event`,`team`,`match`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 --
 -- Data for Table `f_timeline`
 --
 
 /*!40000 ALTER TABLE `f_timeline` DISABLE KEYS */;
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('1','1','2','3','4','2012-07-25 21:14:51');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('2','1','2','3','4','2012-07-25 21:15:11');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('3','2','3','4','5','2012-07-26 01:51:34');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('4','4','5','6','7','2012-07-26 01:59:57');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('5','6','5','6','7','2012-07-26 02:03:46');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('6','6','5','6','7','2012-07-26 02:05:26');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('7','0','1','0','342343','2012-07-26 04:38:25');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('8','1','0','0','342343','2012-07-26 04:38:25');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('9','0','0','1','342343','2012-07-26 04:38:25');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('10','1','0','1','342343','2012-07-26 04:38:25');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('11','3','2','0','342343','2012-07-26 04:38:25');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('12','2','0','0','342343','2012-07-26 04:38:25');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('13','3','0','1','342343','2012-07-26 04:38:25');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('14','2','0','1','342343','2012-07-26 04:38:25');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('15','0','1','0','349371','2012-07-28 07:36:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('16','1','1','0','349371','2012-07-28 07:36:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('17','0','0','1','349371','2012-07-28 07:36:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('18','1','0','1','349371','2012-07-28 07:36:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('19','3','0','0','349371','2012-07-28 07:36:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('20','2','0','0','349371','2012-07-28 07:36:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('21','3','0','1','349371','2012-07-28 07:36:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('22','2','0','1','349371','2012-07-28 07:36:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('23','3','1','1','349371','2012-07-28 07:57:00');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('24','0','2','0','349371','2012-07-28 08:01:19');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('25','0','1','0','342343','2012-07-28 08:43:57');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('26','1','0','0','342343','2012-07-28 08:44:17');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('27','0','0','1','342343','2012-07-28 08:44:37');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('28','1','0','1','342343','2012-07-28 08:44:57');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('29','3','2','0','342343','2012-07-28 08:45:17');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('30','2','0','0','342343','2012-07-28 08:45:37');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('31','3','0','1','342343','2012-07-28 08:45:57');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('32','2','0','1','342343','2012-07-28 08:46:18');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('33','0','1','0','342343','2012-07-28 08:48:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('34','1','0','0','342343','2012-07-28 08:48:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('35','0','0','1','342343','2012-07-28 08:48:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('36','1','0','1','342343','2012-07-28 08:48:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('37','3','2','0','342343','2012-07-28 08:48:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('38','2','0','0','342343','2012-07-28 08:48:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('39','3','0','1','342343','2012-07-28 08:48:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('40','2','0','1','342343','2012-07-28 08:48:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('41','0','1','0','342343','2012-07-28 08:51:41');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('42','1','0','0','342343','2012-07-28 08:51:41');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('43','0','0','1','342343','2012-07-28 08:51:41');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('44','1','0','1','342343','2012-07-28 08:51:41');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('45','3','2','0','342343','2012-07-28 08:51:41');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('46','2','0','0','342343','2012-07-28 08:51:41');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('47','3','0','1','342343','2012-07-28 08:51:41');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('48','2','0','1','342343','2012-07-28 08:51:41');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('49','0','1','0','342343','2012-07-28 08:51:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('50','1','0','0','342343','2012-07-28 08:51:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('51','0','0','1','342343','2012-07-28 08:51:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('52','1','0','1','342343','2012-07-28 08:51:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('53','3','2','0','342343','2012-07-28 08:51:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('54','2','0','0','342343','2012-07-28 08:51:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('55','3','0','1','342343','2012-07-28 08:51:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('56','2','0','1','342343','2012-07-28 08:51:53');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('57','0','1','0','350120','2012-07-28 08:58:38');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('58','1','0','0','350120','2012-07-28 08:58:38');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('59','0','1','1','350120','2012-07-28 08:58:38');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('60','1','0','1','350120','2012-07-28 08:58:38');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('61','3','2','0','350120','2012-07-28 08:58:38');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('62','2','0','0','350120','2012-07-28 08:58:38');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('63','3','0','1','350120','2012-07-28 08:58:38');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('64','2','0','1','350120','2012-07-28 08:58:38');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('65','0','3','1','350120','2012-07-28 09:02:27');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('66','3','3','0','350120','2012-07-28 09:02:27');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('67','0','2','0','350120','2012-07-28 09:16:35');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('68','3','1','1','350120','2012-07-28 09:23:45');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('69','0','0','0','350522','2012-07-28 09:45:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('70','1','0','0','350522','2012-07-28 09:45:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('71','0','1','1','350522','2012-07-28 09:45:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('72','1','1','1','350522','2012-07-28 09:45:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('73','3','1','0','350522','2012-07-28 09:45:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('74','2','0','0','350522','2012-07-28 09:45:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('75','3','1','1','350522','2012-07-28 09:45:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('76','2','0','1','350522','2012-07-28 09:45:02');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('77','0','2','0','349369','2012-07-28 09:45:52');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('78','1','2','0','349369','2012-07-28 09:45:52');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('79','0','0','1','349369','2012-07-28 09:45:52');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('80','1','0','1','349369','2012-07-28 09:45:52');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('81','3','0','0','349369','2012-07-28 09:45:52');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('82','2','0','0','349369','2012-07-28 09:45:52');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('83','3','1','1','349369','2012-07-28 09:45:52');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('84','2','0','1','349369','2012-07-28 09:45:52');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('85','3','2','1','349369','2012-07-28 09:53:49');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('86','3','2','1','350522','2012-07-28 10:00:31');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('87','3','3','1','350522','2012-07-28 10:36:42');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('88','0','1','0','350522','2012-07-28 10:38:50');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('89','3','4','1','350522','2012-07-28 10:55:39');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('90','0','3','0','349369','2012-07-28 10:57:01');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('91','0','2','1','350522','2012-07-28 11:00:46');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('92','0','2','0','350522','2012-07-28 18:16:01');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('93','3','2','0','350522','2012-07-28 18:16:01');
-INSERT INTO `f_timeline` (`id`,`event`,`value`,`team`,`match`,`date`) VALUES ('94','3','5','1','350522','2012-07-28 18:16:01');
+
 /*!40000 ALTER TABLE `f_timeline` ENABLE KEYS */;
 
 

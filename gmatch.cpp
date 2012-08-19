@@ -145,7 +145,8 @@ void emitEvent(int iIndex, int iValue, int iTeam)
     char sql[300];
     if (DEBUG)
         cout<<"Event "<<iIndex<<" value: "<<iValue<<" with team "<<iTeam<<endl;
-    sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iIndex,iValue,iTeam,mid);
+    //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iIndex,iValue,iTeam,mid);
+    sprintf(sql,"INSERT INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `value`=%d,`date`=NOW(); ",iIndex,iValue,iTeam,mid,iValue);
     executesql(sql);
     string t,field;
     if (iIndex<8)
@@ -194,7 +195,8 @@ void emitEvent(int iIndex, int iValue, int iTeam)
 void setEvent(int iEvent,int iValue=0)
 {
     char sql[300];
-    sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
+    //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
+    sprintf(sql,"INSERT INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `value`=%d,`date`=NOW();",iEvent,iValue,0,mid,iValue);
     executesql(sql);
 
 }
