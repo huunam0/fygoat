@@ -24,6 +24,7 @@ string  teamname,group;
 int iMinute;
 int matchid;
 string sToday;
+string sDate;
 struct Fmatch
 {
     int mid;
@@ -395,6 +396,14 @@ void getMatch(int mId)
     system(cmd);
 
 }
+void setEvent(int iEvent,int iValue=0)
+{
+    char sql[300];
+    //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
+    sprintf(sql,"INSERT INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `value`=%d,`date`=NOW();",iEvent,iValue,0,mid,iValue);
+    executesql(sql);
+
+}
 void getToday(string sDay="")
 {
     shtml m,t,n,nh;
@@ -447,6 +456,7 @@ void getToday(string sDay="")
         t.retainBetween("\"","\"");
         bEOM = t.contain(" 1 ");
         parseDate(cday);
+        setEvent(100);
     }
     //cout<<"Today is "<<cday<<" End of month:"<<bEOM<<" - "<<day<<month<<year<<endl;
 
@@ -592,10 +602,10 @@ void getToday(string sDay="")
 void deleteTimeline()
 {
     write_log_call("Empty timeline...");
-    char sql[]="delete  from `f_timeline` where RAND()>0.9;";
+    char sql[]="delete  from `f_timeline` ;";
     executesql(sql);
-    //char sql2[]="ALTER TABLE f_timeline AUTO_INCREMENT = 1;";
-    //executesql(sql2);
+    char sql2[]="ALTER TABLE f_timeline AUTO_INCREMENT = 1;";
+    executesql(sql2);
 }
 //For daemon:
 int lockfile(int fd)
@@ -643,7 +653,7 @@ bool daemon_init(void)
 }
 int main(int argc, char** argv)
 {
-    string sDate;
+
     if (argc>1) sDate=string(argv[1]);
     if (sDate.find("debug")!=string::npos)
     {
@@ -657,6 +667,7 @@ int main(int argc, char** argv)
     {
         if (argc>2) DEBUG=true;
     }
+    sDate="";
     if (!DEBUG) daemon_init();
     if (already_running())
     {
