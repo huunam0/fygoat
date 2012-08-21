@@ -19,7 +19,7 @@ string tleague;
 int pos,play,hw,hd,hl,aw,ad,al,ow,od,ol,tabletype;
 int hf,ha,af,aa,of,oa;
 int gd,pts;
-
+string teamlistname="0";
 
 int after_equal(char * c){
 	int i=0;
@@ -156,6 +156,7 @@ void addTeam(string tid, string tname, int type)
         {
             sprintf(sql,"Update f_teams set `team_pos`=%d,`team_op`=%d,`team_ow`=%d,`team_od`=%d,`team_ol`=%d,`team_of`=%d,`team_oa`=%d,`team_gd`=%d,`team_pts`=%d,team_updated=1,team_date=NOW() where team_league='%s' and team_name='%s'",pos,play,ow,od,ol,of,oa,gd,pts,tleague.c_str(),tname.c_str());
         }
+        teamlistname+=","+tname;
     }
     else
     {
@@ -172,16 +173,17 @@ void addTeam(string tid, string tname, int type)
     //write_log(sql);
     executesql(sql);
 }
-void resetTable(string sLeague, string tids)
+void resetTable(string sLeague, string tids, string tnames)
 {
     char sql[500];
-    sprintf(sql,"update f_teams set team_updated=0,team_date=NOW() where team_league='%s' and team_id not in (%s)",sLeague.c_str(),tids.c_str());
+    sprintf(sql,"update f_teams set team_updated=0,team_date=NOW() where (team_league='%s') and (team_id not in (%s)) and (team_name not in (%s))",sLeague.c_str(),tids.c_str(),tnames.c_str());
     executesql(sql);
 }
 void getTable(string sLeague)
 {
     shtml m,t,n,nh;
     string teamlist="0";
+
     //m.loadfromfile("tables.htm");
 	if (!m.loadFromURL((string("http://soccernet.espn.go.com/tables?league=")+sLeague).c_str())) return;
     m.removeBetween("<!--","-->",-1);
@@ -285,7 +287,7 @@ void getTable(string sLeague)
         t=m.cutTagByName("div");
     }
     //m.viewContent();
-    resetTable(sLeague, teamlist);
+    resetTable(sLeague, teamlist,teamlistname);
 }
 int main(int argc, char** argv)
 {

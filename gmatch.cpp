@@ -449,7 +449,7 @@ int main(int argc, char** argv)
     if (argc>1)
     {
         int kt=0;
-        for (var i=2; i<argc; i++)
+        for (int i=2; i<argc; i++)
         {
             if (strcmp(argv[i],"debug")==0)
             {
@@ -469,8 +469,12 @@ int main(int argc, char** argv)
         {
             getMatch(mid);
             sleep(3);
-            k++;
-            if (k>3600) break;
+            kt++;
+            if (kt>5400)
+            {
+                write_log("Overtime match %d:%d times",mid,kt);
+                break;
+            }
         }
         if (status>=7)
         {
