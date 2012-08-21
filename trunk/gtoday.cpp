@@ -389,6 +389,7 @@ void parseDate(string sDate)
 }
 void getMatch(int mId)
 {
+    if (mId<=0) return;
     char cmd[200];
     write_log_call("Get Match %d ",mId);
     sprintf(cmd,"%sgmatch %d &",f_home,mId);
@@ -400,7 +401,7 @@ void setEvent(int iEvent,int iValue=0)
 {
     char sql[300];
     //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
-    sprintf(sql,"INSERT INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `value`=%d,`date`=NOW();",iEvent,iValue,0,mid,iValue);
+    sprintf(sql,"INSERT INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `value`=%d,`date`=NOW();",iEvent,iValue,0,0,iValue);
     executesql(sql);
 
 }
