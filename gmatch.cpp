@@ -239,6 +239,10 @@ int parseStatus( shtml status)
         }
         else return 9;
     }
+    else if (status.contain("Postponed"))
+    {
+        return 11;
+    }
     else
     {
         return 1;
@@ -434,7 +438,7 @@ void getTable(string sLeague)
 }
 void deleteTimeline(int maid)
 {
-    write_log_call("Empty timeline for %d",maid);
+    write_log("Empty timeline for %d",maid);
     char sql[200];
     sprintf(sql, "delete  from `f_timeline` where `match`='%d';",maid);
     executesql(sql);
@@ -444,7 +448,16 @@ int main(int argc, char** argv)
     //int iMatch;
     if (argc>1)
     {
-        if (argc>2) DEBUG = true;
+        int kt=0;
+        for (var i=2; i<argc; i++)
+        {
+            if (strcmp(argv[i],"debug")==0)
+            {
+                DEBUG=true;
+                break;
+            }
+        }
+        //DEBUG = true;
         init_mysql_conf();
         init_mysql();
 
@@ -456,12 +469,18 @@ int main(int argc, char** argv)
         {
             getMatch(mid);
             sleep(3);
+            k++;
+            if (k>3600) break;
         }
-        deleteTimeline(mid);
-        setEvent(12,status);
+        if (status>=7)
+        {
+            deleteTimeline(mid);
+            setEvent(12,status);
+        }
+
         if (argc>2)
         {
-            getTable(argv[2]);
+            //getTable(argv[2]);
         }
 
     }
