@@ -443,6 +443,15 @@ void deleteTimeline(int maid)
     sprintf(sql, "delete  from `f_timeline` where `match`='%d';",maid);
     executesql(sql);
 }
+void killSame(int sid)
+{
+    char cmd[200];
+    //write_log_call("Get Match %d ",mId);
+    sprintf(cmd,"kill `ps -ef | grep 'gmatch %d' | grep -v grep | awk '{print $2}'` &",sid);
+    //sprintf(cmd,"kill `ps -ef | grep 'gmatch \+%d' | grep -v grep | awk '{print $2}'` &",sid);
+    //cout<<cmd<<endl;
+    system(cmd);
+}
 int main(int argc, char** argv)
 {
     //int iMatch;
@@ -462,6 +471,7 @@ int main(int argc, char** argv)
         init_mysql();
 
         mid = atoi(argv[1]);
+        killSame(mid);
         setEvent(10);
         getMatch(mid);
         //if (status>0) setEvent(10);
