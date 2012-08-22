@@ -405,6 +405,14 @@ void setEvent(int iEvent,int iValue=0)
     executesql(sql);
 
 }
+void deleteTimeline()
+{
+    write_log_call("Empty timeline...");
+    char sql[]="delete  from `f_timeline` ;";
+    executesql(sql);
+    char sql2[]="ALTER TABLE f_timeline AUTO_INCREMENT = 1;";
+    executesql(sql2);
+}
 void getToday(string sDay="")
 {
     shtml m,t,n,nh;
@@ -457,6 +465,7 @@ void getToday(string sDay="")
         t.retainBetween("\"","\"");
         bEOM = t.contain(" 1 ");
         parseDate(cday);
+        deleteTimeline();
         setEvent(100);
     }
     //cout<<"Today is "<<cday<<" End of month:"<<bEOM<<" - "<<day<<month<<year<<endl;
@@ -600,14 +609,7 @@ void getToday(string sDay="")
     }
     //m.viewContent();
 }
-void deleteTimeline()
-{
-    write_log_call("Empty timeline...");
-    char sql[]="delete  from `f_timeline` ;";
-    executesql(sql);
-    char sql2[]="ALTER TABLE f_timeline AUTO_INCREMENT = 1;";
-    executesql(sql2);
-}
+
 //For daemon:
 int lockfile(int fd)
 {
