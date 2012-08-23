@@ -454,10 +454,14 @@ void getToday(string sDay="")
     if (DEBUG) cout<<cday<<" ::: "<<sToday<<endl;
     if (!isFirstTime)
     {
-
-        isFirstTime=(cday!=sToday);
+        if (cday != sToday)
+        {
+            isFirstTime = true;
+            sToday=cday;
+        }
+        //if (isFirstTime)
     }
-    sToday=cday;
+
     if (isFirstTime)
     {
         //
@@ -465,8 +469,11 @@ void getToday(string sDay="")
         t.retainBetween("\"","\"");
         bEOM = t.contain(" 1 ");
         parseDate(cday);
+        init_mysql_conf();
+        init_mysql();
         deleteTimeline();
         setEvent(100);
+        write_log_call("is First Time - new day");
     }
     //cout<<"Today is "<<cday<<" End of month:"<<bEOM<<" - "<<day<<month<<year<<endl;
 
@@ -677,15 +684,14 @@ int main(int argc, char** argv)
         write_log("Footygoat is already running!");
         return 1;
     }
-    init_mysql_conf();
-    init_mysql();
+
     signal(SIGQUIT,call_for_exit);
 	signal(SIGKILL,call_for_exit);
 	signal(SIGTERM,call_for_exit);
 	write_log_call("Starting...");
     while (!STOP)
     {
-        //cout<<"Begin get list of match "<<endl;
+
         getToday(sDate);
         isFirstTime=false;
         sleep_time=(stat0==0?3600:10);
