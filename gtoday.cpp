@@ -182,7 +182,7 @@ bool executesql(const char * sql)
 }
 
 int init_mysql() {
-    if(conn==NULL)
+    //if(conn==NULL)
     {
 		conn=mysql_init(NULL);		// init the database connection
 		/* connect the database */
@@ -191,7 +191,7 @@ int init_mysql() {
 
 		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
         {
-			write_log("Error init mysql: %s",mysql_error(conn));
+			write_log("Error init mysql with host=%s,user=%s,pass=%s,db=%s: %s",host_name,user_name,password,db_name,mysql_error(conn));
 			//sleep(20);
 			return false;
 		}
@@ -229,8 +229,8 @@ void addMatch(int iIndex)
 {
     char sql[900];
     sprintf(sql,"INSERT IGNORE INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d",matchs[iIndex].mid,matchs[iIndex].league.c_str(),matchs[iIndex].group.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam,matchs[iIndex].status,matchs[iIndex].hgoal,matchs[iIndex].agoal,iIndex,year2,month2,day2,momment.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam);
-    ///cout<<iIndex<<"::>"<<sql<<endl;
     executesql(sql);
+    write_log("Add match %d ",iIndex);
 
 }
 void addTeam(string teamid, string tname, string league,string group)
@@ -470,7 +470,10 @@ void getToday(string sDay="")
         bEOM = t.contain(" 1 ");
         parseDate(cday);
         init_mysql_conf();
-        init_mysql();
+        if (!init_mysql())
+        {
+
+        }
         deleteTimeline();
         setEvent(100);
         write_log_call("is First Time - new day");
