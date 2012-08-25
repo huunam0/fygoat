@@ -34,7 +34,7 @@ struct Fmatch
     int status;
     int hgoal, agoal;
 };
-const int mmax=200;
+const int mmax=300;
 Fmatch matchs[mmax];
 int mm;
 int iNo=0;
@@ -182,7 +182,7 @@ bool executesql(const char * sql)
 }
 
 int init_mysql() {
-    //if(conn==NULL)
+    if(conn==NULL)
     {
 		conn=mysql_init(NULL);		// init the database connection
 		/* connect the database */
@@ -696,6 +696,11 @@ int main(int argc, char** argv)
     {
 
         getToday(sDate);
+        if (isFirstTime)
+        {
+            if (conn) mysql_close(conn);
+            conn=NULL;
+        }
         isFirstTime=false;
         sleep_time=(stat0==0?3600:10);
         //cout<<"wait "<<sleep_time<<"seconds..."<<endl;
