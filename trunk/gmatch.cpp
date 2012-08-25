@@ -200,9 +200,10 @@ void setEvent(int iEvent,int iValue=0)
     executesql(sql);
 
 }
-void setValue(int iIndex, int iValue, int iTeam)
+void setValue(int iIndex, int iValue=0, int iTeam=0)
 {
-    if ( (isFirstTime) || ((m[iTeam][iIndex]<iValue)&&(iIndex!=7)) || ((m[iTeam][iIndex]!=iValue)&&(iIndex==7)))
+    //if ( (isFirstTime) || ((m[iTeam][iIndex]<iValue)&&(iIndex!=7)) || ((m[iTeam][iIndex]!=iValue)&&(iIndex==7)))
+    if ( (isFirstTime) ||  ((m[iTeam][iIndex]!=iValue)))
     {
         m[iTeam][iIndex]=iValue;
         emitEvent(iIndex,iValue,iTeam);
@@ -345,8 +346,8 @@ bool getMatch(int id)
                 nh=n.cutTagByName("td",i+1);
                 nh.trim();
                 //if (DEBUG) nh.viewContent();
-                if (nh.contain("-")) continue;
-                v=nh.toInt();
+                if (nh.contain("-")) v=0;
+                else v=nh.toInt();
                 setValue(4,v,i);
                 nh.retainBetween("(",")");
                 v=nh.toInt();
@@ -364,8 +365,8 @@ bool getMatch(int id)
             {
                 nh=n.cutTagByName("td",i+1);
                 nh.trim();
-                if (nh.contain("-")) continue;
-                v=nh.toInt();
+                if (nh.contain("-")) v=0;
+                else v=nh.toInt();
                 setValue(6,v,i);
             }
             n=t.cutTagByName("tr");
@@ -380,8 +381,8 @@ bool getMatch(int id)
             {
                 nh=n.cutTagByName("td",i+1);
                 nh.trim();
-                if (nh.contain("-")) continue;
-                v=nh.toInt();
+                if (nh.contain("-")) v=0;
+                else v=nh.toInt();
                 setValue(7,v,i);
             }
             n=t.cutTagByName("tr");
@@ -392,8 +393,8 @@ bool getMatch(int id)
             {
                 nh=n.cutTagByName("td",i+1);
                 nh.trim();
-                if (nh.contain("-")) continue;
-                v=nh.toInt();
+                if (nh.contain("-")) v=0;
+                else v=nh.toInt();
                 if (v>0) reCard=false;
                 setValue(3,v,i);
             }
@@ -405,8 +406,8 @@ bool getMatch(int id)
             {
                 nh=n.cutTagByName("td",i+1);
                 nh.trim();
-                if (nh.contain("-")) continue;
-                v=nh.toInt();
+                if (nh.contain("-")) v=0;
+                else v=nh.toInt();
                 if (reCard) if (v>0) reCard=false;
                 setValue(2,v,i);
             }

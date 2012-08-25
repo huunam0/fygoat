@@ -702,7 +702,8 @@ bool shtml::containTag(string sTag)
 }
 int shtml::toInt()
 {
-    return atoi(htm.c_str());
+    if (htm.empty()) return 0;
+    else return atoi(htm.c_str());
 }
 float shtml::toFloat()
 {
