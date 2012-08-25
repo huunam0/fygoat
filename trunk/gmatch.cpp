@@ -244,6 +244,10 @@ int parseStatus( shtml status)
     {
         return 11;
     }
+    else if (status.contain("Suspended"))
+    {
+        return 12;
+    }
     else
     {
         return 1;
@@ -473,9 +477,9 @@ int main(int argc, char** argv)
 
         mid = atoi(argv[1]);
         killSame(mid);
-        setEvent(10);
+        //setEvent(10);
         getMatch(mid);
-        //if (status>0) setEvent(10);
+        if (status>0) setEvent(10);
         while (status<7)
         {
             getMatch(mid);
