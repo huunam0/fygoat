@@ -327,7 +327,7 @@ int parseStatus(string status)
     }
     else if (sh.contain("Susp"))
     {
-        return 12;
+        return 6;
     }
     else
     {

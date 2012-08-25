@@ -246,7 +246,7 @@ int parseStatus( shtml status)
     }
     else if (status.contain("Suspended"))
     {
-        return 12;
+        return 6;
     }
     else
     {
