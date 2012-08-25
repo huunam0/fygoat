@@ -321,6 +321,14 @@ int parseStatus(string status)
         //if (sh.contain("+")) v++;
         return v;
     }
+    else if (sh.contain("Postp"))
+    {
+        return 11;
+    }
+    else if (sh.contain("Susp"))
+    {
+        return 12;
+    }
     else
     {
         return 0;
