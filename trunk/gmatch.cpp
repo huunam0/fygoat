@@ -263,7 +263,11 @@ bool getMatch(int id)
     //sprintf(url,"http://soccernet.espn.go.com/match?id=%d&cc=4716",id);
     if (DEBUG)
         cout<<"Loading from "<<url<<endl;
-    if(!sh.loadFromURL(url)) return false;
+    if(!sh.loadFromURL(url))
+    {
+        if (DEBUG) cout<<"Cannot load from "<<url<<endl;
+        return false;
+    }
     if (sh.isEmpty()) return false;
     sh.removeBetween("<!--","-->",-1);
     t=sh.cutTagByName("div");
@@ -455,7 +459,7 @@ void killSame(int sid)
     sprintf(cmd,"kill `ps -ef | grep 'gmatch %d' | grep -v grep | awk '{print $2}'` &",sid);
     //sprintf(cmd,"kill `ps -ef | grep 'gmatch \+%d' | grep -v grep | awk '{print $2}'` &",sid);
     //cout<<cmd<<endl;
-    system(cmd);
+    //system(cmd);
 }
 int main(int argc, char** argv)
 {
