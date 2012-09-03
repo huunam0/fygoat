@@ -38,7 +38,7 @@ const int mmax=300;
 Fmatch matchs[mmax];
 int mm;
 int iNo=0;
-bool isFirstTime = true;
+bool isFirstTime = true, isNewDay=false;
 bool isTimeLineFull=true;
 int sleep_time = 10;
 int day, month, year, day2, month2, year2;
@@ -432,6 +432,7 @@ void getToday(string sDay="")
     string status,hteam,ateam,score,league,league_name,gid,group,hname,aname, cday;
     int v, iStatus, hscore, ascore;
     bool noId,bRet;
+    int homeid,awayid;
 
     //m.loadfromfile("scores2.htm");
     stat1=100;
@@ -487,7 +488,7 @@ void getToday(string sDay="")
         write_log_call("is First Time - new day");
     }
     //cout<<"Today is "<<cday<<" End of month:"<<bEOM<<" - "<<day<<month<<year<<endl;
-
+    isNewDay=false;
     m.retainTagByName("div",2);
     m.retainTagByName("div");
     m.retainTagByName("div",2);
@@ -531,7 +532,15 @@ void getToday(string sDay="")
                 if (n.containAttr("gamebox"))
                 {
                     //cout<<n.getAttr()<<endl;
-                    matchid = atoi(n.getBetweenAttr("id=\"","-").c_str());
+                    try
+                    {
+                        matchid = atoi(n.getBetweenAttr("id=\"","-").c_str());
+                    }
+                    catch(...)
+                    {
+                        return;
+                    }
+                    if (matchid!=matchs[iNo].mid) isNewDay=true;
                     nh=n.cutTagByName("td");
                     status=nh.getText();
                     iStatus=parseStatus(status);
@@ -572,12 +581,28 @@ void getToday(string sDay="")
                         matchs[iNo].mid=matchid;
                         matchs[iNo].league=league;
                         matchs[iNo].group=group;
-                        matchs[iNo].hteam=atoi(hteam.c_str());
-                        matchs[iNo].ateam=atoi(ateam.c_str());
+                        //matchs[iNo].hteam=atoi(hteam.c_str());
+                        //matchs[iNo].ateam=atoi(ateam.c_str());
                         matchs[iNo].hgoal=hscore;
                         matchs[iNo].agoal=ascore;
+                        try
+                        {
+                            homeid = atoi(hteam.c_str());
+                        }
+                        catch (...)
+                        {
+                            homeid=0;
+                        }
+                        try
+                        {
+                            awayid = atoi(ateam.c_str());
+                        }
+                        catch (...)
+                        {
+                            awayid=0;
+                        }
                         //addMatch(iNo);
-                        addMatch(matchid,league,group,atoi(hteam.c_str()),atoi(ateam.c_str()),iStatus,hscore,ascore);
+                        addMatch(matchid,league,group,homeid,awayid,iStatus,hscore,ascore);
                         if (iStatus>0) getMatch(matchid);
                         if (DEBUG) cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", hteam="<<hteam<<", ateam="<<ateam<<", hscore="<<hscore<<", ascore="<<ascore<<", Satus="<<iStatus<<endl;
                     }
@@ -627,6 +652,7 @@ void getToday(string sDay="")
         t=m.cutTagByName("div");
     }
     //m.viewContent();
+    isFirstTime = false;
 }
 
 //For daemon:
@@ -703,17 +729,16 @@ int main(int argc, char** argv)
 	write_log_call("Starting...");
     while (!STOP)
     {
+		if (!isFirstTime)
+		{
+		    isFirstTime=isNewDay;
+		}
 		if ((isFirstTime))
 		{
 			init_mysql();
 		}
         getToday(sDate);
-//        if (isFirstTime)
-//        {
-//            if (conn) mysql_close(conn);
-//            conn=NULL;
-//        }
-        isFirstTime=false;
+        //isFirstTime=false;
         sleep_time=(stat0==0?3600:10);
         //cout<<"wait "<<sleep_time<<"seconds..."<<endl;
         if ((stat1==0)  )

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="gtoday.cpp" open="1" top="1" tabpos="0">
-		<Cursor position="3955" topLine="179" />
+	<File name="gtoday.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="4422" topLine="735" />
+	</File>
+	<File name="shtml.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="17376" topLine="664" />
 	</File>
 </CodeBlocks_layout_file>
