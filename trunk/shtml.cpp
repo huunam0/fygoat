@@ -664,17 +664,17 @@ bool shtml::loadFromURL(const string sUrl)
         return false;
     }
     if(!in)
-        {
-            return false;
-        }
+    {
+        return false;
+    }
 
     while(fgets(buff, sizeof(buff), in)!=NULL)
         {
-            if (ferror (pFile)) break;
+            if (ferror (in)) break;
             string s(buff);
             htm+= s;
         }
-    if (ferror (pFile)) return false;
+    if (ferror (in)) return false;
     pclose(in);
     return true;
 }
