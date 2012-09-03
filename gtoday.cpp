@@ -483,9 +483,8 @@ void getToday(string sDay="")
         t.retainBetween("\"","\"");
         bEOM = t.contain(" 1 ");
         parseDate(cday);
-        deleteTimeline();
-        setEvent(100);
-        write_log_call("is First Time - new day");
+        //deleteTimeline();
+
     }
     //cout<<"Today is "<<cday<<" End of month:"<<bEOM<<" - "<<day<<month<<year<<endl;
     isNewDay=false;
@@ -736,6 +735,8 @@ int main(int argc, char** argv)
 		if ((isFirstTime))
 		{
 			init_mysql();
+			setEvent(100);
+			write_log_call("is First Time or new day");
 		}
         getToday(sDate);
         //isFirstTime=false;
