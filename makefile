@@ -4,7 +4,6 @@ GFLAG= -Wall
 MFLAG= -I/usr/local/mysql/include/mysql -I/usr/include/mysql
 LFLAG= -L/usr/local/mysql/lib/mysql -L/usr/lib/mysql  -lmysqlclient
 
-.PHONY clean
 
 all: gmatch gtable gtoday
 
