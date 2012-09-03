@@ -659,7 +659,7 @@ bool shtml::loadFromURL(const string sUrl)
     {
         in = popen(command, "r");
     }
-    catch (int err)
+    catch (...)
     {
         return false;
     }
