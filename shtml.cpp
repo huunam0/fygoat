@@ -655,16 +655,26 @@ bool shtml::loadFromURL(const string sUrl)
     //sprintf(command,"wget -q -O -  '%s' ",sUrl.c_str());
     //cout<<"Load from "<<sUrl<<endl;
     htm.clear();
-    if(!(in = popen(command, "r")))
+    try
+    {
+        in = popen(command, "r");
+    }
+    catch (int err)
+    {
+        return false;
+    }
+    if(!in)
         {
             return false;
         }
 
     while(fgets(buff, sizeof(buff), in)!=NULL)
         {
+            if (ferror (pFile)) break;
             string s(buff);
             htm+= s;
         }
+    if (ferror (pFile)) return false;
     pclose(in);
     return true;
 }

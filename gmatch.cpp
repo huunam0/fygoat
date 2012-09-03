@@ -248,6 +248,10 @@ int parseStatus( shtml status)
     {
         return 6;
     }
+    else if (status.contain("Abandoned"))
+    {
+        return 10;
+    }
     else
     {
         return 1;
