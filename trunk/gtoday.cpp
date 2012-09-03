@@ -204,6 +204,7 @@ int init_mysql() {
 void getTable(string sLeague)
 {
     //if (DEBUG) cout<<"Get table "<<sLeague<<endl;
+    if (sLeague.empty()) return;
     char cmd[200];
     write_log_call("Get table %s ",sLeague.c_str());
     sprintf(cmd,"%sgtable %s &",f_home,sLeague.c_str());
@@ -230,7 +231,7 @@ void addMatch(int iIndex)
     char sql[900];
     sprintf(sql,"INSERT IGNORE INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d",matchs[iIndex].mid,matchs[iIndex].league.c_str(),matchs[iIndex].group.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam,matchs[iIndex].status,matchs[iIndex].hgoal,matchs[iIndex].agoal,iIndex,year2,month2,day2,momment.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam);
     executesql(sql);
-    write_log("Add match %d ",iIndex);
+    //write_log("Add match %d ",iIndex);
 
 }
 void addTeam(string teamid, string tname, string league,string group)
@@ -328,6 +329,10 @@ int parseStatus(string status)
     else if (sh.contain("Susp"))
     {
         return 6;
+    }
+    else if (sh.contain("Aban"))
+    {
+        return 10;
     }
     else
     {
@@ -477,11 +482,6 @@ void getToday(string sDay="")
         t.retainBetween("\"","\"");
         bEOM = t.contain(" 1 ");
         parseDate(cday);
-        init_mysql_conf();
-        if (!init_mysql())
-        {
-
-        }
         deleteTimeline();
         setEvent(100);
         write_log_call("is First Time - new day");
@@ -576,7 +576,8 @@ void getToday(string sDay="")
                         matchs[iNo].ateam=atoi(ateam.c_str());
                         matchs[iNo].hgoal=hscore;
                         matchs[iNo].agoal=ascore;
-                        addMatch(iNo);
+                        //addMatch(iNo);
+                        addMatch(matchid,league,group,atoi(hteam.c_str()),atoi(ateam.c_str()),iStatus,hscore,ascore);
                         if (iStatus>0) getMatch(matchid);
                         if (DEBUG) cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", hteam="<<hteam<<", ateam="<<ateam<<", hscore="<<hscore<<", ascore="<<ascore<<", Satus="<<iStatus<<endl;
                     }
@@ -695,20 +696,23 @@ int main(int argc, char** argv)
         write_log("Footygoat is already running!");
         return 1;
     }
-
+	init_mysql_conf();
     signal(SIGQUIT,call_for_exit);
 	signal(SIGKILL,call_for_exit);
 	signal(SIGTERM,call_for_exit);
 	write_log_call("Starting...");
     while (!STOP)
     {
-
+		if ((isFirstTime))
+		{
+			init_mysql();
+		}
         getToday(sDate);
-        if (isFirstTime)
-        {
-            if (conn) mysql_close(conn);
-            conn=NULL;
-        }
+//        if (isFirstTime)
+//        {
+//            if (conn) mysql_close(conn);
+//            conn=NULL;
+//        }
         isFirstTime=false;
         sleep_time=(stat0==0?3600:10);
         //cout<<"wait "<<sleep_time<<"seconds..."<<endl;

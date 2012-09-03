@@ -1,11 +1,13 @@
 #makefile by Tran Huu Nam, huunam0@gmail.com
 CC=g++
-GFLAG= -I.
+GFLAG= -Wall
 MFLAG= -I/usr/local/mysql/include/mysql -I/usr/include/mysql
 LFLAG= -L/usr/local/mysql/lib/mysql -L/usr/lib/mysql  -lmysqlclient
 
-all: 
-	$(CC) -o gtoday shtml.cpp gtoday.cpp $(GFLAG)
+.PHONY clean
+
+all: gmatch gtable gtoday
+
 gtoday:	
 	$(CC) -o gtoday shtml.cpp gtoday.cpp $(GFLAG) $(MFLAG) $(LFLAG)
 gtoday2:	
