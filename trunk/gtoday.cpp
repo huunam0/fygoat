@@ -182,7 +182,7 @@ bool executesql(const char * sql)
 }
 
 int init_mysql() {
-    if(conn==NULL)
+    //if(conn==NULL)
     {
 		conn=mysql_init(NULL);		// init the database connection
 		/* connect the database */
