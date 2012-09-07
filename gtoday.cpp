@@ -631,8 +631,10 @@ void getToday(string sDay="")
                     //if (DEBUG) cout<<"GET  group "<<endl;
                     nh=n.getTagByName("a");
                     //gid=nh.getAttr();
-                    group=nh.getText();
-                    group=group.substr(group.length()-1);
+                    group = nh.getBetween("Group ",".");
+                    //group=nh.getText();
+                    //group=group.substr(group.length()-1);
+
                     nh.setContent(nh.getAttr());
                     gid=nh.getBetween("/groupId/","\"");
                     //cout<<"Group "<<gid<<":"<<group<<endl;
