@@ -481,7 +481,7 @@ int main(int argc, char** argv)
         }
         //DEBUG = true;
         init_mysql_conf();
-        init_mysql();
+
 
         mid = atoi(argv[1]);
         killSame(mid);
@@ -490,6 +490,7 @@ int main(int argc, char** argv)
         if (status>0) setEvent(10);
         while (status<7)
         {
+            init_mysql();
             getMatch(mid);
             sleep(3);
             kt++;
