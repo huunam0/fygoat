@@ -565,7 +565,7 @@ int main(int argc, char** argv)
         killSame(mid);
         //setEvent(10);
         getMatch(mid);
-        if (status>0) setEvent(10);
+        if (status>0) setEvent2(10);
         while (status<7)
         {
             init_mysql();
@@ -581,7 +581,7 @@ int main(int argc, char** argv)
         if (status>=7)
         {
             deleteTimeline(mid);
-            setEvent(12,status);
+            setEvent2(12,status);
         }
 
         if (argc>2)

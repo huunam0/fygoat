@@ -418,6 +418,14 @@ void setEvent(int iEvent,int iValue=0)
     executesql(sql);
 
 }
+void setEvent2(int iEvent,int iValue0=0,int iValue1=0)
+{
+    char sql[300];
+    //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
+    sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `home`=%d,`away`=%d,`date`=NOW();",iEvent,iValue0,iValue1,0,iValue0,iValue1);
+    executesql(sql);
+
+}
 void deleteTimeline()
 {
     write_log_call("Empty timeline...");
@@ -737,7 +745,7 @@ int main(int argc, char** argv)
 		if ((isFirstTime))
 		{
 			init_mysql();
-			setEvent(100);
+			setEvent2(100);
 			write_log_call("is First Time or new day");
 		}
         getToday(sDate);
