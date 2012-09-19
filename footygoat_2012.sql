@@ -191,13 +191,17 @@ CREATE TABLE `f_timeline` (
   UNIQUE KEY `lam2lan` (`event`,`team`,`match`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
---
--- Data for Table `f_timeline`
---
-
-/*!40000 ALTER TABLE `f_timeline` DISABLE KEYS */;
-
-/*!40000 ALTER TABLE `f_timeline` ENABLE KEYS */;
+DROP TABLE IF EXISTS `f_timeline2`;
+CREATE TABLE `f_timeline2` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `event` int(10) NOT NULL,
+  `home` int(10) DEFAULT NULL,
+  `away` int(10) DEFAULT NULL,
+  `match` int(10) DEFAULT NULL,
+  `date` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `lam1lan` (`event`,`match`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 --
