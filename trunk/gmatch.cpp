@@ -192,11 +192,72 @@ void emitEvent(int iIndex, int iValue, int iTeam)
     }
 
 }
-void setEvent(int iEvent,int iValue=0)
+void emit2Event(int iIndex, int iValue0, int iValue1)
+{
+    char sql[300];
+    if (DEBUG)
+        cout<<"Event "<<iIndex<<" value: "<<iValue0<<" - "<<iValue1<<endl;
+    //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iIndex,iValue,iTeam,mid);
+    sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `home`=%d,`away`=%d,`date`=NOW(); ",iIndex,iValue0,iValue1,mid,iValue0,iValue1);
+    executesql(sql);
+    string field;
+    switch (iIndex)
+    {
+    case 0:
+        field="goals";
+        break;
+    case 1:
+        field="1goals";
+        break;
+    case 2:
+        field="reds";
+        break;
+    case 3:
+        field="yellows";
+        break;
+    case 4:
+        field="shots";
+        break;
+    case 5:
+        field="gshots";
+        break;
+    case 6:
+        field="corner";
+        break;
+    case 7:
+        field="possession";
+        break;
+    case 8:
+        field="minutes";
+        break;
+    }
+    if (!field.empty())
+    {
+        if (iIndex!=8)
+        {
+            sprintf(sql,"UPDATE f_matches SET h%s=%d,a%s=%d where match_id=%d",field.c_str(),iValue0,field.c_str(),iValue1,mid);
+        }
+        else
+        {
+            sprintf(sql,"UPDATE f_matches SET minutes=%d,status=%d where match_id=%d",iValue0,iValue1,mid);
+        }
+        executesql(sql);
+    }
+
+}
+void setEvent(int iEvent,int iValue)
 {
     char sql[300];
     //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
     sprintf(sql,"INSERT INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `value`=%d,`date`=NOW();",iEvent,iValue,0,mid,iValue);
+    executesql(sql);
+
+}
+void setEvent2(int iEvent,int iValue0=0,int iValue1=0)
+{
+    char sql[300];
+    //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
+    sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `home`=%d,`away`=%d,`date`=NOW();",iEvent,iValue0,iValue1,mid,iValue0,iValue1);
     executesql(sql);
 
 }
@@ -207,6 +268,16 @@ void setValue(int iIndex, int iValue=0, int iTeam=0)
     {
         m[iTeam][iIndex]=iValue;
         emitEvent(iIndex,iValue,iTeam);
+    }
+}
+void set2Value(int iIndex, int iValue0=0, int iValue1=0)
+{
+    //if ( (isFirstTime) || ((m[iTeam][iIndex]<iValue)&&(iIndex!=7)) || ((m[iTeam][iIndex]!=iValue)&&(iIndex==7)))
+    if ( (isFirstTime) ||  ((m[0][iIndex]!=iValue0)) || (m[1][iIndex]!=iValue1))
+    {
+        m[0][iIndex]=iValue0;
+        m[1][iIndex]=iValue1;
+        emit2Event(iIndex,iValue0,iValue1);
     }
 }
 int parseStatus( shtml status)
@@ -260,7 +331,7 @@ int parseStatus( shtml status)
 bool getMatch(int id)
 {
     shtml sh,t,n,nh,nh2;
-    int i=0,v=0;
+    int i=0,v[2],g[2];
     char url[300];
     bool reCard = true;
     sprintf(url,"http://soccernet.espn.go.com/match/_/id/%d?cc=4716",id);
@@ -294,7 +365,7 @@ bool getMatch(int id)
     n = t.cutTagByName("div");
 
     status = parseStatus(n.cutTagByName("span"));
-    setValue(9,status,0);
+    //setValue(9,status,0);
     n.retainTagByName("span");
     //if (n.contain("'")&&(!n.contain("display:none;")))
     if (((status==1) || (status==3)) && n.contain("'"))
@@ -302,8 +373,9 @@ bool getMatch(int id)
         n.retainBetween("-","'");
         n.trim();
         minutes=n.toInt();
-        setValue(8,minutes,0);
+
     }
+    set2Value(8,status,minutes);
     if (DEBUG)
         cout<<"Status:"<<status<<endl;
     t.retainTagByName("p");
@@ -338,12 +410,9 @@ bool getMatch(int id)
             }
             n=t.cutTagByName("tr");
         }
-        for (i=0;i<2;i++)
-        {
-            setValue(0,sc[i],i);
-            setValue(1,sc1[i],i);
-        }
 
+        set2Value(0,sc[0],sc[1]);
+        set2Value(1,sc1[0],sc1[1]);
         t=sh.cutTagByName("div");
     }
     if (t.contain("Match Stats")) {
@@ -359,12 +428,14 @@ bool getMatch(int id)
                 nh.trim();
                 //if (DEBUG) nh.viewContent();
                 if (nh.contain("-")) v=0;
-                else v=nh.toInt();
-                setValue(4,v,i);
+                else v[i]=nh.toInt();
+                //setValue(4,v,i);
                 nh.retainBetween("(",")");
-                v=nh.toInt();
-                setValue(5,v,i);
+                g[i]=nh.toInt();
+                //setValue(5,v,i);
             }
+            set2Value(4,v[0],v[1]);
+            set2Value(5,g[0],g[1]);
             n=t.cutTagByName("tr");
         }
         if (n.contain("Fouls"))
@@ -377,10 +448,11 @@ bool getMatch(int id)
             {
                 nh=n.cutTagByName("td",i+1);
                 nh.trim();
-                if (nh.contain("-")) v=0;
-                else v=nh.toInt();
-                setValue(6,v,i);
+                if (nh.contain("-")) v[i]=0;
+                else v[i]=nh.toInt();
+                //setValue(6,v,i);
             }
+            set2Value(6,v[0],v[1]);
             n=t.cutTagByName("tr");
         }
         if (n.contain("Offsides"))
@@ -393,10 +465,11 @@ bool getMatch(int id)
             {
                 nh=n.cutTagByName("td",i+1);
                 nh.trim();
-                if (nh.contain("-")) v=0;
-                else v=nh.toInt();
-                setValue(7,v,i);
+                if (nh.contain("-")) v[i]=0;
+                else v[i]=nh.toInt();
+                //setValue(7,v,i);
             }
+            set2Value(7,v[0],v[1]);
             n=t.cutTagByName("tr");
         }
         if (n.contain("Yellow Cards"))
@@ -405,11 +478,12 @@ bool getMatch(int id)
             {
                 nh=n.cutTagByName("td",i+1);
                 nh.trim();
-                if (nh.contain("-")) v=0;
-                else v=nh.toInt();
-                if (v>0) reCard=false;
-                setValue(3,v,i);
+                if (nh.contain("-")) v[i]=0;
+                else v[i]=nh.toInt();
+                if (v[i]>0) reCard=false;
+                //setValue(3,v,i);
             }
+            set2Value(3,v[0],v[1]);
             n=t.cutTagByName("tr");
         }
         if (n.contain("Red Cards"))
@@ -418,29 +492,33 @@ bool getMatch(int id)
             {
                 nh=n.cutTagByName("td",i+1);
                 nh.trim();
-                if (nh.contain("-")) v=0;
-                else v=nh.toInt();
-                if (reCard) if (v>0) reCard=false;
-                setValue(2,v,i);
+                if (nh.contain("-")) v[i]=0;
+                else v[i]=nh.toInt();
+                if (reCard) if (v[i]>0) reCard=false;
+                //setValue(2,v,i);
             }
+            set2Value(2,v[0],v[1]);
             n=t.cutTagByName("tr");
         }
 
         t=sh.cutTagByName("div");
     }
-    if (reCard)
+    if (reCard) {
         if (DEBUG) cout<<"->Recalcule red & yellow cards"<<endl;
         for (i=0; i<2; i++)
         {
             t.removeTagByName("div",3);
             //int card[3];
-            v=t.count("soccer-icons-yellowcard");
-            setValue(3,v,i);
-            v=t.count("soccer-icons-redcard");
-            setValue(2,v,i);
+            v[i]=t.count("soccer-icons-yellowcard");
+            //setValue(3,v,i);
+            g[i]=t.count("soccer-icons-redcard");
+            //setValue(2,v,i);
             //cout<<"Team "<<i<<" has "<<card[1]<<" yellow card(s) and "<<card[2]<<" red card(s)."<<endl;
             t=sh.cutTagByName("div");
         }
+        set2Value(3,v[0],v[1]);
+        set2Value(2,g[0],g[1]);
+    }
     isFirstTime=false;
     //cout<<"End of get data"<<endl;
     return true;
