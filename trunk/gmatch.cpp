@@ -239,7 +239,7 @@ void emit2Event(int iIndex, int iValue0, int iValue1)
         }
         else
         {
-            sprintf(sql,"UPDATE f_matches SET minutes=%d,status=%d where match_id=%d",iValue0,iValue1,mid);
+            sprintf(sql,"UPDATE f_matches SET status=%d,minutes=%d where match_id=%d",iValue0,iValue1,mid);
         }
         executesql(sql);
     }
