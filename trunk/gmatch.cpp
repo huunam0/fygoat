@@ -401,9 +401,9 @@ bool getMatch(int id)
                         {
                             nh.deleteTo(" ");
                         }
-                    v=nh.toInt();
+                    v[i]=nh.toInt();
                     sc[i]++;
-                    if (v<46) sc1[i]++;
+                    if (v[i]<46) sc1[i]++;
                     //cout<<"Team "<<i<<" goal at "<<v<<" minute th"<<endl;
 
                 }
@@ -427,7 +427,7 @@ bool getMatch(int id)
                 nh=n.cutTagByName("td",i+1);
                 nh.trim();
                 //if (DEBUG) nh.viewContent();
-                if (nh.contain("-")) v=0;
+                if (nh.contain("-")) v[i]=0;
                 else v[i]=nh.toInt();
                 //setValue(4,v,i);
                 nh.retainBetween("(",")");
@@ -531,7 +531,7 @@ void deleteTimeline(int maid)
 {
     write_log("Empty timeline for %d",maid);
     char sql[200];
-    sprintf(sql, "delete  from `f_timeline` where `match`='%d';",maid);
+    sprintf(sql, "delete  from `f_timeline2` where `match`='%d';",maid);
     executesql(sql);
 }
 void killSame(int sid)
@@ -559,7 +559,7 @@ int main(int argc, char** argv)
         }
         //DEBUG = true;
         init_mysql_conf();
-
+        init_mysql();
 
         mid = atoi(argv[1]);
         killSame(mid);
@@ -581,7 +581,7 @@ int main(int argc, char** argv)
         if (status>=7)
         {
             deleteTimeline(mid);
-            setEvent2(12,status);
+            //setEvent2(12,status);
         }
 
         if (argc>2)
