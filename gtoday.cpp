@@ -453,7 +453,11 @@ void getToday(string sDay="")
     {
         bRet=m.loadFromURL((string("http://soccernet.espn.go.com/scores?date=")+sDay+string("&cc=4716&league=all")).c_str());
     }
-    if (!bRet) return;
+    if (!bRet)
+    {
+        isFirstTime=true;
+        return;
+    }
     m.removeBetween("<!--","-->",-1);
     t=m.cutTagByName("div");
 
