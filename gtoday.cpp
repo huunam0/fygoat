@@ -45,7 +45,7 @@ int day, month, year, day2, month2, year2;
 string momment;//moment of a match
 int stat0,stat1;
 bool bEOM;//end of month
-
+char currentdate[20];
 
 //For daemon start:
 static bool STOP=false;
@@ -221,7 +221,7 @@ void addLeague(string lid, string lname)
 void addMatch(int mid, string league,string group,int hteam, int ateam,int status=0, int hscore=0, int ascore=0)
 {
     char sql[900];
-    sprintf(sql,"INSERT IGNORE INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d",mid,league.c_str(),group.c_str(),hteam,ateam,status,hscore,ascore,iNo,year2,month2,day2,momment.c_str(),hteam,ateam);
+    sprintf(sql,"INSERT IGNORE INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`,`viewdate`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s','%s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d,viewdate='%s'",mid,league.c_str(),group.c_str(),hteam,ateam,status,hscore,ascore,iNo,year2,month2,day2,momment.c_str(),currentdate,hteam,ateam,currentdate);
     ///cout<<sql<<endl;
     executesql(sql);
 
@@ -399,6 +399,7 @@ void parseDate(string sDate)
     sh.deleteTo(" ");
     year = sh.toInt();
     //cout<<", year:"<<year<<endl;
+    sprintf(currentdate,"%d-%d-%d",year,month,day);
 }
 void getMatch(int mId)
 {
@@ -429,10 +430,16 @@ void setEvent2(int iEvent,int iValue0=0,int iValue1=0)
 void deleteTimeline()
 {
     write_log_call("Empty timeline...");
-    char sql[]="delete  from `f_timeline` ;";
+    char sql[]="delete  from `f_timeline2` where `event` < 100;";
     executesql(sql);
-    char sql2[]="ALTER TABLE f_timeline AUTO_INCREMENT = 1;";
+    char sql2[]="ALTER TABLE f_timeline2 AUTO_INCREMENT = 2;";
     executesql(sql2);
+}
+void setCurrentDate()
+{
+    char sql[500];
+    sprintf(sql,"update f_params set p_value='%s' where p_name='currentdate';",currentdate);
+    executesql(sql);
 }
 void getToday(string sDay="")
 {
