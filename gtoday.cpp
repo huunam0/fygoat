@@ -503,7 +503,7 @@ void getToday(string sDay="")
         bEOM = t.contain(" 1 ");
         parseDate(cday);
         //deleteTimeline();
-
+        setCurrentDate();
     }
     //cout<<"Today is "<<cday<<" End of month:"<<bEOM<<" - "<<day<<month<<year<<endl;
     isNewDay=false;
