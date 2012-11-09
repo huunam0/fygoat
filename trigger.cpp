@@ -84,6 +84,7 @@ bool init_mysql_conf()
 	user_name[0]=0;
 	password[0]=0;
 	db_name[0]=0;
+	triggerurl[0]=0;
 	port_number=3306;
 
 	fp = fopen("/etc/footygoat/footygoat.conf", "r");
@@ -99,7 +100,8 @@ bool init_mysql_conf()
             read_buf(buf, "F_TRIGGER_URL",triggerurl);
         }
 		return true;
-	//	fclose(fp);
+		fclose(fp);
+		cout<<triggerurl<<endl;
     }
     else
     {
@@ -143,7 +145,7 @@ void checktriggers()
 {
     char output[100];
     char url[1000];
-    sprintf(url,"wget -O - http://localhost/%sgottriggers.php",triggerurl);
+    sprintf(url,"wget -O - %s/gottriggers.php",triggerurl);
     FILE *p = popen(url, "r");
     if(p != NULL)
         while(fgets(output, sizeof(output), p) != NULL)
