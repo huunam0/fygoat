@@ -157,5 +157,6 @@ void checktriggers()
 
 int main(int argc, char** argv)
 {
+    init_mysql_conf();
     checktriggers();
 }
