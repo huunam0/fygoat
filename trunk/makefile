@@ -15,7 +15,8 @@ gtable:
 	$(CC) -o gtable shtml.cpp gtable.cpp $(GFLAG) $(MFLAG) $(LFLAG)
 gmatch: needed.h
 	$(CC) -o gmatch shtml.cpp gmatch.cpp $(GFLAG) $(MFLAG) $(LFLAG)
-
+trigger: needed.h
+	$(CC) -o trigger trigger.cpp $(GFLAG) $(MFLAG) $(LFLAG)
 clear:
 	rm -f gtoday gtable gmatch
 clean:
