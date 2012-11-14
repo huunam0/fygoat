@@ -145,7 +145,7 @@ void checktriggers()
 {
     char output[100];
     char url[1000];
-    sprintf(url,"wget -O - %s/gottriggers.php",triggerurl);
+    sprintf(url,"wget -q -O - %s/gottriggers.php",triggerurl);
     FILE *p = popen(url, "r");
     if(p != NULL)
         while(fgets(output, sizeof(output), p) != NULL)
