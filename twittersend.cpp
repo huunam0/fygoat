@@ -215,6 +215,8 @@ bool sendDirectMessage(string toUser,string message)
 }
 int main( int argc, char* argv[] )
 {
-
+    init_conf();
+    initTwitter();
+    sendDirectMessage(string("huunam0"),string("Please go to chamthi.net"));
     return 0;
 }
