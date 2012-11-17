@@ -86,6 +86,10 @@ bool init_conf()
         t_pass=std::string(password);
         t_key=std::string(consumerkey);
         t_secret==std::string(consumersecret);
+        cout<<"Name:"<<t_name<<endl;
+        cout<<"Pass:"<<t_pass<<endl;
+        cout<<"Key:"<<t_key<<endl;
+        cout<<"Secret:"<<t_secret<<endl;
 		return true;
 	//	fclose(fp);
     }
@@ -98,7 +102,7 @@ bool init_conf()
 
 void printUsage()
 {
-    printf( "\nUsage:\ntwitterClient -u username -p password\n" );
+    printf( "\nUsage:\ntwittersend -u username -p password\n" );
 }
 
 bool initTwitter()
@@ -112,8 +116,8 @@ bool initTwitter()
     std::ifstream oAuthTokenKeyIn;
     std::ifstream oAuthTokenSecretIn;
 
-    oAuthTokenKeyIn.open( "twitterClient_token_key.txt" );
-    oAuthTokenSecretIn.open( "twitterClient_token_secret.txt" );
+    oAuthTokenKeyIn.open( "twittersend_token_key.txt" );
+    oAuthTokenSecretIn.open( "twittersend_token_secret.txt" );
     char tmpBuf[1024];
 
     memset( tmpBuf, 0, 1024 );
@@ -159,8 +163,8 @@ bool initTwitter()
         std::ofstream oAuthTokenKeyOut;
         std::ofstream oAuthTokenSecretOut;
 
-        oAuthTokenKeyOut.open( "twitterClient_token_key.txt" );
-        oAuthTokenSecretOut.open( "twitterClient_token_secret.txt" );
+        oAuthTokenKeyOut.open( "twittersend_token_key.txt" );
+        oAuthTokenSecretOut.open( "twittersend_token_secret.txt" );
 
         oAuthTokenKeyOut.clear();
         oAuthTokenSecretOut.clear();
@@ -179,7 +183,7 @@ bool initTwitter()
         if (DEBUG)
         {
             twitterObj.getLastWebResponse( replyMsg );
-            printf( "\ntwitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str() );
+            printf( "\ntwittersend:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str() );
         }
         return true;
     }
@@ -188,7 +192,7 @@ bool initTwitter()
         if (DEBUG)
         {
             twitterObj.getLastCurlError(replyMsg);
-            printf( "\ntwitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str() );
+            printf( "\ntwittersend:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str() );
         }
         return false;
     }
@@ -199,13 +203,13 @@ bool postTweet(std::string tmpStr)
     if( twitterObj.statusUpdate( tmpStr ) )
     {
         twitterObj.getLastWebResponse( replyMsg );
-        printf( "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str() );
+        printf( "\ntwittersend:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str() );
         return true;
     }
     else
     {
         twitterObj.getLastCurlError( replyMsg );
-        printf( "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str() );
+        printf( "\ntwittersend:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str() );
         return  false;
     }
 }
@@ -216,7 +220,11 @@ bool sendDirectMessage(string toUser,string message)
 int main( int argc, char* argv[] )
 {
     init_conf();
-    initTwitter();
-    sendDirectMessage(string("huunam0"),string("Please go to chamthi.net"));
+    if (!initTwitter())
+    {
+        cout<<"Init fail"<<endl;
+        return 1;
+    }
+    //sendDirectMessage(string("huunam0"),string("Please go to chamthi.net"));
     return 0;
 }
