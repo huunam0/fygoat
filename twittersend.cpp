@@ -239,12 +239,12 @@ void test_tsend()
     if (!initTwitter())
     {
         cout<<"Init fail"<<endl;
-        return 1;
+        return ;
     }
     sendDirectMessage(string("huunam0"),string("Please go to chamthi.net"));
 }
 int main( int argc, char* argv[] )
 {
-    test_popen()
+    test_popen();
     return 0;
 }
