@@ -80,16 +80,13 @@ bool init_conf()
             read_buf(buf, "F_T_UNAME",user_name);
             read_buf(buf, "F_T_PASS",password);
             read_buf(buf, "F_T_C_KEY",consumerkey);
-            read_buf(buf , "F_T_C_SECRET", consumersecret);
+            read_buf(buf, "F_T_C_SECRET",consumersecret);
         }
         t_name=std::string(user_name);
         t_pass=std::string(password);
         t_key=std::string(consumerkey);
-        t_secret==std::string(consumersecret);
-        cout<<"Name:"<<t_name<<endl;
-        cout<<"Pass:"<<t_pass<<endl;
-        cout<<"Key:"<<t_key<<endl;
-        cout<<"Secret:"<<t_secret<<endl;
+        t_secret=std::string(consumersecret);
+
 		return true;
 	//	fclose(fp);
     }
@@ -217,7 +214,26 @@ bool sendDirectMessage(string toUser,string message)
 {
     return twitterObj.directMessageSend(toUser,message);
 }
-int main( int argc, char* argv[] )
+
+void test_popen()
+{
+  // setup
+  string data;
+  FILE *stream;
+  int MAX_BUFFER = 1000;
+  char buffer[MAX_BUFFER];
+
+  // do it
+  stream = popen("wget -O - http://footygoat.com/gottriggers.php", "r");
+  while ( fgets(buffer, MAX_BUFFER, stream) != NULL )
+    cout<<buffer<<endl;
+    //data.append(buffer);
+  pclose(stream);
+
+  // exit
+  //return trim(data);
+}
+void test_tsend()
 {
     init_conf();
     if (!initTwitter())
@@ -225,6 +241,10 @@ int main( int argc, char* argv[] )
         cout<<"Init fail"<<endl;
         return 1;
     }
-    //sendDirectMessage(string("huunam0"),string("Please go to chamthi.net"));
+    sendDirectMessage(string("huunam0"),string("Please go to chamthi.net"));
+}
+int main( int argc, char* argv[] )
+{
+    test_popen()
     return 0;
 }
