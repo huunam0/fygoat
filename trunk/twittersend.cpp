@@ -220,6 +220,8 @@ bool postTweet(std::string tmpStr)
 }
 bool sendDirectMessage(string toUser,string message)
 {
+    if (DEBUG)
+        write_log("Send message  to user '%s'",toUser.c_str());
     return twitterObj.directMessageSend(toUser,message);
 }
 
