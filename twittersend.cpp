@@ -65,6 +65,13 @@ bool read_buf(char * buf,const char * key,char * value)
    }
    return 0;
 }
+void read_int(char * buf,const char * key,int * value)
+{
+	char buf2[BUFFER_SIZE];
+	if (read_buf(buf,key,buf2))
+		sscanf(buf2, "%d", value);
+
+}
 bool init_conf()
 {
 	FILE *fp=NULL;
@@ -163,7 +170,6 @@ bool initTwitter()
     std::string myOAuthAccessTokenSecret(t_tokensecret);
     std::ifstream oAuthTokenKeyIn;
     std::ifstream oAuthTokenSecretIn;
-    char tmpBuf[1024];
     if( myOAuthAccessTokenKey.size() && myOAuthAccessTokenSecret.size() )
     {
         twitterObj.getOAuth().setOAuthTokenKey( myOAuthAccessTokenKey );
@@ -233,7 +239,7 @@ void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_
     if (sendDirectMessage(string(user_twitter),string(msg)))
     {
         char sql[500];
-        sprintf(sql,"insert into f_sent (user_id,match_id,moment) value (%d,%d,NOW());")
+        sprintf(sql,"insert into f_sent (user_id,match_id,moment) value (%s,%s,NOW());",user_id,match_id);
         executesql(sql);
     }
     else
@@ -306,6 +312,7 @@ int main( int argc, char* argv[] )
     while(true)
     {
         work();
+        break;
         break;
     }
     work();
