@@ -1,10 +1,18 @@
 #include "twittersend.h"
-#define BUFFER_SIZE 1024
+#include <mysql/mysql.h>
+#include <string.h>
+#include <stdarg.h>
 
 twitCurl twitterObj;
 string t_name, t_pass, t_key, t_secret, t_token, t_tokensecret,replyMsg;
-
+#define BUFFER_SIZE 1024
+static char host_name[BUFFER_SIZE];
+static char user_name[BUFFER_SIZE];
+static char password [BUFFER_SIZE];
+static char db_name  [BUFFER_SIZE];
+static int port_number;
 bool DEBUG = true;
+static MYSQL *conn;
 
 void write_log(const char *fmt, ...)
 {
@@ -61,8 +69,6 @@ bool init_conf()
 {
 	FILE *fp=NULL;
 	char buf[BUFFER_SIZE];
-    char user_name[BUFFER_SIZE];
-    char password [BUFFER_SIZE];
     char consumerkey [BUFFER_SIZE];
     char consumersecret [BUFFER_SIZE];
     char token[BUFFER_SIZE];
@@ -72,7 +78,11 @@ bool init_conf()
 	password[0]=0;
 	consumerkey[0]=0;
 	consumersecret[0]=0;
-
+    host_name[0]=0;
+	user_name[0]=0;
+	password[0]=0;
+	db_name[0]=0;
+	port_number=3306;
 
 	fp = fopen("/etc/footygoat/footygoat.conf", "r");
 	if(fp!=NULL)
@@ -81,6 +91,11 @@ bool init_conf()
         {
             //read_buf(buf, "F_T_UNAME",user_name);
             //read_buf(buf, "F_T_PASS",password);
+            read_buf(buf,"F_HOST_NAME",host_name);
+            read_buf(buf, "F_USER_NAME",user_name);
+            read_buf(buf, "F_PASSWORD",password);
+            read_buf(buf, "F_DB_NAME",db_name);
+            read_int(buf , "F_PORT_NUMBER", &port_number);
             read_buf(buf, "F_T_C_KEY",consumerkey);
             read_buf(buf, "F_T_C_SECRET",consumersecret);
             read_buf(buf, "F_T_ATOKEN",token);
@@ -101,7 +116,38 @@ bool init_conf()
         return false;
     }
 }
+bool executesql(const char * sql)
+{
+    if (DEBUG) cout<<sql<<endl;
+	if (mysql_real_query(conn,sql,strlen(sql)))
+    {
+		//sleep(20);
+		write_log("Error in sql %s:%s",sql,mysql_error(conn));
+		//conn=NULL;
+		return false;
+	}
+	else
+	    return true;
+}
+int init_mysql() {
+    if(conn==NULL)
+    {
+		conn=mysql_init(NULL);		// init the database connection
+		/* connect the database */
+		const char timeout=30;
+		mysql_options(conn,MYSQL_OPT_CONNECT_TIMEOUT,&timeout);
 
+		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
+        {
+			write_log("Error init mysql: %s",mysql_error(conn));
+			//sleep(20);
+			return false;
+		}
+	}
+	if (!executesql("set names utf8"))
+        return false;
+	return true;
+}
 void printUsage()
 {
     printf( "\nUsage:\ntwittersend -u username -p password\n" );
@@ -117,22 +163,7 @@ bool initTwitter()
     std::string myOAuthAccessTokenSecret(t_tokensecret);
     std::ifstream oAuthTokenKeyIn;
     std::ifstream oAuthTokenSecretIn;
-
-    //oAuthTokenKeyIn.open( "twittersend_token_key.txt" );
-    //oAuthTokenSecretIn.open( "twittersend_token_secret.txt" );
     char tmpBuf[1024];
-
-    //memset( tmpBuf, 0, 1024 );
-    //oAuthTokenKeyIn >> tmpBuf;
-    //myOAuthAccessTokenKey = tmpBuf;
-
-    //memset( tmpBuf, 0, 1024 );
-    //oAuthTokenSecretIn >> tmpBuf;
-    //myOAuthAccessTokenSecret = tmpBuf;
-
-    //oAuthTokenKeyIn.close();
-    //oAuthTokenSecretIn.close();
-
     if( myOAuthAccessTokenKey.size() && myOAuthAccessTokenSecret.size() )
     {
         twitterObj.getOAuth().setOAuthTokenKey( myOAuthAccessTokenKey );
@@ -201,7 +232,9 @@ void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_
     sprintf(msg,"[F] match got triggers, #%s:%s",match_id,match_teams);
     if (sendDirectMessage(string(user_twitter),string(msg)))
     {
-        //ghi nhan vao CSDL
+        char sql[500];
+        sprintf(sql,"insert into f_sent (user_id,match_id,moment) value (%d,%d,NOW());")
+        executesql(sql);
     }
     else
     {
@@ -209,9 +242,8 @@ void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_
     }
 
 }
-void test_popen()
+void work()
 {
-
     string data;
     FILE *stream;
     int MAX_BUFFER = 1000;
@@ -251,6 +283,7 @@ void test_popen()
 
             }
             cout<<"Match id:"<<match_id<<", teams:"<<match_team<<endl;
+            tweet_match(user_id,user_twit,match_id,match_team);
         }
 
     }
@@ -270,6 +303,12 @@ void test_tsend()
 }
 int main( int argc, char* argv[] )
 {
-    test_popen();
+    while(true)
+    {
+        work();
+        break;
+    }
+    work();
+
     return 0;
 }
