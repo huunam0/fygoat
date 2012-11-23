@@ -311,8 +311,8 @@ int main( int argc, char* argv[] )
 {
     while(true)
     {
+        init_mysql();
         work();
-        break;
         break;
     }
     work();
