@@ -311,6 +311,7 @@ void test_tsend()
 }
 int main( int argc, char* argv[] )
 {
+    init_conf();
     while(true)
     {
         init_mysql();
