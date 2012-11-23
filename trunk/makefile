@@ -18,7 +18,7 @@ gmatch: needed.h
 trigger: needed.h
 	$(CC) -o trigger trigger.cpp $(GFLAG) $(MFLAG) $(LFLAG)
 twittersend: 
-	$(CC) -o twittersend twittersend.cpp $(CFLAG)
+	$(CC) -o twittersend twittersend.cpp $(CFLAG) $(GFLAG) $(MFLAG) $(LFLAG)
 clear:
 	rm -f gtoday gtable gmatch
 clean:
