@@ -315,7 +315,7 @@ int main( int argc, char* argv[] )
     if (!initTwitter())
     {
         write_log("Init twitter fail");
-        return ;
+        return -1;
     }
     while(true)
     {
