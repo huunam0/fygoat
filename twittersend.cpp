@@ -168,8 +168,6 @@ bool initTwitter()
     twitterObj.getOAuth().setConsumerSecret(t_secret);
     std::string myOAuthAccessTokenKey(t_token);
     std::string myOAuthAccessTokenSecret(t_tokensecret);
-    std::ifstream oAuthTokenKeyIn;
-    std::ifstream oAuthTokenSecretIn;
     if( myOAuthAccessTokenKey.size() && myOAuthAccessTokenSecret.size() )
     {
         twitterObj.getOAuth().setOAuthTokenKey( myOAuthAccessTokenKey );
@@ -221,7 +219,7 @@ bool postTweet(std::string tmpStr)
 bool sendDirectMessage(string toUser,string message)
 {
     if (DEBUG)
-        write_log("Send message  to user '%s'",toUser.c_str());
+        write_log("Send message '%s' to user '%s'",message.c_str(),toUser.c_str());
     return twitterObj.directMessageSend(toUser,message);
 }
 
@@ -307,6 +305,7 @@ void test_tsend()
         cout<<"Init fail"<<endl;
         return ;
     }
+    write_log("Init twitter OK");
     sendDirectMessage(string("huunam0"),string("Please go to chamthi.net"));
 }
 int main( int argc, char* argv[] )
@@ -317,13 +316,14 @@ int main( int argc, char* argv[] )
         write_log("Init twitter fail");
         return -1;
     }
+    write_log("Init twitter OK");
     while(true)
     {
         init_mysql();
         work();
         break;
     }
-    work();
+    //work();
 
     return 0;
 }
