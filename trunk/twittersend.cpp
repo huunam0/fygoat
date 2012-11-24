@@ -312,6 +312,11 @@ void test_tsend()
 int main( int argc, char* argv[] )
 {
     init_conf();
+    if (!initTwitter())
+    {
+        write_log("Init twitter fail");
+        return ;
+    }
     while(true)
     {
         init_mysql();
