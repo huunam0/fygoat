@@ -167,8 +167,8 @@ bool initTwitter()
     twitterObj.setTwitterPassword(t_pass);
     twitterObj.getOAuth().setConsumerKey(t_key);
     twitterObj.getOAuth().setConsumerSecret(t_secret);
-    std::string myOAuthAccessTokenKey();
-    std::string myOAuthAccessTokenSecret();
+    std::string myOAuthAccessTokenKey("");
+    std::string myOAuthAccessTokenSecret("");
     std::ifstream oAuthTokenKeyIn;
     std::ifstream oAuthTokenSecretIn;
 
