@@ -96,8 +96,8 @@ bool init_conf()
     {
         while (fgets(buf, BUFFER_SIZE - 1, fp))
         {
-            //read_buf(buf, "F_T_UNAME",user_name);
-            //read_buf(buf, "F_T_PASS",password);
+            read_buf(buf, "F_T_UNAME",user_name);
+            read_buf(buf, "F_T_PASS",password);
             read_buf(buf,"F_HOST_NAME",host_name);
             read_buf(buf, "F_USER_NAME",user_name);
             read_buf(buf, "F_PASSWORD",password);
@@ -162,8 +162,8 @@ void printUsage()
 
 bool initTwitter()
 {
-    //twitterObj.setTwitterUsername(t_name);
-    //twitterObj.setTwitterPassword(t_pass);
+    twitterObj.setTwitterUsername(t_name);
+    twitterObj.setTwitterPassword(t_pass);
     twitterObj.getOAuth().setConsumerKey(t_key);
     twitterObj.getOAuth().setConsumerSecret(t_secret);
     std::string myOAuthAccessTokenKey(t_token);
