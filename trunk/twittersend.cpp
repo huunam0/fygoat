@@ -162,12 +162,29 @@ void printUsage()
 
 bool initTwitter()
 {
+    char tmpBuf[1024];
     twitterObj.setTwitterUsername(t_name);
     twitterObj.setTwitterPassword(t_pass);
     twitterObj.getOAuth().setConsumerKey(t_key);
     twitterObj.getOAuth().setConsumerSecret(t_secret);
-    std::string myOAuthAccessTokenKey(t_token);
-    std::string myOAuthAccessTokenSecret(t_tokensecret);
+    std::string myOAuthAccessTokenKey();
+    std::string myOAuthAccessTokenSecret();
+    std::ifstream oAuthTokenKeyIn;
+    std::ifstream oAuthTokenSecretIn;
+
+    oAuthTokenKeyIn.open( "twitterClient_token_key.txt" );
+    oAuthTokenSecretIn.open( "twitterClient_token_secret.txt" );
+
+    memset( tmpBuf, 0, 1024 );
+    oAuthTokenKeyIn >> tmpBuf;
+    myOAuthAccessTokenKey = tmpBuf;
+
+    memset( tmpBuf, 0, 1024 );
+    oAuthTokenSecretIn >> tmpBuf;
+    myOAuthAccessTokenSecret = tmpBuf;
+
+    oAuthTokenKeyIn.close();
+    oAuthTokenSecretIn.close();
     if( myOAuthAccessTokenKey.size() && myOAuthAccessTokenSecret.size() )
     {
         twitterObj.getOAuth().setOAuthTokenKey( myOAuthAccessTokenKey );
@@ -175,6 +192,27 @@ bool initTwitter()
     }
     else
     {
+        std::string authUrl;
+        twitterObj.oAuthRequestToken( authUrl );
+        twitterObj.oAuthHandlePIN( authUrl );
+        twitterObj.getOAuth().getOAuthTokenKey( myOAuthAccessTokenKey );
+        twitterObj.getOAuth().getOAuthTokenSecret( myOAuthAccessTokenSecret );
+
+        /* Step 6: Save these keys in a file or wherever */
+        std::ofstream oAuthTokenKeyOut;
+        std::ofstream oAuthTokenSecretOut;
+
+        oAuthTokenKeyOut.open( "twitterClient_token_key.txt" );
+        oAuthTokenSecretOut.open( "twitterClient_token_secret.txt" );
+
+        oAuthTokenKeyOut.clear();
+        oAuthTokenSecretOut.clear();
+
+        oAuthTokenKeyOut << myOAuthAccessTokenKey.c_str();
+        oAuthTokenSecretOut << myOAuthAccessTokenSecret.c_str();
+
+        oAuthTokenKeyOut.close();
+        oAuthTokenSecretOut.close();
         /* Step 2: Get request token key and secret */
         return false;
     }
