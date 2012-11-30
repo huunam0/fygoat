@@ -460,11 +460,12 @@ int main( int argc, char* argv[] )
         return -1;
     }
     write_log("Init twitter OK");
+    int v=0;
     while(true)
     {
         init_mysql();
         work();
-        break;
+        if (v++>10) break;
     }
     //work();
 
