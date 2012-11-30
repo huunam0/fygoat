@@ -78,6 +78,8 @@ bool init_conf()
 	char buf[BUFFER_SIZE];
     char user_name[BUFFER_SIZE];
     char password [BUFFER_SIZE];
+    char t_username[BUFFER_SIZE];
+    char t_password [BUFFER_SIZE];
     char consumerkey [BUFFER_SIZE];
     char consumersecret [BUFFER_SIZE];
     char token[BUFFER_SIZE];
@@ -85,6 +87,8 @@ bool init_conf()
 
 	user_name[0]=0;
 	password[0]=0;
+	t_username[0]=0;
+	t_password[0]=0;
 	consumerkey[0]=0;
 	consumersecret[0]=0;
     host_name[0]=0;
@@ -101,8 +105,8 @@ bool init_conf()
             read_buf(buf, "F_T_UNAME",user_name);
             read_buf(buf, "F_T_PASS",password);
             read_buf(buf,"F_HOST_NAME",host_name);
-            read_buf(buf, "F_USER_NAME",user_name);
-            read_buf(buf, "F_PASSWORD",password);
+            read_buf(buf, "F_USER_NAME",t_username);
+            read_buf(buf, "F_PASSWORD",t_password);
             read_buf(buf, "F_DB_NAME",db_name);
             read_int(buf , "F_PORT_NUMBER", &port_number);
             read_buf(buf, "F_T_C_KEY",consumerkey);
@@ -110,8 +114,8 @@ bool init_conf()
             read_buf(buf, "F_T_ATOKEN",token);
             read_buf(buf, "F_T_ATOKENS",tokensecret);
         }
-        t_name=std::string(user_name);
-        t_pass=std::string(password);
+        t_name=std::string(t_username);
+        t_pass=std::string(t_password);
         t_key=std::string(consumerkey);
         t_secret=std::string(consumersecret);
         t_token=std::string(token);
@@ -443,7 +447,7 @@ void work()
 void test_tsend()
 {
     init_conf();
-    if (!initTwitter())
+    if (!initTwitter0())
     {
         cout<<"Init fail"<<endl;
         return ;
@@ -465,7 +469,7 @@ int main( int argc, char* argv[] )
     {
         init_mysql();
         work();
-        if (v++>10) break;
+        if (v++>2) break;
     }
     //work();
 
