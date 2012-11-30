@@ -102,11 +102,11 @@ bool init_conf()
     {
         while (fgets(buf, BUFFER_SIZE - 1, fp))
         {
-            read_buf(buf, "F_T_UNAME",user_name);
-            read_buf(buf, "F_T_PASS",password);
+            read_buf(buf, "F_T_UNAME",t_username);
+            read_buf(buf, "F_T_PASS",t_password);
             read_buf(buf,"F_HOST_NAME",host_name);
-            read_buf(buf, "F_USER_NAME",t_username);
-            read_buf(buf, "F_PASSWORD",t_password);
+            read_buf(buf, "F_USER_NAME",user_name);
+            read_buf(buf, "F_PASSWORD",password);
             read_buf(buf, "F_DB_NAME",db_name);
             read_int(buf , "F_PORT_NUMBER", &port_number);
             read_buf(buf, "F_T_C_KEY",consumerkey);
@@ -469,7 +469,8 @@ int main( int argc, char* argv[] )
     {
         init_mysql();
         work();
-        if (v++>2) break;
+        //if (v++>2)
+        break;
     }
     //work();
 
