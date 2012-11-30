@@ -76,8 +76,7 @@ bool init_conf()
 {
 	FILE *fp=NULL;
 	char buf[BUFFER_SIZE];
-    char user_name[BUFFER_SIZE];
-    char password [BUFFER_SIZE];
+
     char t_username[BUFFER_SIZE];
     char t_password [BUFFER_SIZE];
     char consumerkey [BUFFER_SIZE];
@@ -85,8 +84,7 @@ bool init_conf()
     char token[BUFFER_SIZE];
     char tokensecret[BUFFER_SIZE];
 
-	user_name[0]=0;
-	password[0]=0;
+
 	t_username[0]=0;
 	t_password[0]=0;
 	consumerkey[0]=0;
@@ -153,7 +151,7 @@ int init_mysql() {
 		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
         {
 			write_log("Error init mysql: %s",mysql_error(conn));
-			//sleep(20);
+			write_log("host=%s,user=%s,pas=%s,db=%s,port=%d",host_name,user_name,password,db_name,port_number);
 			return false;
 		}
 	}
@@ -458,7 +456,7 @@ void test_tsend()
 int main( int argc, char* argv[] )
 {
     init_conf();
-    if (!initTwitter())
+    if (!initTwitter0())
     {
         write_log("Init twitter fail");
         return -1;
