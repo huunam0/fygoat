@@ -17,10 +17,8 @@ gmatch: needed.h
 	$(CC) -o gmatch shtml.cpp gmatch.cpp $(GFLAG) $(MFLAG) $(LFLAG)
 trigger: needed.h
 	$(CC) -o trigger trigger.cpp $(GFLAG) $(MFLAG) $(LFLAG)
-fsend: 
-	$(CC) -o ffsend fsend.cpp $(FFLAG) $(GFLAG) $(MFLAG) $(LFLAG)
-tsend: 
-	$(CC) -o ftsend tsend.cpp $(TFLAG) $(GFLAG) $(MFLAG) $(LFLAG)
+ftrigger: 
+	$(CC) -o ftrigger ftrigger.cpp $(TFLAG) $(GFLAG) $(MFLAG) $(LFLAG)
 clear:
 	rm -f gtoday gtable gmatch
 clean:

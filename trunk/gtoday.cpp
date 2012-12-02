@@ -217,11 +217,12 @@ void addLeague(string lid, string lname)
     //if (DEBUG) cout<<"Add league "<<lid<<" / "<<lname<<endl;
     executesql(sql);
     getTable(lid);
+    getTable(lid);
 }
 void addMatch(int mid, string league,string group,int hteam, int ateam,int status=0, int hscore=0, int ascore=0)
 {
     char sql[900];
-    sprintf(sql,"INSERT INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`,`viewdate`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s','%s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d,viewdate='%s'",mid,league.c_str(),group.c_str(),hteam,ateam,status,hscore,ascore,iNo,year2,month2,day2,momment.c_str(),currentdate,hteam,ateam,currentdate);
+    sprintf(sql,"INSERT INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`,`viewdate`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s','%s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d,viewdate='%s',`order`=%d",mid,league.c_str(),group.c_str(),hteam,ateam,status,hscore,ascore,iNo,year2,month2,day2,momment.c_str(),currentdate,hteam,ateam,currentdate,iNo);
     ///cout<<sql<<endl;
     executesql(sql);
 
