@@ -1,4 +1,4 @@
-#include "tsend.h"
+#include "ftrigger.h"
 #include <mysql/mysql.h>
 #include <string.h>
 #include <stdarg.h>
@@ -13,6 +13,7 @@ static char db_name  [BUFFER_SIZE];
 static int port_number;
 bool DEBUG = true;
 static MYSQL *conn;
+string hadsent=string("#");
 
 void write_log(const char *fmt, ...)
 {
@@ -346,6 +347,9 @@ void stra2cpy(char* &dst, char* src)
 }
 void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_teams)
 {
+    string tmp= string(user_id)+string("-")+string(match_id)+string("#");
+    if (hadsent.find(string("#")+tmp)!=string::npos) return;
+    hadsent+=tmp;
     char msg[140];
     sprintf(msg,"[F] match got triggers, #%s:%s",match_id,match_teams);
     if (sendDirectMessage(string(user_twitter),string(msg)))
@@ -385,7 +389,7 @@ void work()
                 }
 
             }
-            cout<<"User id:"<<user_id<<", twit:"<<user_twit<<endl;
+            //cout<<"User id:"<<user_id<<", twit:"<<user_twit<<endl;
         }
 		else if (strcmp(wrd,"match")==0)
         {
@@ -400,7 +404,7 @@ void work()
                 }
 
             }
-            cout<<"Match id:"<<match_id<<", teams:"<<match_team<<endl;
+            //cout<<"Match id:"<<match_id<<", teams:"<<match_team<<endl;
             tweet_match(user_id,user_twit,match_id,match_team);
         }
 
@@ -414,7 +418,7 @@ void test_tsend()
     init_conf();
     if (!initTwitter0())
     {
-        cout<<"Init fail"<<endl;
+        //cout<<"Init fail"<<endl;
         return ;
     }
     write_log("Init twitter OK");
@@ -435,7 +439,7 @@ int main( int argc, char* argv[] )
         init_mysql();
         work();
         //if (v++>2)
-        break;
+        //break;
     }
     //work();
 
