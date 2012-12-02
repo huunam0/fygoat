@@ -129,7 +129,6 @@ bool init_conf()
 }
 bool executesql(const char * sql)
 {
-    if (DEBUG) cout<<sql<<endl;
 	if (mysql_real_query(conn,sql,strlen(sql)))
     {
 		//sleep(20);
@@ -295,7 +294,7 @@ bool initTwitter0()
         std::string authUrl;
         twitterObj.oAuthRequestToken( authUrl );
         twitterObj.oAuthHandlePIN( authUrl );
-
+        cout<<"authURL:"<<authUrl<<endl;
 
         /* Step 4: Exchange request token with access token */
         twitterObj.oAuthAccessToken();
