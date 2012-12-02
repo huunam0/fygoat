@@ -118,10 +118,10 @@ bool init_conf()
         t_secret=std::string(consumersecret);
         t_token=std::string(token);
         t_tokensecret=std::string(tokensecret);
-        printf("KEY:%s\n",t_key);
-        printf("SECRET:%s\n",t_secret);
-        printf("Token key:%s\n",token);
-        printf("Token secret:%s\n",tokensecret);
+        printf("KEY:%s\n",t_key.c_str());
+        printf("SECRET:%s\n",t_secret.c_str());
+        printf("Token key:%s\n",token.c_str());
+        printf("Token secret:%s\n",tokensecret.c_str());
 		return true;
 	//	fclose(fp);
     }
