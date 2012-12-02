@@ -1,4 +1,4 @@
-#include "twittersend.h"
+#include "tsend.h"
 #include <mysql/mysql.h>
 #include <string.h>
 #include <stdarg.h>
