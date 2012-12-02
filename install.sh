@@ -7,7 +7,7 @@
 WEBBASE=/var/www/
 APACHEUSER=www-data
 DBUSER=root
-DBPASS=usbw
+DBPASS=sql#2012
 
 #try install tools
 sudo apt-get install flex g++ libmysql++-dev php5 apache2 mysql-server php5-mysql php5-gd php5-cli mono-gmcs libapache2-mod-php5 curl libcurl3 libcurl3-dev php5-curl
@@ -17,13 +17,15 @@ sudo yum -y install php httpd php-mysql mysql-server php-xml php-gd gcc-c++  mys
 
 
 #compile and install the core
-rm -f gtoday gtable gmatch
+rm -f gtoday gtable gmatch ftrigger
 make gmatch
 make gtable
 make gtoday
+make ftrigger
 sudo cp gmatch /usr/bin
 sudo cp gtable /usr/bin
 sudo cp gtoday /usr/bin
+sudo cp ftrigger /usr/bin
 
 #create work dir set default conf
 sudo    mkdir /etc/footygoat
@@ -37,4 +39,9 @@ sudo cp footygoat /etc/init.d/footygoat
 sudo chmod +x  /etc/init.d/footygoat
 sudo ln -s /etc/init.d/footygoat /etc/rc3.d/S93footygoat
 sudo ln -s /etc/init.d/footygoat /etc/rc2.d/S93footygoat
-sudo /etc/init.d/footygoat start
+
+sudo cp ftrigger /etc/init.d/ftrigger
+sudo chmod +x  /etc/init.d/ftrigger
+sudo ln -s /etc/init.d/ftrigger /etc/rc3.d/S93ftrigger
+sudo ln -s /etc/init.d/ftrigger /etc/rc2.d/S93ftrigger
+#sudo /etc/init.d/footygoat start

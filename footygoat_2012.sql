@@ -232,6 +232,16 @@ INSERT INTO `f_trigger` (`trigger_id`,`groupid`,`user_id`,`field_id`,`operater`,
 /*!40000 ALTER TABLE `f_trigger` ENABLE KEYS */;
 
 
+DROP TABLE IF EXISTS `f_sent`;
+CREATE TABLE `f_sent` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(9) NOT NULL DEFAULT '0',
+  `match_id` int(9) NOT NULL DEFAULT '0',
+  `moment` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
 --
 -- Create Table `f_users`
 --
