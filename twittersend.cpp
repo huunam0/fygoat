@@ -109,8 +109,8 @@ bool init_conf()
             read_int(buf , "F_PORT_NUMBER", &port_number);
             read_buf(buf, "F_T_C_KEY",consumerkey);
             read_buf(buf, "F_T_C_SECRET",consumersecret);
-            read_buf(buf, "F_T_ATOKEN",token);
-            read_buf(buf, "F_T_ATOKENS",tokensecret);
+            read_buf(buf, "F_T_ATOKEN_KEY",token);
+            read_buf(buf, "F_T_ATOKEN_SECRET",tokensecret);
         }
         t_name=std::string(t_username);
         t_pass=std::string(t_password);
@@ -120,8 +120,8 @@ bool init_conf()
         t_tokensecret=std::string(tokensecret);
         printf("KEY:%s\n",t_key.c_str());
         printf("SECRET:%s\n",t_secret.c_str());
-        printf("Token key:%s\n",token.c_str());
-        printf("Token secret:%s\n",tokensecret.c_str());
+        printf("Token key:%s\n",t_token.c_str());
+        printf("Token secret:%s\n",t_tokensecret.c_str());
 		return true;
 	//	fclose(fp);
     }
