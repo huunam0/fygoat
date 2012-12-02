@@ -2,6 +2,10 @@
 #include <mysql/mysql.h>
 #include <string.h>
 #include <stdarg.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <signal.h>
+#include <errno.h>
 
 twitCurl twitterObj;
 string t_name, t_pass, t_key, t_secret, t_token, t_tokensecret,replyMsg;
@@ -12,8 +16,18 @@ static char password [BUFFER_SIZE];
 static char db_name  [BUFFER_SIZE];
 static int port_number;
 bool DEBUG = true;
+#define LOCKFILE "/var/run/ftrigger.pid"
+#define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 static MYSQL *conn;
 string hadsent=string("#");
+//For daemon start:
+static bool STOP=false;
+int sleep_time = 3;
+void call_for_exit(int s)
+{
+   STOP=true;
+   printf("Stopping ftrigger...\n");
+}
 
 void write_log(const char *fmt, ...)
 {
@@ -25,7 +39,7 @@ void write_log(const char *fmt, ...)
     sTm = gmtime (&now);
     strftime (times, sizeof(times), "%Y-%m-%d %H:%M:%S", sTm);
 
-	sprintf(buffer,"/var/log/footygoat/tweet.log");
+	sprintf(buffer,"/var/log/footygoat/trigger.log");
 	FILE *fp = fopen(buffer, "a+");
 	if (fp==NULL)
     {
@@ -372,7 +386,7 @@ void work()
     char buffer[MAX_BUFFER];
     //char *wrd;
     char *user_id=NULL, *user_twit=NULL, *match_id=NULL, *match_team=NULL;
-    stream = popen("wget -q -O - http://footygoat.com/gottriggers.php", "r");
+    stream = popen("wget -q -O - http://localhost/gottriggers.php", "r");
     while ( fgets(buffer, MAX_BUFFER, stream) != NULL )
     {
         char *wrd=strtok(buffer,"#");
@@ -413,16 +427,49 @@ void work()
     pclose(stream);
 
 }
-void test_tsend()
+//For daemon:
+int lockfile(int fd)
 {
-    init_conf();
-    if (!initTwitter0())
+	struct flock fl;
+	fl.l_type = F_WRLCK;
+	fl.l_start = 0;
+	fl.l_whence = SEEK_SET;
+	fl.l_len = 0;
+	return (fcntl(fd,F_SETLK,&fl));
+}
+bool already_running()
+{
+	int fd;
+	char buf[16];
+	fd = open(LOCKFILE, O_RDWR|O_CREAT, LOCKMODE);
+	if (fd < 0)
     {
-        //cout<<"Init fail"<<endl;
-        return ;
-    }
-    write_log("Init twitter OK");
-    sendDirectMessage(string("huunam0"),string("Please go to chamthi.net"));
+		write_log("can't open %s: %s", LOCKFILE, strerror(errno));
+		return true;
+	}
+	if (lockfile(fd) < 0)
+    {
+		if (errno == EACCES || errno == EAGAIN)
+		{
+			close(fd);
+			return true;
+		}
+		write_log("can't lock %s: %s", LOCKFILE, strerror(errno));
+		return true;
+	}
+	ftruncate(fd, 0);
+	sprintf(buf,"%d", getpid());
+	write(fd,buf,strlen(buf)+1);
+	return false;
+}
+bool daemon_init(void)
+ {
+     setsid();
+     umask(0); /* clear file mode creation mask */
+     close(0); /* close stdin */
+     close(1); /* close stdout */
+     close(2); /* close stderr */
+     return(true);
 }
 int main( int argc, char* argv[] )
 {
@@ -434,13 +481,21 @@ int main( int argc, char* argv[] )
     }
     write_log("Init twitter OK");
     int v=0;
-    while(true)
+	if (!DEBUG) daemon_init();
+    if (already_running())
+    {
+        write_log("Ftrigger is already running!");
+        return 1;
+    }
+	signal(SIGQUIT,call_for_exit);
+	signal(SIGKILL,call_for_exit);
+	signal(SIGTERM,call_for_exit);
+    while(!STOP)
     {
         init_mysql();
         work();
-        //if (v++>2)
-        //break;
-    }
+    	sleep(sleep_time);
+	}
     //work();
 
     return 0;
