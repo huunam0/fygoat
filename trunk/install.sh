@@ -40,8 +40,8 @@ sudo chmod +x  /etc/init.d/footygoat
 sudo ln -s /etc/init.d/footygoat /etc/rc3.d/S93footygoat
 sudo ln -s /etc/init.d/footygoat /etc/rc2.d/S93footygoat
 
-sudo cp ftrigger /etc/init.d/ftrigger
-sudo chmod +x  /etc/init.d/ftrigger
-sudo ln -s /etc/init.d/ftrigger /etc/rc3.d/S93ftrigger
-sudo ln -s /etc/init.d/ftrigger /etc/rc2.d/S93ftrigger
+sudo cp ftrigger /etc/init.d/ftriggers
+sudo chmod +x  /etc/init.d/ftriggers
+sudo ln -s /etc/init.d/ftriggers /etc/rc3.d/S93ftriggers
+sudo ln -s /etc/init.d/ftriggers /etc/rc2.d/S93ftriggers
 #sudo /etc/init.d/footygoat start
