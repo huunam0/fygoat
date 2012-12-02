@@ -15,7 +15,7 @@ static char user_name[BUFFER_SIZE];
 static char password [BUFFER_SIZE];
 static char db_name  [BUFFER_SIZE];
 static int port_number;
-bool DEBUG = true;
+bool DEBUG = false;
 #define LOCKFILE "/var/run/ftrigger.pid"
 #define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 static MYSQL *conn;
@@ -473,6 +473,7 @@ bool daemon_init(void)
 }
 int main( int argc, char* argv[] )
 {
+    if (argv>0) if (strcmp(argv[1],"debug")==0) DEBUG=true;
     init_conf();
     if (!initTwitter0())
     {
