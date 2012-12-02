@@ -3,7 +3,7 @@ CC=g++
 GFLAG= -Wall
 MFLAG= -I/usr/local/mysql/include/mysql -I/usr/include/mysql
 LFLAG= -L/usr/local/mysql/lib/mysql -L/usr/lib/mysql  -lmysqlclient
-CFLAG= -ltwitcurl
+TFLAG= -ltwitcurl
 
 all: gmatch gtable gtoday
 
@@ -17,8 +17,8 @@ gmatch: needed.h
 	$(CC) -o gmatch shtml.cpp gmatch.cpp $(GFLAG) $(MFLAG) $(LFLAG)
 trigger: needed.h
 	$(CC) -o trigger trigger.cpp $(GFLAG) $(MFLAG) $(LFLAG)
-twittersend: 
-	$(CC) -o twittersend twittersend.cpp $(CFLAG) $(GFLAG) $(MFLAG) $(LFLAG)
+tsend: 
+	$(CC) -o tsend tsend.cpp $(TFLAG) $(GFLAG) $(MFLAG) $(LFLAG)
 clear:
 	rm -f gtoday gtable gmatch
 clean:
