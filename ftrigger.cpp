@@ -357,7 +357,7 @@ bool daemon_init(void)
 }
 int main( int argc, char* argv[] )
 {
-    if (argv>0) if (strcmp(argv[1],"debug")==0) DEBUG=true;
+    if (argv>1) if (strcmp(argv[1],"debug")==0) DEBUG=true;
     if (DEBUG) cout<<"I'm running in debug mod"<<endl;
     init_conf();
     if (!initTwitter0())
