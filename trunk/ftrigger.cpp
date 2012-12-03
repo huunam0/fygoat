@@ -358,7 +358,7 @@ bool daemon_init(void)
 }
 int main( int argc, char* argv[] )
 {
-    if (argv>1) if (strcmp(argv[1],"debug")==0) DEBUG=true;
+    if (argc>1) if (strcmp(argv[1],"debug")==0) DEBUG=true;
     if (DEBUG) write_log("I'm running in debug mod = %s",DEBUG);
     init_conf();
     if (!initTwitter0())
