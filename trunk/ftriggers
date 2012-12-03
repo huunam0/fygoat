@@ -40,6 +40,7 @@ do_start()
 	#   0 if daemon has been started
 	#   1 if daemon was already running
 	#   2 if daemon could not be started
+	echo "Starting $DESC";
 	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null || return 1
 	start-stop-daemon --start --quiet -b --pidfile $PIDFILE --exec $DAEMON  \
 		|| return 2
@@ -58,9 +59,11 @@ do_stop()
 	#   1 if daemon was already stopped
 	#   2 if daemon could not be stopped
 	#   other if a failure occurred
+	echo "Stopping $DESC";
 	start-stop-daemon --stop --retry=10 --pidfile $PIDFILE --name $NAME
 	#kill `ps -ef | grep gmatch | grep -v grep | awk '{print $2}'`
 	RETVAL="$?"
+	echo "$RETVAL"
 	[ "$RETVAL" = 2 ] && return 2
 	# Wait for children to finish too if this is a daemon that forks
 	# and if the daemon is only ever run from this initscript.
@@ -68,8 +71,8 @@ do_stop()
 	# that waits for the process to drop all resources that could be
 	# needed by services started subsequently.  A last resort is to
 	# sleep for some time.
-	start-stop-daemon --stop --quiet --oknodo --retry=10 --pidfile $PIDFILE
-	[ "$?" = 2 ] && return 2
+	#start-stop-daemon --stop --quiet --oknodo --retry=10 --pidfile $PIDFILE
+	#[ "$?" = 2 ] && return 2
 	# Many daemons don't delete their pidfiles when they exit.
 	rm -f $PIDFILE
 	return "$RETVAL"
@@ -84,6 +87,7 @@ do_reload() {
 	# restarting (for example, when it is sent a SIGHUP),
 	# then implement that here.
 	#
+	echo "Reload $DESC";
 	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name $NAME
 	return 0
 }
