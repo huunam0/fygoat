@@ -177,96 +177,6 @@ int init_mysql() {
 }
 
 
-bool initTwitter()
-{
-    //char tmpBuf[1024];
-    twitterObj.setTwitterUsername(t_name);
-    twitterObj.setTwitterPassword(t_pass);
-    twitterObj.getOAuth().setConsumerKey(t_key);
-    twitterObj.getOAuth().setConsumerSecret(t_secret);
-    std::string myOAuthAccessTokenKey("");
-    std::string myOAuthAccessTokenSecret("");
-    std::ifstream oAuthTokenKeyIn;
-    std::ifstream oAuthTokenSecretIn;
-    char token_key[]="twittersend_token_key.txt";
-    char token_secret[]="twittersend_token_secret.txt";
-    oAuthTokenKeyIn.open(token_key);
-    oAuthTokenSecretIn.open(token_secret);
-    char tmpBuf[1024];
-
-    memset( tmpBuf, 0, 1024 );
-    oAuthTokenKeyIn >> tmpBuf;
-    myOAuthAccessTokenKey = tmpBuf;
-
-    memset( tmpBuf, 0, 1024 );
-    oAuthTokenSecretIn >> tmpBuf;
-    myOAuthAccessTokenSecret = tmpBuf;
-
-    oAuthTokenKeyIn.close();
-    oAuthTokenSecretIn.close();
-    if( myOAuthAccessTokenKey.size() && myOAuthAccessTokenSecret.size() )
-    {
-        /* If we already have these keys, then no need to go through auth again */
-        if (DEBUG)
-            printf( "\nUsing:\nKey: %s\nSecret: %s\n\n", myOAuthAccessTokenKey.c_str(), myOAuthAccessTokenSecret.c_str() );
-
-        twitterObj.getOAuth().setOAuthTokenKey( myOAuthAccessTokenKey );
-        twitterObj.getOAuth().setOAuthTokenSecret( myOAuthAccessTokenSecret );
-    }
-    else
-    {
-        std::string authUrl;
-        twitterObj.oAuthRequestToken( authUrl );
-        twitterObj.oAuthHandlePIN( authUrl );
-
-
-        /* Step 4: Exchange request token with access token */
-        twitterObj.oAuthAccessToken();
-
-        /* Step 5: Now, save this access token key and secret for future use without PIN */
-        twitterObj.getOAuth().getOAuthTokenKey( myOAuthAccessTokenKey );
-        twitterObj.getOAuth().getOAuthTokenSecret( myOAuthAccessTokenSecret );
-
-        /* Step 6: Save these keys in a file or wherever */
-        std::ofstream oAuthTokenKeyOut;
-        std::ofstream oAuthTokenSecretOut;
-
-        oAuthTokenKeyOut.open(token_key);
-        oAuthTokenSecretOut.open(token_secret);
-
-        oAuthTokenKeyOut.clear();
-        oAuthTokenSecretOut.clear();
-
-        oAuthTokenKeyOut << myOAuthAccessTokenKey.c_str();
-        oAuthTokenSecretOut << myOAuthAccessTokenSecret.c_str();
-
-        oAuthTokenKeyOut.close();
-        oAuthTokenSecretOut.close();
-        /* Step 2: Get request token key and secret */
-
-    }
-    /* OAuth flow ends */
-
-    /* Account credentials verification */
-    if(twitterObj.accountVerifyCredGet())
-    {
-        if (DEBUG)
-        {
-            twitterObj.getLastWebResponse( replyMsg );
-            printf( "\ntwittersend:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str() );
-        }
-        return true;
-    }
-    else
-    {
-        if (DEBUG)
-        {
-            twitterObj.getLastCurlError(replyMsg);
-            printf( "\ntwittersend:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str() );
-        }
-        return false;
-    }
-}
 bool initTwitter0()
 {
 
@@ -333,9 +243,11 @@ void stra2cpy(char* &dst, char* src)
 }
 void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_teams)
 {
+    /*
     string tmp= string(user_id)+string("-")+string(match_id)+string("#");
     if (hadsent.find(string("#")+tmp)!=string::npos) return;
     hadsent+=tmp;
+    */
     char msg[140];
     sprintf(msg,"[F] match got triggers, #%s:%s",match_id,match_teams);
     if (sendDirectMessage(string(user_twitter),string(msg)))
