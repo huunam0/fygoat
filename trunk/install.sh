@@ -10,10 +10,11 @@ DBUSER=root
 DBPASS=sql#2012
 
 #try install tools
+sudo apt-get update
 sudo apt-get install flex g++ libmysql++-dev php5 apache2 mysql-server php5-mysql php5-gd php5-cli mono-gmcs libapache2-mod-php5 curl libcurl3 libcurl3-dev php5-curl
 
-sudo yum -y update
-sudo yum -y install php httpd php-mysql mysql-server php-xml php-gd gcc-c++  mysql-devel php-mbstring glibc-static
+#sudo yum -y update
+#sudo yum -y install php httpd php-mysql mysql-server php-xml php-gd gcc-c++  mysql-devel php-mbstring glibc-static
 
 
 #compile and install the core
@@ -40,8 +41,8 @@ sudo chmod +x  /etc/init.d/footygoat
 sudo ln -s /etc/init.d/footygoat /etc/rc3.d/S93footygoat
 sudo ln -s /etc/init.d/footygoat /etc/rc2.d/S93footygoat
 
-sudo cp ftrigger /etc/init.d/ftriggers
+sudo cp ftriggers /etc/init.d/ftriggers
 sudo chmod +x  /etc/init.d/ftriggers
 sudo ln -s /etc/init.d/ftriggers /etc/rc3.d/S93ftriggers
 sudo ln -s /etc/init.d/ftriggers /etc/rc2.d/S93ftriggers
-#sudo /etc/init.d/footygoat start
+sudo /etc/init.d/footygoat start

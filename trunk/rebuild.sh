@@ -4,7 +4,7 @@
 #ps -ef | grep gmatch
 #kill `ps -ef | grep gmatch | grep -v grep | awk '{print $2}'`
 for i in $*; do
-   echo Building  $i
+   echo -e "\e[0;31m Building\e[0m  $i"
    rm $i
    make $i
    sudo cp $i /usr/bin
