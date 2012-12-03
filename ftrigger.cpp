@@ -1,6 +1,7 @@
-#include "ftrigger.h"
+#include <time.h>
 #include <mysql/mysql.h>
 #include <string.h>
+#include "ftrigger.h"
 #include <stdarg.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -15,7 +16,7 @@ static char user_name[BUFFER_SIZE];
 static char password [BUFFER_SIZE];
 static char db_name  [BUFFER_SIZE];
 static int port_number;
-bool DEBUG = false;
+static bool DEBUG = false;
 #define LOCKFILE "/var/run/ftrigger.pid"
 #define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 static MYSQL *conn;
@@ -29,30 +30,7 @@ void call_for_exit(int s)
    printf("Stopping ftrigger...\n");
 }
 
-void write_log(const char *fmt, ...)
-{
-	va_list         ap;
-	char            buffer[4096];
-	char times[20];
-    struct tm *sTm;
-    time_t now = time (0);
-    sTm = gmtime (&now);
-    strftime (times, sizeof(times), "%Y-%m-%d %H:%M:%S", sTm);
 
-	sprintf(buffer,"/var/log/footygoat/trigger.log");
-	FILE *fp = fopen(buffer, "a+");
-	if (fp==NULL)
-    {
-		 fprintf(stderr,"openfile error!\n");
-		 system("pwd");
-	}va_start(ap, fmt);
-	vsprintf(buffer, fmt, ap);
-	fprintf(fp,"%s \t %s\n",times,buffer);
-	//if (DEBUG) printf("%s\n",buffer);
-	va_end(ap);
-	fclose(fp);
-
-}
 int after_equal(char * c){
 	int i=0;
 	for(;c[i]!='\0'&&c[i]!='=';i++);
@@ -85,6 +63,30 @@ void read_int(char * buf,const char * key,int * value)
 	char buf2[BUFFER_SIZE];
 	if (read_buf(buf,key,buf2))
 		sscanf(buf2, "%d", value);
+
+}
+void write_log(const char *fmt, ...)
+{
+	va_list         ap;
+	char            buffer[4096];
+	char times[20];
+    struct tm *sTm;
+    time_t now = time (0);
+    sTm = gmtime (&now);
+    strftime (times, sizeof(times), "%Y-%m-%d %H:%M:%S", sTm);
+
+	sprintf(buffer,"/var/log/footygoat/trigger.log");
+	FILE *fp = fopen(buffer, "a+");
+	if (fp==NULL)
+    {
+		 fprintf(stderr,"openfile error!\n");
+		 system("pwd");
+	}va_start(ap, fmt);
+	vsprintf(buffer, fmt, ap);
+	fprintf(fp,"%s \t %s\n",times,buffer);
+	//if (DEBUG) printf("%s\n",buffer);
+	va_end(ap);
+	fclose(fp);
 
 }
 bool init_conf()
@@ -133,10 +135,6 @@ bool init_conf()
         t_secret=std::string(consumersecret);
         t_token=std::string(token);
         t_tokensecret=std::string(tokensecret);
-        printf("KEY:%s\n",t_key.c_str());
-        printf("SECRET:%s\n",t_secret.c_str());
-        printf("Token key:%s\n",t_token.c_str());
-        printf("Token secret:%s\n",t_tokensecret.c_str());
 		return true;
 	//	fclose(fp);
     }
@@ -177,10 +175,7 @@ int init_mysql() {
         return false;
 	return true;
 }
-void printUsage()
-{
-    printf( "\nUsage:\ntwittersend -u username -p password\n" );
-}
+
 
 bool initTwitter()
 {
@@ -274,34 +269,11 @@ bool initTwitter()
 }
 bool initTwitter0()
 {
-    //char tmpBuf[1024];
-    //twitterObj.setTwitterUsername(t_name);
-    //twitterObj.setTwitterPassword(t_pass);
+
     twitterObj.getOAuth().setConsumerKey(t_key);
     twitterObj.getOAuth().setConsumerSecret(t_secret);
     std::string myOAuthAccessTokenKey(t_token);
     std::string myOAuthAccessTokenSecret(t_tokensecret);
-    //std::ifstream oAuthTokenKeyIn;
-    //std::ifstream oAuthTokenSecretIn;
-    //char token_key[]="twittersend_token_key.txt";
-    //char token_secret[]="twittersend_token_secret.txt";
-    //oAuthTokenKeyIn.open(token_key);
-    //oAuthTokenSecretIn.open(token_secret);
-    //char tmpBuf[1024];
-
-    //memset( tmpBuf, 0, 1024 );
-    //oAuthTokenKeyIn >> tmpBuf;
-    //myOAuthAccessTokenKey = tmpBuf;
-
-    //memset( tmpBuf, 0, 1024 );
-    //oAuthTokenSecretIn >> tmpBuf;
-    //myOAuthAccessTokenSecret = tmpBuf;
-
-    //oAuthTokenKeyIn.close();
-    //oAuthTokenSecretIn.close();
-    /* If we already have these keys, then no need to go through auth again */
-   // if (DEBUG)
-        //printf( "\nUsing:\nKey: %s\nSecret: %s\n\n", myOAuthAccessTokenKey.c_str(), myOAuthAccessTokenSecret.c_str() );
     twitterObj.getOAuth().setOAuthTokenKey( myOAuthAccessTokenKey );
     twitterObj.getOAuth().setOAuthTokenSecret( myOAuthAccessTokenSecret );
     /* OAuth flow ends */
@@ -474,13 +446,13 @@ bool daemon_init(void)
 int main( int argc, char* argv[] )
 {
     if (argv>0) if (strcmp(argv[1],"debug")==0) DEBUG=true;
+    if (DEBUG) cout<<"I'm running in debug mod"<<endl;
     init_conf();
     if (!initTwitter0())
     {
         write_log("Init twitter fail");
         return -1;
     }
-    write_log("Init twitter OK");
     int v=0;
 	if (!DEBUG) daemon_init();
     if (already_running())
