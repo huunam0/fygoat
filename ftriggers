@@ -63,16 +63,17 @@ do_stop()
 	start-stop-daemon --stop --retry=10 --pidfile $PIDFILE --name $NAME
 	#kill `ps -ef | grep gmatch | grep -v grep | awk '{print $2}'`
 	RETVAL="$?"
-	echo "$RETVAL"
+	#echo "$RETVAL"
 	[ "$RETVAL" = 2 ] && return 2
+	[ "$RETVAL" = 0 ] && return 0
 	# Wait for children to finish too if this is a daemon that forks
 	# and if the daemon is only ever run from this initscript.
 	# If the above conditions are not satisfied then add some other code
 	# that waits for the process to drop all resources that could be
 	# needed by services started subsequently.  A last resort is to
 	# sleep for some time.
-	#start-stop-daemon --stop --quiet --oknodo --retry=10 --pidfile $PIDFILE
-	#[ "$?" = 2 ] && return 2
+	start-stop-daemon --stop --quiet --oknodo --retry=10 --pidfile $PIDFILE
+	[ "$?" = 2 ] && return 2
 	# Many daemons don't delete their pidfiles when they exit.
 	rm -f $PIDFILE
 	return "$RETVAL"
