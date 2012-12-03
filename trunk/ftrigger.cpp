@@ -228,7 +228,7 @@ bool postTweet(std::string tmpStr)
 bool sendDirectMessage(string toUser,string message)
 {
     if (DEBUG)
-        write_log("Send message '%s' to user '%s'",message.c_str(),toUser.c_str());
+        printf("Send message '%s' to user '%s'",message.c_str(),toUser.c_str());
     return twitterObj.directMessageSend(toUser,message);
 }
 
@@ -243,11 +243,12 @@ void stra2cpy(char* &dst, char* src)
 }
 void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_teams)
 {
-    /*
+    /**/
     string tmp= string(user_id)+string("-")+string(match_id)+string("#");
     if (hadsent.find(string("#")+tmp)!=string::npos) return;
     hadsent+=tmp;
-    */
+    write_log("DM:to %s with match %s and tmp=%s",user_id,match_id,tmp.c_str());
+    /**/
     char msg[140];
     sprintf(msg,"[F] match got triggers, #%s:%s",match_id,match_teams);
     if (sendDirectMessage(string(user_twitter),string(msg)))
@@ -358,7 +359,7 @@ bool daemon_init(void)
 int main( int argc, char* argv[] )
 {
     if (argv>1) if (strcmp(argv[1],"debug")==0) DEBUG=true;
-    if (DEBUG) cout<<"I'm running in debug mod"<<endl;
+    if (DEBUG) write_log("I'm running in debug mod = %s",DEBUG);
     init_conf();
     if (!initTwitter0())
     {
