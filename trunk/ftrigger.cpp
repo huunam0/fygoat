@@ -24,6 +24,7 @@ string hadsent=string("#");
 //For daemon start:
 static bool STOP=false;
 int sleep_time = 3;
+
 void call_for_exit(int s)
 {
    STOP=true;
@@ -179,7 +180,7 @@ int init_mysql() {
 
 bool initTwitter0()
 {
-
+    write_log("Init twitter");
     twitterObj.getOAuth().setConsumerKey(t_key);
     twitterObj.getOAuth().setConsumerSecret(t_secret);
     std::string myOAuthAccessTokenKey(t_token);
@@ -208,7 +209,18 @@ bool initTwitter0()
         return false;
     }
 }
-
+void reverify()
+{
+    if (!initTwitter0())
+    {
+        write_log("Cannot initialize Twitter");
+        if (!initTwitter0())
+        {
+            write_log("Cannot initialize Twitter again, it must stop");
+            STOP=true;
+        }
+    }
+}
 bool postTweet(std::string tmpStr)
 {
     replyMsg = "";
@@ -359,7 +371,7 @@ bool daemon_init(void)
 int main( int argc, char* argv[] )
 {
     if (argc>1) if (strcmp(argv[1],"debug")==0) DEBUG=true;
-    if (DEBUG) write_log("I'm running in debug mod = %s",DEBUG);
+    write_log("I'm running in debug mod = %s",DEBUG);
     init_conf();
     if (!initTwitter0())
     {
@@ -376,6 +388,7 @@ int main( int argc, char* argv[] )
 	signal(SIGQUIT,call_for_exit);
 	signal(SIGKILL,call_for_exit);
 	signal(SIGTERM,call_for_exit);
+	signal(SIGHUP,reverify);
     while(!STOP)
     {
         init_mysql();
