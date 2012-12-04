@@ -209,7 +209,7 @@ bool initTwitter0()
         return false;
     }
 }
-void reverify()
+void reverify(int s)
 {
     if (!initTwitter0())
     {
@@ -371,7 +371,7 @@ bool daemon_init(void)
 int main( int argc, char* argv[] )
 {
     if (argc>1) if (strcmp(argv[1],"debug")==0) DEBUG=true;
-    write_log("I'm running in debug mod = %s",DEBUG);
+    write_log("I'm running in debug mod = %d",DEBUG);
     init_conf();
     if (!initTwitter0())
     {
