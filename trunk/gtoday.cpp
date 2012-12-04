@@ -720,6 +720,10 @@ bool daemon_init(void)
      close(2); /* close stderr */
      return(true);
 }
+void reload_ftrigger()
+{
+    system("service ftriggers reload");
+}
 int main(int argc, char** argv)
 {
 
@@ -759,6 +763,7 @@ int main(int argc, char** argv)
 			init_mysql();
 			setEvent2(100);
 			write_log_call("is First Time or new day");
+			reload_ftrigger();
 		}
         getToday(sDate);
         //isFirstTime=false;
