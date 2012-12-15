@@ -16,6 +16,7 @@ static char db_name  [BUFFER_SIZE];
 static char f_home  [BUFFER_SIZE];
 static int port_number;
 static bool DEBUG=false;
+static bool RELOAD=false;
 #define LOCKFILE "/var/run/footygoat.pid"
 #define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 static MYSQL *conn;
@@ -410,7 +411,7 @@ void getMatch(int mId)
     sprintf(cmd,"%sgmatch %d &",f_home,mId);
     //cout<<cmd<<endl;
     system(cmd);
-
+    RELOAD=true;
 }
 void setEvent(int iEvent,int iValue=0)
 {
@@ -724,6 +725,10 @@ void reload_ftrigger()
 {
     system("service ftriggers reload");
 }
+void restart_ftrigger()
+{
+    system("service ftriggers restart");
+}
 int main(int argc, char** argv)
 {
 
@@ -763,9 +768,14 @@ int main(int argc, char** argv)
 			init_mysql();
 			setEvent2(100);
 			write_log_call("is First Time or new day");
-			reload_ftrigger();
+			restart_ftrigger();
 		}
         getToday(sDate);
+        if (RELOAD)
+        {
+            RELOAD=false;
+            reload_ftrigger();
+        }
         //isFirstTime=false;
         sleep_time=(stat0==0?3600:10);
         //cout<<"wait "<<sleep_time<<"seconds..."<<endl;
