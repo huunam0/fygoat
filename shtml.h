@@ -34,7 +34,7 @@ class shtml
         void removeAllTags();
         string getText();
         bool loadfromfile(const string fileName);
-        bool loadFromURL(const string sUrl, bool bconv = true);
+        bool loadFromURL(const string sUrl, bool bconv = false);
         bool writeFile(const string fileName);
         bool isEmpty();
         bool contain(string sSub);
