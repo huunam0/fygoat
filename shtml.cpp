@@ -657,7 +657,7 @@ bool shtml::loadFromURL(const string sUrl, bool bconv)
     }
     else
     {
-        sprintf(command,"wget -q -O -  '%s' ,sUrl.c_str());
+        sprintf(command,"wget -q -O -  '%s'" ,sUrl.c_str());
     }
     //sprintf(command,"wget -q -O -  '%s' ",sUrl.c_str());
     //cout<<"Load from "<<sUrl<<endl;
