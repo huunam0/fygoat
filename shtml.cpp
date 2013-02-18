@@ -646,12 +646,19 @@ bool shtml::loadfromfile(const string fileName)
 	myFile.close();
 	return true;
 }
-bool shtml::loadFromURL(const string sUrl)
+bool shtml::loadFromURL(const string sUrl, bool bconv)
 {
     FILE *in;
     char buff[10240];
     char command[250];
-    sprintf(command,"wget -q -O -  '%s' | iconv -c -s -f iso-8859-1 -t utf-8",sUrl.c_str());
+    if (bconv) //convert from iso-8859-1 to utf-8
+    {
+        sprintf(command,"wget -q -O -  '%s' | iconv -c -s -f iso-8859-1 -t utf-8",sUrl.c_str());
+    }
+    else
+    {
+        sprintf(command,"wget -q -O -  '%s' ,sUrl.c_str());
+    }
     //sprintf(command,"wget -q -O -  '%s' ",sUrl.c_str());
     //cout<<"Load from "<<sUrl<<endl;
     htm.clear();
