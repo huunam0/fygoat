@@ -456,11 +456,11 @@ void getToday(string sDay="")
     iNo=0;
     if (sDay.empty())
     {
-        bRet=m.loadFromURL("http://soccernet.espn.go.com/scores?cc=4716");
+        bRet=m.loadFromURL("http://espnfc.com/scores?cc=4716");
     }
     else
     {
-        bRet=m.loadFromURL((string("http://soccernet.espn.go.com/scores?date=")+sDay+string("&cc=4716&league=all")).c_str());
+        bRet=m.loadFromURL((string("http://espnfc.com/scores?date=")+sDay+string("&cc=4716&league=all")).c_str());
     }
     if (!bRet)
     {
@@ -676,7 +676,6 @@ void getToday(string sDay="")
     //m.viewContent();
     isFirstTime = false;
 }
-
 //For daemon:
 int lockfile(int fd)
 {

@@ -328,13 +328,76 @@ int parseStatus( shtml status)
         return 1;
     }
 }
-bool getMatch(int id)
+void parseStatus2(shtml stat)
+{
+    if (stat.contain("FT-Pens"))
+    {
+        status=9;
+        minutes=90;
+    }
+    else if (stat.contain("FT"))
+    {
+        status=7;
+        minutes=90;
+    }
+    else if (stat.contain("Postp"))//
+    {
+        status=11;
+    }
+    else if (stat.contain("Aban"))//
+    {
+        status=10;
+    }
+    else if (stat.contain("AET"))//
+    {
+        status=8;
+    }
+    else if (stat.contain("Susp"))//
+    {
+        status=6;
+    }
+    else if (stat.contain("2nd"))
+    {
+        status=3;
+    }
+    else if (stat.contain("HT"))
+    {
+        status=2;
+        minutes=45;
+    }
+    else if (stat.contain("1st"))
+    {
+        status=1;
+    }
+    else if (stat.contain(":"))//
+    {
+        status=0;
+    }
+    else
+    {
+        minutes=stat.toInt();
+        if (minutes<46)
+        {
+            status=1;
+        }
+        else if (minutes<91)
+        {
+            status=3;
+        }
+        else
+        {
+            status=0;
+        }
+    }
+}
+bool getMatch(int id) //for major league
 {
     shtml sh,t,n,nh,nh2;
     int i=0,v[2],g[2];
     char url[300];
     bool reCard = true;
-    sprintf(url,"http://soccernet.espn.go.com/match/_/id/%d?cc=4716",id);
+    sprintf(url,"http://espnfc.com/en/gamecast/statistics/id/%d/statistics.html?soccernet=true&cc=4716",id);
+    //sprintf(url,"http://soccernet.espn.go.com/match/_/id/%d?cc=4716",id);
     //sprintf(url,"http://soccernet.espn.go.com/match?id=%d&cc=4716",id);
     if (DEBUG)
         cout<<"Loading from "<<url<<endl;
@@ -344,11 +407,13 @@ bool getMatch(int id)
         return false;
     }
     if (sh.isEmpty()) return false;
+    /*Remove comments in html*/
     sh.removeBetween("<!--","-->",-1);
+    /* Remove odd parts*/
     t=sh.cutTagByName("div");
     while (!t.isEmpty())
     {
-        if (t.containAttr("bg-elements"))
+        if (t.containAttr("content-wrap"))
         {
             sh=t;
             break;
@@ -356,64 +421,63 @@ bool getMatch(int id)
         if (sh.isEmpty()) break;
         t=sh.cutTagByName("div");
     }
-    sh.retainTagByName("div",2);
     sh.retainTagByName("div");
-    sh.retainTagByName("div",2);
-    sh.retainTagByName("div");
-    t=sh.cutTagByName("div",2);
-    t.retainTagByName("div");
-    n = t.cutTagByName("div");
+    //sh.retainTagByName("div");
+    //sh.retainTagByName("div",2);
+    //sh.retainTagByName("div");
+    //t=sh.cutTagByName("div",2);
+    //t.retainTagByName("div");
+    //n = t.cutTagByName("div");
 
-    status = parseStatus(n.cutTagByName("span"));
-    //setValue(9,status,0);
-    n.retainTagByName("span");
-    //if (n.contain("'")&&(!n.contain("display:none;")))
-    if (((status==1) || (status==3)) && n.contain("'"))
-    {
-        n.retainBetween("-","'");
-        n.trim();
-        minutes=n.toInt();
-
-    }
+    /*Get status and obmit event 8th*/
+    n.setContent(sh.getBetween("<p class=\"time\">","</p>"));
+    n.trim();
+    parseStatus2(n);
     set2Value(8,status,minutes);
     if (DEBUG)
         cout<<"Status:"<<status<<endl;
-    t.retainTagByName("p");
     //t.viewContent();
-    sh.retainTagByName("div",2);
-    t=sh.cutTagByName("div");
+    /* Get other infos */
+    if (sh.contain("id=\"matchstats\""))
+    {
+        sh.retainTagByName("section",3);
+        sh.retainTagByName("div");
+        sh.retainTagByName("div");
+    }
+    else
+    {
+        sh.retainTagByName("div",2);
+    }
+    t=sh.cutTagByName("section");
     if (t.contain("Scoring Summary")) {
         if (DEBUG) cout<<"->Scoring Summary"<<endl;
-        t.retainTagByName("tbody");
-        n=t.cutTagByName("tr");
         int sc[2]={0,0};
         int sc1[2]={0,0};
-        while (!n.isEmpty())
+        for (i=1;i<=2;i++)
         {
-            for (i=0;i<2;i++)
+            nh=t.cutTagByName("tbody");
+            n=nh.cutTagByName("tr");
+            while (!n.isEmpty())
             {
-                nh=n.cutTagByName("td");
-                if (nh.contain("'"))
+                n.retainTagByName("td");
+                if (n.contain("'"))
                 {
-                    nh.retainBetween("(","'");
-                    if (nh.contain(" miss ")) continue;
-                    while (nh.contain(" "))
+                    n.retainBetween("(","'");
+                    if (n.contain(" miss ")) continue;
+                    while (n.contain(" "))
                         {
-                            nh.deleteTo(" ");
+                            n.deleteTo(" ");
                         }
                     v[i]=nh.toInt();
                     sc[i]++;
                     if (v[i]<46) sc1[i]++;
-                    //cout<<"Team "<<i<<" goal at "<<v<<" minute th"<<endl;
-
                 }
+                n=nh.cutTagByName("tr");
             }
-            n=t.cutTagByName("tr");
         }
-
         set2Value(0,sc[0],sc[1]);
         set2Value(1,sc1[0],sc1[1]);
-        t=sh.cutTagByName("div");
+        t=sh.cutTagByName("section");
     }
     if (t.contain("Match Stats")) {
         if (DEBUG) cout<<"->Match Stats"<<endl;
@@ -501,8 +565,9 @@ bool getMatch(int id)
             n=t.cutTagByName("tr");
         }
 
-        t=sh.cutTagByName("div");
+        t=sh.cutTagByName("section");
     }
+    /*
     if (reCard) {
         if (DEBUG) cout<<"->Recalcule red & yellow cards"<<endl;
         for (i=0; i<2; i++)
@@ -519,6 +584,199 @@ bool getMatch(int id)
         set2Value(3,v[0],v[1]);
         set2Value(2,g[0],g[1]);
     }
+    */
+    isFirstTime=false;
+    //cout<<"End of get data"<<endl;
+    return true;
+}
+bool getMatch0(int id) //for little league
+{
+    shtml sh,t,n,nh,nh2;
+    int i=0,v[2],g[2];
+    char url[300];
+    bool reCard = true;
+    sprintf(url,"http://espnfc.com/en/gamecast/statistics/id/%d/statistics.html?soccernet=true&cc=4716",id);
+    //sprintf(url,"http://soccernet.espn.go.com/match/_/id/%d?cc=4716",id);
+    //sprintf(url,"http://soccernet.espn.go.com/match?id=%d&cc=4716",id);
+    if (DEBUG)
+        cout<<"Loading from "<<url<<endl;
+    if(!sh.loadFromURL(url))
+    {
+        if (DEBUG) cout<<"Cannot load from "<<url<<endl;
+        return false;
+    }
+    if (sh.isEmpty()) return false;
+    /*Remove comments in html*/
+    sh.removeBetween("<!--","-->",-1);
+    /* Remove odd parts*/
+    t=sh.cutTagByName("div");
+    while (!t.isEmpty())
+    {
+        if (t.containAttr("content-wrap"))
+        {
+            sh=t;
+            break;
+        }
+        if (sh.isEmpty()) break;
+        t=sh.cutTagByName("div");
+    }
+    sh.retainTagByName("div");
+    //sh.retainTagByName("div");
+    //sh.retainTagByName("div",2);
+    //sh.retainTagByName("div");
+    //t=sh.cutTagByName("div",2);
+    //t.retainTagByName("div");
+    //n = t.cutTagByName("div");
+
+    /*Get status and obmit event 8th*/
+    n.setContent(sh.getBetween("<p class=\"time\">","</p>"));
+    n.trim();
+    parseStatus2(n);
+    set2Value(8,status,minutes);
+    if (DEBUG)
+        cout<<"Status:"<<status<<endl;
+    //t.viewContent();
+    /* Get other infos */
+    sh.retainTagByName("section",3);
+    sh.retainTagByName("div");
+    sh.retainTagByName("div");
+    t=sh.cutTagByName("section");
+    if (t.contain("Scoring Summary")) {
+        if (DEBUG) cout<<"->Scoring Summary"<<endl;
+        int sc[2]={0,0};
+        int sc1[2]={0,0};
+        for (i=1;i<=2;i++)
+        {
+            nh=t.cutTagByName("tbody");
+            n=nh.cutTagByName("tr");
+            while (!n.isEmpty())
+            {
+                n.retainTagByName("td");
+                if (n.contain("'"))
+                {
+                    n.retainBetween("(","'");
+                    if (n.contain(" miss ")) continue;
+                    while (n.contain(" "))
+                        {
+                            n.deleteTo(" ");
+                        }
+                    v[i]=nh.toInt();
+                    sc[i]++;
+                    if (v[i]<46) sc1[i]++;
+                }
+                n=nh.cutTagByName("tr");
+            }
+        }
+        set2Value(0,sc[0],sc[1]);
+        set2Value(1,sc1[0],sc1[1]);
+        t=sh.cutTagByName("section");
+    }
+    if (t.contain("Match Stats")) {
+        if (DEBUG) cout<<"->Match Stats"<<endl;
+        t.retainTagByName("table");
+        n=t.cutTagByName("tr");
+        //if (DEBUG) n.viewContent();
+        if (n.contain("Shots"))
+        {
+            for (i=0;i<2;i++)
+            {
+                nh=n.cutTagByName("td",i+1);
+                nh.trim();
+                //if (DEBUG) nh.viewContent();
+                if (nh.contain("-")) v[i]=0;
+                else v[i]=nh.toInt();
+                //setValue(4,v,i);
+                nh.retainBetween("(",")");
+                g[i]=nh.toInt();
+                //setValue(5,v,i);
+            }
+            set2Value(4,v[0],v[1]);
+            set2Value(5,g[0],g[1]);
+            n=t.cutTagByName("tr");
+        }
+        if (n.contain("Fouls"))
+        {
+            n=t.cutTagByName("tr");
+        }
+        if (n.contain("Corner Kicks"))
+        {
+            for (i=0;i<2;i++)
+            {
+                nh=n.cutTagByName("td",i+1);
+                nh.trim();
+                if (nh.contain("-")) v[i]=0;
+                else v[i]=nh.toInt();
+                //setValue(6,v,i);
+            }
+            set2Value(6,v[0],v[1]);
+            n=t.cutTagByName("tr");
+        }
+        if (n.contain("Offsides"))
+        {
+            n=t.cutTagByName("tr");
+        }
+        if (n.contain("Time of Possession"))
+        {
+            for (i=0;i<2;i++)
+            {
+                nh=n.cutTagByName("td",i+1);
+                nh.trim();
+                if (nh.contain("-")) v[i]=0;
+                else v[i]=nh.toInt();
+                //setValue(7,v,i);
+            }
+            set2Value(7,v[0],v[1]);
+            n=t.cutTagByName("tr");
+        }
+        if (n.contain("Yellow Cards"))
+        {
+            for (i=0;i<2;i++)
+            {
+                nh=n.cutTagByName("td",i+1);
+                nh.trim();
+                if (nh.contain("-")) v[i]=0;
+                else v[i]=nh.toInt();
+                if (v[i]>0) reCard=false;
+                //setValue(3,v,i);
+            }
+            set2Value(3,v[0],v[1]);
+            n=t.cutTagByName("tr");
+        }
+        if (n.contain("Red Cards"))
+        {
+            for (i=0;i<2;i++)
+            {
+                nh=n.cutTagByName("td",i+1);
+                nh.trim();
+                if (nh.contain("-")) v[i]=0;
+                else v[i]=nh.toInt();
+                if (reCard) if (v[i]>0) reCard=false;
+                //setValue(2,v,i);
+            }
+            set2Value(2,v[0],v[1]);
+            n=t.cutTagByName("tr");
+        }
+
+        t=sh.cutTagByName("section");
+    }
+    /*
+    if (reCard) {
+        if (DEBUG) cout<<"->Recalcule red & yellow cards"<<endl;
+        for (i=0; i<2; i++)
+        {
+            t.removeTagByName("div",3);
+            //int card[3];
+            v[i]=t.count("soccer-icons-yellowcard");
+            //setValue(3,v,i);
+            g[i]=t.count("soccer-icons-redcard");
+            //setValue(2,v,i);
+            //cout<<"Team "<<i<<" has "<<card[1]<<" yellow card(s) and "<<card[2]<<" red card(s)."<<endl;
+            t=sh.cutTagByName("div");
+        }
+        set2Value(3,v[0],v[1]);
+        set2Value(2,g[0],g[1]);
+    }
+    */
     isFirstTime=false;
     //cout<<"End of get data"<<endl;
     return true;
