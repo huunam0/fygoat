@@ -421,7 +421,9 @@ bool getMatch(int id) //for major league
         if (sh.isEmpty()) break;
         t=sh.cutTagByName("div");
     }
+    if (DEBUG) cout<<"->MAIN:"<<sh.getContent()<<endl;
     sh.retainTagByName("div");
+
     //sh.retainTagByName("div");
     //sh.retainTagByName("div",2);
     //sh.retainTagByName("div");
@@ -440,14 +442,17 @@ bool getMatch(int id) //for major league
     /* Get other infos */
     if (sh.contain("id=\"matchstats\""))
     {
+        if (DEBUG) cout<<"-> OLD VERSION"<<endl;
         sh.retainTagByName("section",3);
         sh.retainTagByName("div");
         sh.retainTagByName("div");
     }
     else
     {
+        if (DEBUG) cout<<"-> NEW VERSION"<<endl;
         sh.retainTagByName("div",2);
     }
+    if (DEBUG) cout<<"->"<<sh.getContent()<<endl;
     t=sh.cutTagByName("section");
     if (t.contain("Scoring Summary")) {
         if (DEBUG) cout<<"->Scoring Summary"<<endl;
