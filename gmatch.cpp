@@ -578,8 +578,9 @@ bool getMatch(int id) //for major league
 
         t=sh.cutTagByName("section");
     }
-    t=sh.cutTagByName("section");
     if (!t.isEmpty()) t=sh.cutTagByName("section");
+    if (!t.isEmpty()) if (!t.contain("Yellow Cards")) t=sh.cutTagByName("section");
+    if (DEBUG) cout<<"t:: "<<t.getContent().substr(1,150)<<endl;
     if (t.contain("Yellow Cards"))
     {
         for(i=0;i<2;i++)
@@ -786,6 +787,17 @@ bool getMatch0(int id) //for little league
         }
 
         t=sh.cutTagByName("section");
+    }
+    if (!t.isEmpty()) t=sh.cutTagByName("section");
+    if (!t.isEmpty()) if (!t.contain("Yellow Cards")) t=sh.cutTagByName("section");
+    if (t.contain("Yellow Cards"))
+    {
+        for (i=0; i<2; i++)
+        {
+            n=t.cutTagByName("div");
+            v[i]=n.count("soccer-icons-yellowcard");
+        }
+
     }
     /*
     if (reCard) {
