@@ -450,7 +450,11 @@ bool getMatch(int id) //for major league
     else
     {
         if (DEBUG) cout<<"-> NEW VERSION"<<endl;
-        sh.retainTagByName("div",2);
+        //sh.retainTagByName("div",2);
+        sh.removeTagByName("section");
+        sh.removeTagByName("section");
+        sh.removeTagByName("section");
+        sh.removeTagByName("div");
     }
     if (DEBUG) cout<<"sh->"<<sh.getContent().substr(1,200)<<endl;
     t=sh.cutTagByName("section");
