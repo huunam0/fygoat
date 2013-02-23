@@ -463,7 +463,7 @@ bool getMatch(int id) //for major league
         if (DEBUG) cout<<"->Scoring Summary"<<endl;
         int sc[2]={0,0};
         int sc1[2]={0,0};
-        for (i=1;i<=2;i++)
+        for (i=0;i<2;i++)
         {
             nh=t.cutTagByName("tbody");
             n=nh.cutTagByName("tr");
@@ -478,7 +478,7 @@ bool getMatch(int id) //for major league
                         {
                             n.deleteTo(" ");
                         }
-                    v[i]=nh.toInt();
+                    v[i]=n.toInt();
                     sc[i]++;
                     if (v[i]<46) sc1[i]++;
                 }
