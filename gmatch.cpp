@@ -578,9 +578,8 @@ bool getMatch(int id) //for major league
 
         t=sh.cutTagByName("section");
     }
+    t=sh.cutTagByName("section");
     if (!t.isEmpty()) t=sh.cutTagByName("section");
-    if (!t.isEmpty()) if (!t.contain("Yellow Cards")) t=sh.cutTagByName("section");
-    if (DEBUG) if (!t.isEmpty()) cout<<"t:: "<<t.getContent().substr(1,150)<<endl;
     if (t.contain("Yellow Cards"))
     {
         for(i=0;i<2;i++)
@@ -589,6 +588,7 @@ bool getMatch(int id) //for major league
             v[i]=n.count("soccer-icons-yellowcard");
         }
         set2Value(3,v[0],v[1]);
+
         for(i=0;i<2;i++)
         {
             n=t.cutTagByName("div");
