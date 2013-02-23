@@ -421,9 +421,9 @@ bool getMatch(int id) //for major league
         if (sh.isEmpty()) break;
         t=sh.cutTagByName("div");
     }
-    if (DEBUG) cout<<"->MAIN:"<<sh.getContent().substr(1,100)<<endl;
-    sh.retainTagByName("div");
 
+    sh.retainTagByName("div");
+    if (DEBUG) cout<<"->MAIN:"<<sh.getContent().substr(1,200)<<endl;
     //sh.retainTagByName("div");
     //sh.retainTagByName("div",2);
     //sh.retainTagByName("div");
@@ -452,9 +452,9 @@ bool getMatch(int id) //for major league
         if (DEBUG) cout<<"-> NEW VERSION"<<endl;
         sh.retainTagByName("div",2);
     }
-    if (DEBUG) cout<<"sh->"<<sh.getContent().substr(1,100)<<endl;
+    if (DEBUG) cout<<"sh->"<<sh.getContent().substr(1,200)<<endl;
     t=sh.cutTagByName("section");
-    if (DEBUG) cout<<"t->"<<t.getContent().substr(1,100)<<endl;
+    if (DEBUG) cout<<"t->"<<t.getContent().substr(1,200)<<endl;
     if (t.contain("Scoring Summary")) {
         if (DEBUG) cout<<"->Scoring Summary"<<endl;
         int sc[2]={0,0};
@@ -485,7 +485,7 @@ bool getMatch(int id) //for major league
         set2Value(1,sc1[0],sc1[1]);
         t=sh.cutTagByName("section");
     }
-    if (DEBUG) cout<<"t->"<<t.getContent().substr(1,100)<<endl;
+    if (DEBUG) cout<<"t->"<<t.getContent().substr(1,200)<<endl;
     if (t.contain("Match Stats")) {
         if (DEBUG) cout<<"->Match Stats"<<endl;
         t.retainTagByName("table");
