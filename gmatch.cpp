@@ -578,6 +578,23 @@ bool getMatch(int id) //for major league
 
         t=sh.cutTagByName("section");
     }
+    t=sh.cutTagByName("section");
+    if (!t.isEmpty()) t=sh.cutTagByName("section");
+    if (t.contain("Yellow Cards"))
+    {
+        for(i=0;i<2;i++)
+        {
+            n=t.cutTagByName("div");
+            v[i]=n.count("soccer-icons-yellowcard");
+        }
+        set2Value(3,v[0],v[1]);
+        for(i=0;i<2;i++)
+        {
+            n=t.cutTagByName("div");
+            v[i]=n.count("soccer-icons-redcard");
+        }
+        set2Value(2,v[0],v[1]);
+    }
     /*
     if (reCard) {
         if (DEBUG) cout<<"->Recalcule red & yellow cards"<<endl;
