@@ -517,7 +517,7 @@ bool getMatch(int id) //for major league
         {
             n=t.cutTagByName("tr");
         }
-        if (n.contain("Corner Kicks"))
+        if (n.contain("Corner kicks"))
         {
             for (i=0;i<2;i++)
             {
