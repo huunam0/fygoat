@@ -218,7 +218,7 @@ void addLeague(string lid, string lname)
     //if (DEBUG) cout<<"Add league "<<lid<<" / "<<lname<<endl;
     executesql(sql);
     getTable(lid);
-    getTable(lid);
+    //getTable(lid);
 }
 void addMatch(int mid, string league,string group,int hteam, int ateam,int status=0, int hscore=0, int ascore=0)
 {
@@ -633,7 +633,7 @@ void getToday(string sDay="")
                             matchs[iNo].status=iStatus;
                             getMatch(matchs[iNo].mid);
                         }
-                        else if ((iStatus>=7) && (matchs[iNo].status<7))
+                        if ((iStatus>=7) && (matchs[iNo].status<7))
                         {
                             matchs[iNo].status=iStatus;
                             getTable(league);
