@@ -273,7 +273,7 @@ void getTable(string sLeague)
                 gd=nh.toInt();
                 nh=n.cutTagByName("td");
                 pts=nh.toInt();
-                //cout<<pos<<"/"<<teamid<<"/"<<teamname<<"/"<<play<<"/"<<ow<<"/"<<od<<"/"<<ol<<"/"<<of<<"/"<<oa<<"/"<<hw<<"/"<<hd<<"/"<<hl<<"/"<<hf<<"/"<<ha<<"/"<<aw<<"/"<<ad<<"/"<<al<<"/"<<af<<"/"<<aa<<"/"<<gd<<"/"<<pts<<endl;
+                if (DEBUG) cout<<pos<<"/"<<teamid<<"/"<<teamname<<"/"<<play<<"/"<<ow<<"/"<<od<<"/"<<ol<<"/"<<of<<"/"<<oa<<"/"<<hw<<"/"<<hd<<"/"<<hl<<"/"<<hf<<"/"<<ha<<"/"<<aw<<"/"<<ad<<"/"<<al<<"/"<<af<<"/"<<aa<<"/"<<gd<<"/"<<pts<<endl;
                 if (!teamid.empty())
                 {
                     teamlist+=","+teamid;
@@ -293,6 +293,7 @@ int main(int argc, char** argv)
 {
     if (argc>1)
     {
+        if (argc>2) DEBUG=true;
         tleague = argv[1];
         init_mysql_conf();
         init_mysql();
