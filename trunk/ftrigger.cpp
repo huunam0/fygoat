@@ -226,14 +226,14 @@ bool postTweet(std::string tmpStr)
     replyMsg = "";
     if( twitterObj.statusUpdate( tmpStr ) )
     {
-        twitterObj.getLastWebResponse( replyMsg );
-        printf( "\ntwittersend:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str() );
+        //twitterObj.getLastWebResponse( replyMsg );
+        //printf( "\ntwittersend:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str() );
         return true;
     }
     else
     {
-        twitterObj.getLastCurlError( replyMsg );
-        printf( "\ntwittersend:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str() );
+        //twitterObj.getLastCurlError( replyMsg );
+        //printf( "\ntwittersend:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str() );
         return  false;
     }
 }
@@ -262,12 +262,16 @@ void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_
     write_log("DM:to %s with match %s and tmp=%s",user_id,match_id,tmp.c_str());
     /**/
     char msg[140];
-    sprintf(msg,"[F] match got triggers, #%s:%s",match_id,match_teams);
+    sprintf(msg,"ALERT %s www.footygoat.com",match_id,match_teams);
     if (sendDirectMessage(string(user_twitter),string(msg)))
     {
         char sql[500];
         sprintf(sql,"insert into f_sent (user_id,match_id,moment) value (%s,%s,NOW());",user_id,match_id);
         executesql(sql);
+        if (strcmp(user_twitter,"FootyGoat")==0)
+        {
+            postTweet(string(msg));
+        }
     }
     else
     {

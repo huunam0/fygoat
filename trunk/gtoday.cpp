@@ -773,7 +773,8 @@ int main(int argc, char** argv)
         if (RELOAD)
         {
             RELOAD=false;
-            reload_ftrigger();
+            //reload_ftrigger();
+            restart_ftrigger();
         }
         //isFirstTime=false;
         sleep_time=(stat0==0?3600:10);
