@@ -183,7 +183,7 @@ bool executesql(const char * sql)
 }
 
 int init_mysql() {
-    //if(conn==NULL)
+    if(conn==NULL)
     {
 		conn=mysql_init(NULL);		// init the database connection
 		/* connect the database */
@@ -758,13 +758,14 @@ int main(int argc, char** argv)
 	write_log_call("Starting...");
     while (!STOP)
     {
+		init_mysql();
 		if (!isFirstTime)
 		{
 		    isFirstTime=isNewDay;
 		}
 		if ((isFirstTime))
 		{
-			init_mysql();
+
 			setEvent2(100);
 			write_log_call("is First Time or new day");
 			restart_ftrigger();
