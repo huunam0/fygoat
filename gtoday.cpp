@@ -394,6 +394,10 @@ void parseDate(string sDate)
     {
         month=12;
     }
+    else
+    {
+        month=0;
+    }
     //cout<<", month:"<<month;
     st.deleteTo(" ",2);
     day = st.toInt();
@@ -442,6 +446,7 @@ void setCurrentDate()
     char sql[500];
     sprintf(sql,"update f_params set p_value='%s' where p_name='currentdate';",currentdate);
     executesql(sql);
+    write_log_call(" New day %s ",currentdate);
 }
 void getToday(string sDay="")
 {
@@ -505,6 +510,10 @@ void getToday(string sDay="")
         bEOM = t.contain(" 1 ");
         parseDate(cday);
         //deleteTimeline();
+        if ((day==0)||(month==0)||(year==0))
+        {
+            return;
+        }
         setCurrentDate();
     }
     //cout<<"Today is "<<cday<<" End of month:"<<bEOM<<" - "<<day<<month<<year<<endl;
