@@ -512,6 +512,7 @@ void getToday(string sDay="")
         //deleteTimeline();
         if ((day==0)||(month==0)||(year==0))
         {
+            write_log("errorindate %s",cday.c_str());
             return;
         }
         setCurrentDate();
