@@ -176,13 +176,15 @@ bool executesql(const char * sql)
 	if (mysql_real_query(conn,sql,strlen(sql)))
     {
 		write_log("Error in sql %s:%s",sql,mysql_error(conn));
+		sleep(20);
+		conn=NULL;
 		return false;
 	}
 	else
 	    return true;
 }
 
-int init_mysql() {
+bool init_mysql() {
     if(conn==NULL)
     {
 		conn=mysql_init(NULL);		// init the database connection
@@ -193,12 +195,15 @@ int init_mysql() {
 		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
         {
 			write_log("Error init mysql with host=%s,user=%s,pass=%s,db=%s: %s",host_name,user_name,password,db_name,mysql_error(conn));
-			//sleep(20);
+			sleep(20);
 			return false;
 		}
 	}
 	if (!executesql("set names utf8"))
+    {
         return false;
+    }
+
 	return true;
 }
 //Xu li chinh
@@ -768,39 +773,41 @@ int main(int argc, char** argv)
 	write_log_call("Starting...");
     while (!STOP)
     {
-		init_mysql();
-		if (!isFirstTime)
-		{
-		    isFirstTime=isNewDay;
-		}
-		if ((isFirstTime))
-		{
-
-			setEvent2(100);
-			write_log_call("is First Time or new day");
-			restart_ftrigger();
-		}
-        getToday(sDate);
-        if (RELOAD)
+		if (init_mysql())
         {
-            RELOAD=false;
-            //reload_ftrigger();
-            restart_ftrigger();
-        }
-        //isFirstTime=false;
-        sleep_time=(stat0==0?3600:10);
-        //cout<<"wait "<<sleep_time<<"seconds..."<<endl;
-        if ((stat1==0)  )
-        {
-            if (isTimeLineFull)
+            if (!isFirstTime)
             {
-                deleteTimeline();
-                isTimeLineFull=false;
+                isFirstTime=isNewDay;
             }
-        }
-        else
-        {
-            isTimeLineFull=true;
+            if ((isFirstTime))
+            {
+
+                setEvent2(100);
+                write_log_call("is First Time or new day");
+                restart_ftrigger();
+            }
+            getToday(sDate);
+            if (RELOAD)
+            {
+                RELOAD=false;
+                //reload_ftrigger();
+                restart_ftrigger();
+            }
+            //isFirstTime=false;
+            sleep_time=(stat0==0?3600:10);
+            //cout<<"wait "<<sleep_time<<"seconds..."<<endl;
+            if ((stat1==0)  )
+            {
+                if (isTimeLineFull)
+                {
+                    deleteTimeline();
+                    isTimeLineFull=false;
+                }
+            }
+            else
+            {
+                isTimeLineFull=true;
+            }
         }
         sleep(sleep_time);
     }
