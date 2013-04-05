@@ -253,6 +253,12 @@ void stra2cpy(char* &dst, char* src)
     dst=(char*)malloc(strlen(src)+1);
     strcpy(dst,src);
 }
+void post_blog(char *match_id)
+{
+    char cmd[200];
+    sprintf(cmd,"wget -q -O - http://localhost/postblog.php?m=%s",match_id);
+    system(cmd);
+}
 void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_teams)
 {
     /**/
@@ -271,6 +277,7 @@ void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_
         if (strcmp(user_twitter,"FootyGoat")==0)
         {
             postTweet(string(msg));
+            post_blog(match_id);
         }
     }
     else
