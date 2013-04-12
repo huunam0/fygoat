@@ -256,8 +256,24 @@ void stra2cpy(char* &dst, char* src)
 void post_blog(char *match_id)
 {
     char cmd[200];
+    FILE *stream;
+    int MAX_BUFFER = 1000;
+    char buffer[MAX_BUFFER];
     sprintf(cmd,"wget -q -O - http://localhost/postblog.php?m=%s",match_id);
-    system(cmd);
+    //system(cmd);
+    stream = popen(cmd, "r");
+    while ( fgets(buffer, MAX_BUFFER, stream) != NULL )
+    {
+        if (strlen(buffer)>0)
+        {
+            char sql[500];
+            sprintf(sql,"update wp_posts set  post_status = 'publish' where ID=%s",buffer);
+            executesql(sql);
+        }
+        break;
+    }
+
+    pclose(stream);
 }
 void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_teams)
 {
@@ -268,7 +284,7 @@ void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_
     write_log("DM:to %s with match %s and tmp=%s",user_id,match_id,tmp.c_str());
     /**/
     char msg[140];
-    sprintf(msg,"ALERT %s www.footygoat.com",match_id,match_teams);
+    sprintf(msg,"ALERT %s www.footygoat.com",match_teams);
     if (sendDirectMessage(string(user_twitter),string(msg)))
     {
         char sql[500];
