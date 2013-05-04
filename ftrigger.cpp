@@ -291,7 +291,7 @@ void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_
         char sql[500];
         sprintf(sql,"insert into f_sent (user_id,match_id,moment) value (%s,%s,NOW());",user_id,match_id);
         executesql(sql);
-        if (strcmp(user_twitter,"FootyGoat")==0)
+        if ((strcmp(user_twitter,"FootyGoat")==0)||(strcmp(user_twitter,"huunamtran")==0))
         {
             postTweet(string(msg));
             post_blog(match_id);
