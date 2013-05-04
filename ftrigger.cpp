@@ -269,6 +269,7 @@ void post_blog(char *match_id)
             char sql[500];
             sprintf(sql,"update wp_posts set  post_status = 'publish' where ID=%s",buffer);
             executesql(sql);
+            write_log("Add blog entry %s",buffer);
         }
         break;
     }
