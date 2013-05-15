@@ -253,7 +253,7 @@ void stra2cpy(char* &dst, char* src)
     dst=(char*)malloc(strlen(src)+1);
     strcpy(dst,src);
 }
-void post_blog(char *match_id)
+int post_blog(char *match_id)
 {
     char cmd[200];
     FILE *stream;
