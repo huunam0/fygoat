@@ -258,6 +258,7 @@ void post_blog(char *match_id)
     char cmd[200];
     FILE *stream;
     int MAX_BUFFER = 1000;
+    int p_id=0;
     char buffer[MAX_BUFFER];
     sprintf(cmd,"wget -q -O - http://localhost/postblog.php?m=%s",match_id);
     //system(cmd);
@@ -270,11 +271,12 @@ void post_blog(char *match_id)
             sprintf(sql,"update wp_posts set  post_status = 'publish' where ID=%s",buffer);
             executesql(sql);
             write_log("Add blog entry %s",buffer);
+            p_id = atoi(buffer);
         }
         break;
     }
-
     pclose(stream);
+    return p_id;
 }
 void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_teams)
 {
@@ -284,17 +286,18 @@ void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_
     hadsent+=tmp;
     write_log("DM:to %s with match %s and tmp=%s",user_id,match_id,tmp.c_str());
     /**/
-    char msg[140];
+    char msg[250],tweet[250];
     sprintf(msg,"ALERT %s www.footygoat.com",match_teams);
     if (sendDirectMessage(string(user_twitter),string(msg)))
     {
         char sql[500];
         sprintf(sql,"insert into f_sent (user_id,match_id,moment) value (%s,%s,NOW());",user_id,match_id);
         executesql(sql);
-        if ((strcmp(user_twitter,"FootyGoat")==0))
+        if ((strcmp(user_twitter,"FootyGoat")==0)||(strcmp(user_twitter,"huunamtran")==0))
         {
-            postTweet(string(msg));
-            post_blog(match_id);
+            int p_id=post_blog(match_id);
+            sprintf(tweet,"%s/blog/?p=%d",msg,p_id);
+            postTweet(string(tweet));
         }
     }
     else
