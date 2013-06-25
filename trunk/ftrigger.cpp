@@ -260,7 +260,7 @@ int post_blog(char *match_id)
     int MAX_BUFFER = 1000;
     int p_id=0;
     char buffer[MAX_BUFFER];
-    sprintf(cmd,"wget -q -O - http://localhost/postblog.php?m=%s",match_id);
+    sprintf(cmd,"wget -q -O - http://localhost/livefootystats/postblog.php?m=%s",match_id);
     //system(cmd);
     stream = popen(cmd, "r");
     while ( fgets(buffer, MAX_BUFFER, stream) != NULL )
@@ -293,10 +293,10 @@ void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_
         char sql[500];
         sprintf(sql,"insert into f_sent (user_id,match_id,moment) value (%s,%s,NOW());",user_id,match_id);
         executesql(sql);
-        if ((strcmp(user_twitter,"FootyGoat")==0)||(strcmp(user_twitter,"huunamtran")==0))
+        if ((strcmp(user_twitter,"FootyGoat")==0))
         {
             int p_id=post_blog(match_id);
-            sprintf(tweet,"%s/blog/?p=%d",msg,p_id);
+            sprintf(tweet,"%s/?p=%d",msg,p_id);
             postTweet(string(tweet));
         }
     }
@@ -314,7 +314,7 @@ void work()
     char buffer[MAX_BUFFER];
     //char *wrd;
     char *user_id=NULL, *user_twit=NULL, *match_id=NULL, *match_team=NULL;
-    stream = popen("wget -q -O - http://localhost/gottriggers.php", "r");
+    stream = popen("wget -q -O - http://localhost/livefootystats/gottriggers.php", "r");
     while ( fgets(buffer, MAX_BUFFER, stream) != NULL )
     {
         char *wrd=strtok(buffer,"#");
