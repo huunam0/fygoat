@@ -209,19 +209,7 @@ bool initTwitter0(bool debug=DEBUG)
         return false;
     }
 }
-void reverify(int s)
-{
-    if (!initTwitter0(true))
-    {
-        write_log("Cannot initialize Twitter");
-        if (!initTwitter0())
-        {
-            write_log("Cannot initialize Twitter again, it must stop");
-            STOP=true;
-        }
-    }
-    sendDirectMessage(string("huunamtran"),string("Ban co khoe khong?"),true);
-}
+
 
 bool postTweet(std::string tmpStr,bool debug=DEBUG)
 {
@@ -268,7 +256,19 @@ bool sendDirectMessage(string toUser,string message, bool debug=DEBUG)
         return  false;
     }
 }
-
+void reverify(int s)
+{
+    if (!initTwitter0(true))
+    {
+        write_log("Cannot initialize Twitter");
+        if (!initTwitter0())
+        {
+            write_log("Cannot initialize Twitter again, it must stop");
+            STOP=true;
+        }
+    }
+    sendDirectMessage(string("huunamtran"),string("Ban co khoe khong?"),true);
+}
 void stra2cpy(char* &dst, char* src)
 {
     if (dst!=NULL)
