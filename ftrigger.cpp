@@ -178,7 +178,7 @@ int init_mysql() {
 }
 
 
-bool initTwitter0()
+bool initTwitter0(bool debug=DEBUG)
 {
     write_log("Init twitter");
     twitterObj.getOAuth().setConsumerKey(t_key);
@@ -192,7 +192,7 @@ bool initTwitter0()
     /* Account credentials verification */
     if(twitterObj.accountVerifyCredGet())
     {
-        if (DEBUG)
+        if (debug)
         {
             twitterObj.getLastWebResponse( replyMsg );
             write_log( "\ntwittersend:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str() );
@@ -201,7 +201,7 @@ bool initTwitter0()
     }
     else
     {
-        if (DEBUG)
+        if (debug)
         {
             twitterObj.getLastCurlError(replyMsg);
             write_log( "\ntwittersend:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str() );
@@ -221,16 +221,13 @@ void reverify(int s)
         }
     }
 }
-void debug_mode()
-{
-    DEBUG = !DEBUG;
-}
-bool postTweet(std::string tmpStr)
+
+bool postTweet(std::string tmpStr,bool debug=DEBUG)
 {
     replyMsg = "";
     if( twitterObj.statusUpdate( tmpStr ) )
     {
-        if (DEBUG)
+        if (debug)
         {
             twitterObj.getLastWebResponse( replyMsg );
             write_log( "\ntwittersend:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str() );
@@ -239,19 +236,36 @@ bool postTweet(std::string tmpStr)
     }
     else
     {
-        if (DEBUG)
+        if (debug)
         {
             twitterObj.getLastCurlError( replyMsg );
-            printf( "\ntwittersend:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str() );
+            write_log( "\ntwittersend:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str() );
         }
         return  false;
     }
 }
-bool sendDirectMessage(string toUser,string message)
+bool sendDirectMessage(string toUser,string message, bool debug=DEBUG)
 {
     if (DEBUG)
         printf("Send message '%s' to user '%s'",message.c_str(),toUser.c_str());
-    return twitterObj.directMessageSend(toUser,message);
+    if (twitterObj.directMessageSend(toUser,message))
+    {
+        if (debug)
+        {
+            twitterObj.getLastWebResponse( replyMsg );
+            write_log( "\ntwittersend:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str() );
+        }
+        return true;
+    }
+    else
+    {
+        if (debug)
+        {
+            twitterObj.getLastCurlError( replyMsg );
+            write_log( "\ntwittersend:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str() );
+        }
+        return  false;
+    }
 }
 
 void stra2cpy(char* &dst, char* src)
