@@ -211,7 +211,7 @@ bool initTwitter0(bool debug=DEBUG)
 }
 void reverify(int s)
 {
-    if (!initTwitter0())
+    if (!initTwitter0(true))
     {
         write_log("Cannot initialize Twitter");
         if (!initTwitter0())
@@ -220,6 +220,7 @@ void reverify(int s)
             STOP=true;
         }
     }
+    sendDirectMessage(string("huunamtran"),string("Ban co khoe khong?"),true);
 }
 
 bool postTweet(std::string tmpStr,bool debug=DEBUG)
