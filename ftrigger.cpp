@@ -195,7 +195,7 @@ bool initTwitter0()
         if (DEBUG)
         {
             twitterObj.getLastWebResponse( replyMsg );
-            printf( "\ntwittersend:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str() );
+            write_log( "\ntwittersend:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str() );
         }
         return true;
     }
@@ -204,7 +204,7 @@ bool initTwitter0()
         if (DEBUG)
         {
             twitterObj.getLastCurlError(replyMsg);
-            printf( "\ntwittersend:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str() );
+            write_log( "\ntwittersend:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str() );
         }
         return false;
     }
@@ -221,19 +221,29 @@ void reverify(int s)
         }
     }
 }
+void debug_mode()
+{
+    DEBUG = !DEBUG;
+}
 bool postTweet(std::string tmpStr)
 {
     replyMsg = "";
     if( twitterObj.statusUpdate( tmpStr ) )
     {
-        //twitterObj.getLastWebResponse( replyMsg );
-        //printf( "\ntwittersend:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str() );
+        if (DEBUG)
+        {
+            twitterObj.getLastWebResponse( replyMsg );
+            write_log( "\ntwittersend:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str() );
+        }
         return true;
     }
     else
     {
-        //twitterObj.getLastCurlError( replyMsg );
-        //printf( "\ntwittersend:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str() );
+        if (DEBUG)
+        {
+            twitterObj.getLastCurlError( replyMsg );
+            printf( "\ntwittersend:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str() );
+        }
         return  false;
     }
 }
