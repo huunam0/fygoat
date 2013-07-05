@@ -1,5 +1,4 @@
 #include <time.h>
-#include <mysql/mysql.h>
 #include <string.h>
 #include "ftrigger.h"
 #include <stdarg.h>
@@ -18,11 +17,8 @@ static char db_name  [BUFFER_SIZE];
 static int port_number;
 static bool DEBUG = false;
 
-static MYSQL *conn;
-string hadsent=string("#");
-//For daemon start:
 
-int sleep_time = 3;
+string hadsent=string("#");
 
 
 
@@ -61,30 +57,7 @@ void read_int(char * buf,const char * key,int * value)
 		sscanf(buf2, "%d", value);
 
 }
-void write_log(const char *fmt, ...)
-{
-	va_list         ap;
-	char            buffer[4096];
-	char times[20];
-    struct tm *sTm;
-    time_t now = time (0);
-    sTm = gmtime (&now);
-    strftime (times, sizeof(times), "%Y-%m-%d %H:%M:%S", sTm);
 
-	sprintf(buffer,"trigger.log");
-	FILE *fp = fopen(buffer, "a+");
-	if (fp==NULL)
-    {
-		 fprintf(stderr,"openfile error!\n");
-		 system("pwd");
-	}va_start(ap, fmt);
-	vsprintf(buffer, fmt, ap);
-	fprintf(fp,"%s \t %s\n",times,buffer);
-	//if (DEBUG) printf("%s\n",buffer);
-	va_end(ap);
-	fclose(fp);
-
-}
 bool init_conf()
 {
 	FILE *fp=NULL;
@@ -144,37 +117,7 @@ bool init_conf()
         return false;
     }
 }
-bool executesql(const char * sql)
-{
-	if (mysql_real_query(conn,sql,strlen(sql)))
-    {
-		//sleep(20);
-		printf("Error in sql %s:%s",sql,mysql_error(conn));
-		//conn=NULL;
-		return false;
-	}
-	else
-	    return true;
-}
-int init_mysql() {
-    if(conn==NULL)
-    {
-		conn=mysql_init(NULL);		// init the database connection
-		/* connect the database */
-		const char timeout=30;
-		mysql_options(conn,MYSQL_OPT_CONNECT_TIMEOUT,&timeout);
 
-		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
-        {
-			printf("Error init mysql: %s",mysql_error(conn));
-			printf("host=%s,user=%s,pas=%s,db=%s,port=%d",host_name,user_name,password,db_name,port_number);
-			return false;
-		}
-	}
-	if (!executesql("set names utf8"))
-        return false;
-	return true;
-}
 
 
 bool initTwitter0()
@@ -251,68 +194,7 @@ bool sendDirectMessage(string toUser,string message)
     }
 }
 
-void stra2cpy(char* &dst, char* src)
-{
-    if (dst!=NULL)
-    {
-        free (dst);
-    }
-    dst=(char*)malloc(strlen(src)+1);
-    strcpy(dst,src);
-}
-int post_blog(char *match_id)
-{
-    char cmd[200];
-    FILE *stream;
-    int MAX_BUFFER = 1000;
-    int p_id=0;
-    char buffer[MAX_BUFFER];
-    sprintf(cmd,"wget -q -O - http://localhost/livefootystats/postblog.php?m=%s",match_id);
-    //system(cmd);
-    stream = popen(cmd, "r");
-    while ( fgets(buffer, MAX_BUFFER, stream) != NULL )
-    {
-        if (strlen(buffer)>1)
-        {
-            char sql[500];
-            sprintf(sql,"update wp_posts set  post_status = 'publish' where ID=%s",buffer);
-            executesql(sql);
-            printf("Add blog entry %s",buffer);
-            p_id = atoi(buffer);
-        }
-        break;
-    }
-    pclose(stream);
-    return p_id;
-}
-void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_teams)
-{
-    /**/
-    string tmp= string(user_id)+string("-")+string(match_id)+string("#");
-    if (hadsent.find(string("#")+tmp)!=string::npos) return;
-    hadsent+=tmp;
-    printf("DM:to %s with match %s and tmp=%s",user_id,match_id,tmp.c_str());
-    /**/
-    char msg[250],tweet[250];
-    sprintf(msg,"ALERT %s www.footygoat.com",match_teams);
-    if (sendDirectMessage(string(user_twitter),string(msg)))
-    {
-        char sql[500];
-        sprintf(sql,"insert into f_sent (user_id,match_id,moment) value (%s,%s,NOW());",user_id,match_id);
-        executesql(sql);
-        if ((strcmp(user_twitter,"FootyGoat")==0))
-        {
-            int p_id=post_blog(match_id);
-            sprintf(tweet,"%s/?p=%d",msg,p_id);
-            postTweet(string(tweet));
-        }
-    }
-    else
-    {
-        printf("Cannot send direct message to %s:%s",user_id,user_twitter);
-    }
 
-}
 
 
 
