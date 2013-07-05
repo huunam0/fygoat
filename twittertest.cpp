@@ -17,12 +17,11 @@ static char password [BUFFER_SIZE];
 static char db_name  [BUFFER_SIZE];
 static int port_number;
 static bool DEBUG = false;
-#define LOCKFILE "/var/run/ftrigger.pid"
-#define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
+
 static MYSQL *conn;
 string hadsent=string("#");
 //For daemon start:
-static bool STOP=false;
+
 int sleep_time = 3;
 
 
@@ -132,6 +131,10 @@ bool init_conf()
         t_secret=std::string(consumersecret);
         t_token=std::string(token);
         t_tokensecret=std::string(tokensecret);
+		printf("CK: %s\n",consumerkey);
+		printf("CKS: %s\n",consumersecret);
+		printf("TK: %s\n",token);
+		printf("TKS: %s\n",tokensecret);
 		return true;
 	//	fclose(fp);
     }
@@ -174,7 +177,7 @@ int init_mysql() {
 }
 
 
-bool initTwitter0(bool debug=DEBUG)
+bool initTwitter0()
 {
     printf("Init twitter");
     twitterObj.getOAuth().setConsumerKey(t_key);
@@ -188,20 +191,18 @@ bool initTwitter0(bool debug=DEBUG)
     /* Account credentials verification */
     if(twitterObj.accountVerifyCredGet())
     {
-        if (debug)
-        {
+
             twitterObj.getLastWebResponse( replyMsg );
             printf( "\ntwittersend:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str() );
-        }
+
         return true;
     }
     else
     {
-        if (debug)
-        {
+
             twitterObj.getLastCurlError(replyMsg);
             printf( "\ntwittersend:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str() );
-        }
+
         return false;
     }
 }
@@ -228,7 +229,7 @@ bool postTweet(std::string tmpStr)
         return  false;
     }
 }
-bool sendDirectMessage(string toUser,string message, bool debug=DEBUG)
+bool sendDirectMessage(string toUser,string message)
 {
     
         printf("Send message '%s' to user '%s'",message.c_str(),toUser.c_str());
