@@ -41,7 +41,7 @@ int mm;
 int iNo=0;
 bool isFirstTime = true, isNewDay=false;
 bool isTimeLineFull=true;
-int sleep_time = 10;
+int sleep_time = 8;
 int day, month, year, day2, month2, year2;
 string momment;//moment of a match
 int stat0,stat1;
@@ -189,7 +189,7 @@ bool init_mysql() {
     {
 		conn=mysql_init(NULL);		// init the database connection
 		/* connect the database */
-		const char timeout=30;
+		const char timeout=50;
 		mysql_options(conn,MYSQL_OPT_CONNECT_TIMEOUT,&timeout);
 
 		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
@@ -201,6 +201,12 @@ bool init_mysql() {
 	}
 	if (!executesql("set names utf8"))
     {
+		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
+        {
+			write_log("Error re-init mysql with host=%s,user=%s,pass=%s,db=%s: %s",host_name,user_name,password,db_name,mysql_error(conn));
+			sleep(20);
+			return false;
+		}
         return false;
     }
 
@@ -211,14 +217,14 @@ void getTable(string sLeague)
 {
     //if (DEBUG) cout<<"Get table "<<sLeague<<endl;
     if (sLeague.empty()) return;
-    char cmd[200];
+    char cmd[500];
     write_log_call("Get table %s ",sLeague.c_str());
     sprintf(cmd,"%sgtable %s &",f_home,sLeague.c_str());
     system(cmd);
 }
 void addLeague(string lid, string lname)
 {
-    char sql[500];
+    char sql[1000];
     sprintf(sql,"INSERT IGNORE INTO f_leagues (`league_id`,`league_name`) VALUE ('%s','%s')",lid.c_str(),lname.c_str());
     //if (DEBUG) cout<<"Add league "<<lid<<" / "<<lname<<endl;
     executesql(sql);
@@ -227,7 +233,7 @@ void addLeague(string lid, string lname)
 }
 void addMatch(int mid, string league,string group,int hteam, int ateam,int status=0, int hscore=0, int ascore=0)
 {
-    char sql[900];
+    char sql[1000];
     sprintf(sql,"INSERT INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`,`viewdate`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s','%s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d,viewdate='%s',`order`=%d",mid,league.c_str(),group.c_str(),hteam,ateam,status,hscore,ascore,iNo,year2,month2,day2,momment.c_str(),currentdate,hteam,ateam,currentdate,iNo);
     ///cout<<sql<<endl;
     executesql(sql);
@@ -235,7 +241,7 @@ void addMatch(int mid, string league,string group,int hteam, int ateam,int statu
 }
 void addMatch(int iIndex)
 {
-    char sql[900];
+    char sql[1000];
     sprintf(sql,"INSERT  INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d",matchs[iIndex].mid,matchs[iIndex].league.c_str(),matchs[iIndex].group.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam,matchs[iIndex].status,matchs[iIndex].hgoal,matchs[iIndex].agoal,iIndex,year2,month2,day2,momment.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam);
     executesql(sql);
     //write_log("Add match %d ",iIndex);
@@ -243,7 +249,7 @@ void addMatch(int iIndex)
 }
 void addTeam(string teamid, string tname, string league,string group)
 {
-    char sql[900];
+    char sql[1000];
     sprintf(sql,"INSERT INTO f_teams (team_id,team_name,team_league,team_group,team_date,team_updated) VALUE (%s,'%s','%s','%s',NOW(),0) ON DUPLICATE KEY UPDATE team_name='%s',team_league='%s',team_group='%s',team_date=NOW(),team_updated=0;",teamid.c_str(),tname.c_str(),league.c_str(),group.c_str(),tname.c_str(),league.c_str(),group.c_str());
     //write_log("Add new team %d %s",teamid,tname.c_str());
     executesql(sql);
@@ -410,12 +416,12 @@ void parseDate(string sDate)
     sh.deleteTo(" ");
     year = sh.toInt();
     //cout<<", year:"<<year<<endl;
-    sprintf(currentdate,"%d-%d-%d",year,month,day);
+    sprintf(currentdate,"%d-%s%d-%s%d",year,(month<=9?"0":""),month,day<=9?"0":"",day);
 }
 void getMatch(int mId)
 {
     if (mId<=0) return;
-    char cmd[200];
+    char cmd[500];
     write_log_call("Get Match %d ",mId);
     sprintf(cmd,"%sgmatch %d &",f_home,mId);
     //cout<<cmd<<endl;
@@ -424,7 +430,7 @@ void getMatch(int mId)
 }
 void setEvent(int iEvent,int iValue=0)
 {
-    char sql[300];
+    char sql[500];
     //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
     sprintf(sql,"INSERT INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `value`=%d,`date`=NOW();",iEvent,iValue,0,0,iValue);
     executesql(sql);
@@ -432,7 +438,7 @@ void setEvent(int iEvent,int iValue=0)
 }
 void setEvent2(int iEvent,int iValue0=0,int iValue1=0)
 {
-    char sql[300];
+    char sql[500];
     //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
     sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `home`=%d,`away`=%d,`date`=NOW();",iEvent,iValue0,iValue1,0,iValue0,iValue1);
     executesql(sql);
