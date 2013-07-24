@@ -214,6 +214,7 @@ bool initTwitter0(bool debug=DEBUG)
 bool postTweet(std::string tmpStr,bool debug=DEBUG)
 {
     replyMsg = "";
+	if (debug) write_log("postTweet: %s", tmpStr.c_str() );
     if( twitterObj.statusUpdate( tmpStr ) )
     {
         if (debug)
