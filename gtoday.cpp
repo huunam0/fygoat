@@ -184,8 +184,8 @@ bool executesql(const char * sql)
 	    return true;
 }
 
-bool init_mysql() {
-    if(conn==NULL)
+bool init_mysql(bool bForce = false) {
+    if((conn==NULL) || (bForce) )
     {
 		conn=mysql_init(NULL);		// init the database connection
 		/* connect the database */
@@ -452,12 +452,12 @@ void deleteTimeline()
     char sql2[]="ALTER TABLE f_timeline2 AUTO_INCREMENT = 2;";
     executesql(sql2);
 }
-void setCurrentDate()
+void setCurrentDate(string refDate="")
 {
     char sql[500];
     sprintf(sql,"update f_params set p_value='%s' where p_name='currentdate';",currentdate);
     executesql(sql);
-    write_log_call(" New day %s ",currentdate);
+    write_log_call(" New day %s -> %s",currentdate,refDate.c_str());
 }
 void getToday(string sDay="")
 {
@@ -526,7 +526,7 @@ void getToday(string sDay="")
             write_log("errorindate %s",cday.c_str());
             return;
         }
-        setCurrentDate();
+        setCurrentDate(cday);
     }
     //cout<<"Today is "<<cday<<" End of month:"<<bEOM<<" - "<<day<<month<<year<<endl;
     isNewDay=false;
@@ -751,7 +751,7 @@ void restart_ftrigger()
 }
 int main(int argc, char** argv)
 {
-
+    bool bForce = false;
     if (argc>1) sDate=string(argv[1]);
     if (sDate.find("debug")!=string::npos)
     {
@@ -779,7 +779,7 @@ int main(int argc, char** argv)
 	write_log_call("Starting...");
     while (!STOP)
     {
-		if (init_mysql())
+		if (init_mysql(bForce))
         {
             if (!isFirstTime)
             {
@@ -800,7 +800,8 @@ int main(int argc, char** argv)
                 restart_ftrigger();
             }
             //isFirstTime=false;
-            sleep_time=(stat0==0?3600:10);
+            bForce=(stat0==0);
+            sleep_time=(bForce?3600:10);
             //cout<<"wait "<<sleep_time<<"seconds..."<<endl;
             if ((stat1==0)  )
             {
