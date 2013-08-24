@@ -47,7 +47,7 @@ string momment;//moment of a match
 int stat0,stat1;
 bool bEOM;//end of month
 char currentdate[20];
-
+bool liveTable=false;
 //For daemon start:
 static bool STOP=false;
 void call_for_exit(int s)
@@ -213,23 +213,22 @@ bool init_mysql(bool bForce = false) {
 	return true;
 }
 //Xu li chinh
-void getTable(string sLeague)
+void getTable(string sLeague, bool isLive = false)
 {
     //if (DEBUG) cout<<"Get table "<<sLeague<<endl;
     if (sLeague.empty()) return;
     char cmd[500];
     write_log_call("Get table %s ",sLeague.c_str());
-    sprintf(cmd,"%sgtable %s &",f_home,sLeague.c_str());
+    sprintf(cmd,"%sg%stable %s &",f_home,(isLive?"live":""),sLeague.c_str());
     system(cmd);
 }
-void addLeague(string lid, string lname)
+void addLeague(string lid, string lname,bool isLive=false)
 {
     char sql[1000];
     sprintf(sql,"INSERT IGNORE INTO f_leagues (`league_id`,`league_name`) VALUE ('%s','%s')",lid.c_str(),lname.c_str());
     //if (DEBUG) cout<<"Add league "<<lid<<" / "<<lname<<endl;
     executesql(sql);
-    getTable(lid);
-    //getTable(lid);
+    getTable(lid,isLive);
 }
 void addMatch(int mid, string league,string group,int hteam, int ateam,int status=0, int hscore=0, int ascore=0)
 {
@@ -538,9 +537,11 @@ void getToday(string sDay="")
     t=m.cutTagByName("div");
     while (!t.isEmpty())
     {
+
         if (t.containAttr("group-set"))
         {
             //if (DEBUG) cout<<"Begin get league "<<endl;
+            liveTable=t.contain("Live Table ");
             if (isFirstTime)
             {
                 gid.clear();
@@ -563,7 +564,6 @@ void getToday(string sDay="")
                 //n.viewContent();
                 league=nh.getContent();
                 league_name=n.getText();
-                //addLeague(league,n.getText());
             }
             t.retainTagByName("table");
             n=t.cutTagByName("tr");
@@ -657,7 +657,7 @@ void getToday(string sDay="")
                         if ((iStatus>=7) && (matchs[iNo].status<7))
                         {
                             matchs[iNo].status=iStatus;
-                            getTable(league);
+                            getTable(league,liveTable);
                         }
                     }
 
@@ -687,7 +687,7 @@ void getToday(string sDay="")
             }
             if (isFirstTime)
             {
-                addLeague(league,league_name);
+                addLeague(league,league_name,liveTable);
             }
             //if (DEBUG) cout<<"End get league "<<endl;
         }
