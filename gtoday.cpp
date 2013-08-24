@@ -201,13 +201,12 @@ bool init_mysql(bool bForce = false) {
 	}
 	if (!executesql("set names utf8"))
     {
-		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
+		if(!bForce)
         {
-			write_log("Error re-init mysql with host=%s,user=%s,pass=%s,db=%s: %s",host_name,user_name,password,db_name,mysql_error(conn));
-			sleep(20);
-			return false;
+			return init_mysql(true);
 		}
-        return false;
+		else
+            return false;
     }
 
 	return true;
