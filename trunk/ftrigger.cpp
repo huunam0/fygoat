@@ -314,7 +314,7 @@ void postfb(int p_id)
     fgets(a_t, 500, stream);
     pclose(stream);
     //char lnk[]="http://baogia.info/bao-gia-vang/";
-    sprintf(cmd,"curl -X POST -F 'message=Gia vang ' -F 'link=http://www.footygoat.com/?p=%d' -F 'access_token=%s' https://graph.facebook.com/%s/feed",p_id,a_t,p_i);
+    sprintf(cmd,"curl -X POST -F 'link=http://www.footygoat.com/?p=%d' -F 'access_token=%s' https://graph.facebook.com/%s/feed",p_id,a_t,p_i);
     system(cmd);
 }
 void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_teams)
