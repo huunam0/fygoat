@@ -157,8 +157,8 @@ bool executesql(const char * sql)
 	else
 	    return true;
 }
-int init_mysql() {
-    if(conn==NULL)
+int init_mysql(bool bForce = false) {
+    if((conn==NULL) || (bForce))
     {
 		conn=mysql_init(NULL);		// init the database connection
 		/* connect the database */
@@ -173,7 +173,14 @@ int init_mysql() {
 		}
 	}
 	if (!executesql("set names utf8"))
-        return false;
+    {
+		if(!bForce)
+        {
+			return init_mysql(true);
+		}
+		else
+            return false;
+    }
 	return true;
 }
 
