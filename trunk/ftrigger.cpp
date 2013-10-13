@@ -23,7 +23,7 @@ static MYSQL *conn;
 string hadsent=string("#");
 //For daemon start:
 static bool STOP=false;
-int sleep_time = 3;
+int sleep_time = 5;
 
 void call_for_exit(int s)
 {
@@ -167,8 +167,8 @@ int init_mysql(bool bForce = false) {
 
 		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
         {
-			write_log("Error init mysql: %s",mysql_error(conn));
-			write_log("host=%s,user=%s,pas=%s,db=%s,port=%d",host_name,user_name,password,db_name,port_number);
+			write_log("Error init mysql %d: %s",bForce?1:0,mysql_error(conn));
+			//write_log("host=%s,user=%s,pas=%s,db=%s,port=%d",host_name,user_name,password,db_name,port_number);
 			return false;
 		}
 	}
@@ -176,10 +176,15 @@ int init_mysql(bool bForce = false) {
     {
 		if(!bForce)
         {
+			write_log("Re-initialize mysql ");
 			return init_mysql(true);
 		}
 		else
+        {
+            init_conf();
             return false;
+        }
+
     }
 	return true;
 }
