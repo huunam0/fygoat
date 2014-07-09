@@ -43,7 +43,7 @@ bool isFirstTime = true, isNewDay=false;
 bool isTimeLineFull=true;
 int sleep_time = 8;
 int day, month, year, day2, month2, year2;
-string momment;//moment of a match
+string momment,match_date;//moment of a match, date of match
 int stat0,stat1;
 bool bEOM;//end of month
 char currentdate[20];
@@ -221,13 +221,32 @@ void getTable(string sLeague, bool isLive = false)
     sprintf(cmd,"%sg%stable %s &",f_home,(isLive?"live":""),sLeague.c_str());
     system(cmd);
 }
-void addLeague(string lid, string lname,bool isLive=false)
+void getTable(string sLeague)
+{
+    //if (DEBUG) cout<<"Get table "<<sLeague<<endl;
+    if (sLeague.empty()) return;
+    char cmd[500];
+    write_log_call("Get table %s ",sLeague.c_str());
+    sprintf(cmd,"%sgtable %s &",f_home,sLeague.c_str());
+    system(cmd);
+}
+//from june 2014, add slug
+void getTable(const string sLeague_id, const string sLeague_slug)
+{
+    //if (DEBUG) cout<<"Get table "<<sLeague<<endl;
+    if (sLeague_id.empty()) return;
+    char cmd[500];
+    write_log_call("Get table %s ",sLeague_id.c_str());
+    sprintf(cmd,"%sgtable %s %s &",f_home,sLeague_id.c_str(), sLeague_slug.c_str());
+    system(cmd);
+}
+void addLeague(string lid, string lname,string lslug)
 {
     char sql[1000];
-    sprintf(sql,"INSERT IGNORE INTO f_leagues (`league_id`,`league_name`) VALUE ('%s','%s')",lid.c_str(),lname.c_str());
+    sprintf(sql,"INSERT IGNORE INTO f_leagues2 (`league_id`,`league_slug`,`league_name`) VALUE ('%s','%s','%s')",lid.c_str(),lslug.c_str(),lname.c_str());
     //if (DEBUG) cout<<"Add league "<<lid<<" / "<<lname<<endl;
     executesql(sql);
-    getTable(lid,isLive);
+    getTable(lid,lslug);
 }
 void addMatch(int mid, string league,string group,int hteam, int ateam,int status=0, int hscore=0, int ascore=0)
 {
@@ -237,14 +256,15 @@ void addMatch(int mid, string league,string group,int hteam, int ateam,int statu
     executesql(sql);
 
 }
-void addMatch(int iIndex)
+void addMatch(int mid, string league,string group,int status=0)
 {
     char sql[1000];
-    sprintf(sql,"INSERT  INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d",matchs[iIndex].mid,matchs[iIndex].league.c_str(),matchs[iIndex].group.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam,matchs[iIndex].status,matchs[iIndex].hgoal,matchs[iIndex].agoal,iIndex,year2,month2,day2,momment.c_str(),matchs[iIndex].hteam,matchs[iIndex].ateam);
+    sprintf(sql,"INSERT INTO f_matches (match_id,league_id,`group`,status,`order`,`match_date`,`viewdate`) VALUE ('%d','%s','%s','%d',%d,'%s','%s') ON DUPLICATE KEY UPDATE viewdate='%s',`order`=%d",mid,league.c_str(),group.c_str(),status,iNo,match_date.c_str(),currentdate,currentdate,iNo);
+    //cout<<sql<<endl;
     executesql(sql);
-    //write_log("Add match %d ",iIndex);
 
 }
+
 void addTeam(string teamid, string tname, string league,string group)
 {
     char sql[1000];
@@ -416,6 +436,19 @@ void parseDate(string sDate)
     //cout<<", year:"<<year<<endl;
     sprintf(currentdate,"%d-%s%d-%s%d",year,(month<=9?"0":""),month,day<=9?"0":"",day);
 }
+void parseDate8(string sDate)
+{
+    //cout<<"Parse "<<sDate;
+    string p;
+    p=sDate.substr(0,4);
+    year = atoi(p.c_str());
+    p=sDate.substr(2,2);
+    month=atoi(p.c_str());
+    p=sDate.substr(4,2);
+    day=atoi(p.c_str());
+    //cout<<", day:"<<day;
+    sprintf(currentdate,"%d-%s%d-%s%d",year,(month<=9?"0":""),month,day<=9?"0":"",day);
+}
 void getMatch(int mId)
 {
     if (mId<=0) return;
@@ -460,7 +493,7 @@ void setCurrentDate(string refDate="")
 void getToday(string sDay="")
 {
     shtml m,t,n,nh;
-    string status,hteam,ateam,score,league,league_name,gid,group,hname,aname, cday;
+    string status,hteam,ateam,score,league,league_slug,league_name,gid,group,hname,aname, cday;
     int v, iStatus, hscore, ascore;
     bool noId,bRet;
     int homeid,awayid;
@@ -470,11 +503,11 @@ void getToday(string sDay="")
     iNo=0;
     if (sDay.empty())
     {
-        bRet=m.loadFromURL("http://espnfc.com/scores?cc=4716");
+        bRet=m.loadFromURL("http://www.espnfc.com/scores");
     }
     else
     {
-        bRet=m.loadFromURL((string("http://espnfc.com/scores?date=")+sDay+string("&cc=4716&league=all")).c_str());
+        bRet=m.loadFromURL((string("http://www.espnfc.com/scores?date=")+sDay).c_str());
     }
     if (!bRet)
     {
@@ -487,7 +520,7 @@ void getToday(string sDay="")
     stat0=stat1=0;
     while (!t.isEmpty())
     {
-        if (t.containAttr("bg-elements"))
+        if (t.containAttr("site"))
         {
             //sh.setContent(t.getContent());
             m=t;
@@ -497,10 +530,32 @@ void getToday(string sDay="")
         t=m.cutTagByName("div");
     }
     //sh.viewContent();
-    cday=m.getBetween("id=\"currentDate\"","</ul>");
-    t.setContent(cday);
-    cday=t.getBetween(">","<");
+    m.retainTagByName("div");//id=site-content
+    m.retainTagByName("div",3);//id=main
+    m.retainTagByName("div");//id=main-content
+    m.retainTagByName("div",2);
+    m.retainTagByName("div");
+    m.retainTagByName("div");//id=score-page
+    m.retainTagByName("div");//id=scores-page-content
+    //m.viewContent();//debug
+    t=m.cutTagByName("div");
+    n=t.cutTagByName("li");
+    while (!n.isEmpty())
+    {
+        if (n.containAttr("selected"))
+        {
+            nh=n;
+            break;
+        }
+        if (t.isEmpty()) break;
+        n=t.cutTagByName("li");
+    }
+    //nh.viewContent();//for debug
+    cday=nh.getBetween("date=","\"");
+    //t.setContent(cday);
+    //cday=t.getBetween(">","<");
     if (DEBUG) cout<<cday<<" ::: "<<sToday<<endl;
+    //return;//debug
     if (!isFirstTime)
     {
         if (cday != sToday)
@@ -514,10 +569,10 @@ void getToday(string sDay="")
     if (isFirstTime)
     {
         //
-        t.deleteTo("<");
-        t.retainBetween("\"","\"");
-        bEOM = t.contain(" 1 ");
-        parseDate(cday);
+        //t.deleteTo("<");
+        //t.retainBetween("\"","\"");
+        //bEOM = t.contain(" 1 ");
+        parseDate8(cday);
         //deleteTimeline();
         if ((day==0)||(month==0)||(year==0))
         {
@@ -527,166 +582,120 @@ void getToday(string sDay="")
         setCurrentDate(cday);
     }
     //cout<<"Today is "<<cday<<" End of month:"<<bEOM<<" - "<<day<<month<<year<<endl;
+    m.retainTagByName("div",2);
+    //m.viewContent();return ;//debug
     isNewDay=false;
-    m.retainTagByName("div",2);
-    m.retainTagByName("div");
-    m.retainTagByName("div",2);
-    m.retainTagByName("div");
-    m.retainTagByName("div");
-    t=m.cutTagByName("div");
+    t=m.cutTagByName("div"); //each league
     while (!t.isEmpty())
     {
 
-        if (t.containAttr("group-set"))
+        if (t.containAttr("score-league"))
         {
             //if (DEBUG) cout<<"Begin get league "<<endl;
-            liveTable=t.contain("Live Table ");
-            if (isFirstTime)
+            if (isFirstTime) //get league id, name, slug
             {
                 gid.clear();
                 group.clear();
-                n=t.getTagByName("a");
-                //t.viewContent();
+                n=t.cutTagByName("a");
+                liveTable=n.containAttr("score-table-link");
                 nh.setContent(n.getAttr());
-                nh.retainBetween("league","\"");
-                if (nh.contain("/"))
+                nh.retainBetween("href=\"","\"");
+                //nh.viewContent();
+                league_slug=nh.getBetween("/","/");
+                league=nh.getBetween("/","/",2); //id
+                //league=nh.getContent();
+                if (liveTable)
                 {
-                    nh.retainBetween("/","/");
+                    n=t.cutTagByName("a");
                 }
-                else
-                {
-                    nh.deleteTo("=");
-                }
-                //n  = t.getTagByOrder(1);
-                //if (DEBUG)cout<<"League: "<<nh.getContent()<<" : "<<n.getText()<<endl;
-                n.replace("'","\\'",-1);
-                //n.viewContent();
-                league=nh.getContent();
-                league_name=n.getText();
+                n.replace("'","''");
+                league_name=n.getContent();
             }
-            t.retainTagByName("table");
-            n=t.cutTagByName("tr");
+
+            n=t.cutTagByName("div");//each group //if any
             while (!n.isEmpty())
             {
                 //if (DEBUG) cout<<"Begin get match "<<endl;
-                if (n.containAttr("gamebox"))
+                if (n.containAttr("score-group"))
                 {
                     //cout<<n.getAttr()<<endl;
-                    try
+                    group=n.getBetween("<p>Group ","</p>");
+                    nh=n.cutTagByName("div");
+                    while (!nh.isEmpty()) //each match
                     {
-                        matchid = atoi(n.getBetweenAttr("id=\"","-").c_str());
+                        if (nh.containAttr("score-box"))
+                        {
+                            nh.retainTagByName("div");
+                            gid=nh.getBetween("data-gameId=\"","\"");
+                            matchid=atoi(gid.c_str());
+                            if (matchid!=matchs[iNo].mid) isNewDay=true;
+                            if (nh.containAttr("score complete full"))
+                            {
+                                iStatus=7;
+                                //+Postp
+                            }
+                            else if (nh.containAttr("score upcoming full"))
+                            {
+                                iStatus=0;
+                            }
+                            if (iStatus==0) stat0++;
+                            if ((iStatus<7)&&((iStatus>=0))) stat1++;
+                            if (isFirstTime) //add teams
+                            {
+                                nh.retainTagByName("div");
+                                nh.retainTagByName("div",3);
+                                nh.replace("T"," ");
+                                //nh.viewContent();
+                                match_date=nh.getBetween("data-time=\"",".");
+                                //match_date.replace(9,1," ");
+                                matchs[iNo].status=iStatus;
+                                matchs[iNo].mid=matchid;
+                                matchs[iNo].league=league;
+                                matchs[iNo].group=group;
+                                //matchs[iNo].hteam=atoi(hteam.c_str());
+                                //matchs[iNo].ateam=atoi(ateam.c_str());
+                                //matchs[iNo].hgoal=hscore;
+                                //matchs[iNo].agoal=ascore;
+
+                                //addMatch(matchid,league,group,homeid,awayid,iStatus,hscore,ascore);
+                                addMatch(matchid,league,group,iStatus);
+                                if (iStatus>0) getMatch(matchid);
+                                if (DEBUG) cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", Satus="<<iStatus<<endl;
+                            }
+                            else
+                            {
+                                if ((iStatus>0) && (matchs[iNo].status<=0)) //begin match
+                                {
+                                    matchs[iNo].status=iStatus;
+                                    getMatch(matchs[iNo].mid);
+                                }
+                                if ((iStatus>=7) && (matchs[iNo].status<7))// stop match
+                                {
+                                    matchs[iNo].status=iStatus;
+                                    getTable(league,league_slug);
+                                }
+                            }
+
+                            iNo++;
+                            if (iNo>=mmax)
+                            {
+                                write_log_call("Over the maximum of matches");
+                                return;
+                            }
+                        }
+                        nh=n.cutTagByName("div");
                     }
-                    catch(...)
-                    {
-                        return;
-                    }
-                    if (matchid!=matchs[iNo].mid) isNewDay=true;
+
                     nh=n.cutTagByName("td");
-                    status=nh.getText();
-                    iStatus=parseStatus(status);
+                    //status=nh.getText();
+                    //iStatus=parseStatus(status);
                     //if (DEBUG) cout<<"Match "<<matchid<<" has status "<<iStatus<<endl;
-                    if (iStatus==0) stat0++;
-                    if ((iStatus<7)&&((iStatus>=0))) stat1++;
-                    if (isFirstTime)
-                    {
-                        nh=n.cutTagByName("td");
-                        nh.replace("'","\\'",-1);
-                        hname=nh.getText();
-                        noId=nh.contain("href");
-                        nh.setContent(nh.getAttr());
-                        hteam=nh.getBetween("teamId-","\"");
-                        //if (DEBUG) cout<<"Home: "<<hteam<<" / "<<hname<<endl;
-                        //if (!noId)
-                        {
-                            addTeam(hteam,hname,league,group);
-                        }
-                        nh=n.cutTagByName("td");
-                        nh.replace("&nbsp;","",-1);
-                        hscore = nh.toInt();
-                        nh.deleteTo("-");
-                        ascore = nh.toInt();
-                        nh=n.cutTagByName("td");
-                        nh.replace("'","\\'",-1);
-                        aname=nh.getText();
-                        noId=nh.contain("href");
-                        nh.setContent(nh.getAttr());
-                        ateam=nh.getBetween("teamId-","\"");
-                        //if (DEBUG) cout<<"AWAY "<<ateam<<" / "<<aname<<endl;
-                        //if (!noId)
-                        {
-                            addTeam(ateam,aname,league,group);
-                        }
-                        //cout<<iNo<<" Status "<<status<<"/"<<iStatus<<". Home:"<<hteam<<". Score:"<<hscore<<ascore<<". Away:"<<ateam<<endl;
-                        matchs[iNo].status=iStatus;
-                        matchs[iNo].mid=matchid;
-                        matchs[iNo].league=league;
-                        matchs[iNo].group=group;
-                        //matchs[iNo].hteam=atoi(hteam.c_str());
-                        //matchs[iNo].ateam=atoi(ateam.c_str());
-                        matchs[iNo].hgoal=hscore;
-                        matchs[iNo].agoal=ascore;
-                        try
-                        {
-                            homeid = atoi(hteam.c_str());
-                        }
-                        catch (...)
-                        {
-                            homeid=0;
-                        }
-                        try
-                        {
-                            awayid = atoi(ateam.c_str());
-                        }
-                        catch (...)
-                        {
-                            awayid=0;
-                        }
-                        //addMatch(iNo);
-                        addMatch(matchid,league,group,homeid,awayid,iStatus,hscore,ascore);
-                        if (iStatus>0) getMatch(matchid);
-                        if (DEBUG) cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", hteam="<<hteam<<", ateam="<<ateam<<", hscore="<<hscore<<", ascore="<<ascore<<", Satus="<<iStatus<<endl;
-                    }
-                    else
-                    {
-                        if ((iStatus>0) && (matchs[iNo].status<=0))
-                        {
-                            matchs[iNo].status=iStatus;
-                            getMatch(matchs[iNo].mid);
-                        }
-                        if ((iStatus>=7) && (matchs[iNo].status<7))
-                        {
-                            matchs[iNo].status=iStatus;
-                            getTable(league,liveTable);
-                        }
-                    }
-
-                    iNo++;
-                    if (iNo>=mmax)
-                    {
-                        write_log_call("Over the maximum of matches");
-                        return;
-                    }
                 }
-                else if (isFirstTime)
-                {
-                    //if (DEBUG) cout<<"GET  group "<<endl;
-                    nh=n.getTagByName("a");
-                    //gid=nh.getAttr();
-                    group = nh.getBetween("Group ",".");
-                    //group=nh.getText();
-                    //group=group.substr(group.length()-1);
-
-                    nh.setContent(nh.getAttr());
-                    gid=nh.getBetween("/groupId/","\"");
-                    //cout<<"Group "<<gid<<":"<<group<<endl;
-                    //if (DEBUG) cout<<"GET  group "<<gid<<" / "<<group<<endl;
-                }
-                //if (DEBUG) cout<<"GET  next match "<<endl;
-                n=t.cutTagByName("tr");
+                n=t.cutTagByName("div");
             }
             if (isFirstTime)
             {
-                addLeague(league,league_name,liveTable);
+                addLeague(league,league_name,league_slug);
             }
             //if (DEBUG) cout<<"End get league "<<endl;
         }
@@ -789,9 +798,10 @@ int main(int argc, char** argv)
 
                 setEvent2(100);
                 write_log_call("is First Time or new day");
-                restart_ftrigger();
+                //restart_ftrigger();
             }
             getToday(sDate);
+            break;//debug
             if (RELOAD)
             {
                 RELOAD=false;
@@ -816,6 +826,7 @@ int main(int argc, char** argv)
             }
         }
         sleep(sleep_time);
+        //break;//for debug
     }
     write_log_call("Stoping...");
     return 0;

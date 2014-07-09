@@ -335,7 +335,7 @@ void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_
     string tmp= string(user_id)+string("-")+string(match_id)+string("#");
     if (hadsent.find(string("#")+tmp)!=string::npos) return;
     hadsent+=tmp;
-    write_log("DM:to %s with match %s and tmp=%s",user_id,match_id,tmp.c_str());
+    write_log("DM:to %s/%s with match %s and tmp=%s",user_id,user_twitter,match_id,tmp.c_str());
     /**/
     char msg[250],tweet[250];
     sprintf(msg,"ALERT %s www.footygoat.com",match_teams);
