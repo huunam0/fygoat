@@ -14,7 +14,7 @@ static int DEBUG=0;
 
 static MYSQL *conn;
 
-string teamid, teamname,group;
+string teamid, teamname,group,team_slug;
 string tleague;
 int pos,play,hw,hd,hl,aw,ad,al,ow,od,ol,tabletype;
 int hf,ha,af,aa,of,oa;
@@ -112,7 +112,12 @@ bool init_mysql_conf()
 }
 bool executesql(const char * sql)
 {
-    if (DEBUG) cout<<sql<<endl;
+    if (DEBUG)
+    {
+        cout<<sql<<endl;
+        return true;
+    }
+
 	if (mysql_real_query(conn,sql,strlen(sql)))
     {
 		//sleep(20);
@@ -173,26 +178,35 @@ void addTeam(string tid, string tname, int type)
     //write_log(sql);
     executesql(sql);
 }
+void addTeam(const string tid, const string tname, const string tslug)
+{
+    char sql[1000];
+    sprintf(sql,"INSERT INTO `f_teams` (`team_id`,`team_slug`,`team_name`,`team_group`,`team_league`,`team_pos`,`team_op`,`team_ow`,`team_od`,`team_ol`,`team_of`,`team_oa`,`team_hw`,`team_hd`,`team_hl`,`team_hf`,`team_ha`,`team_aw`,`team_ad`,`team_al`,`team_af`,`team_aa`,`team_gd`,`team_pts`,team_date,team_updated) VALUES ('%s','%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d',NOW(),1) ON DUPLICATE KEY UPDATE team_group='%s',team_league='%s',team_pos='%d',team_op=%d,team_ow=%d,team_od=%d,team_ol=%d,team_of=%d,team_oa=%d,team_hw=%d,team_hd=%d,team_hl=%d,team_hf=%d,team_ha=%d,team_aw=%d,team_ad=%d,team_al=%d,team_af=%d,team_aa=%d,team_gd=%d,team_pts=%d,team_date=NOW(),team_updated=1;",tid.c_str(),tslug.c_str(),tname.c_str(),group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts,group.c_str(),tleague.c_str(),pos,play,ow,od,ol,of,oa,hw,hd,hl,hf,ha,aw,ad,al,af,aa,gd,pts);
+    teamlistname+=",'"+tname+"'";
+    executesql(sql);
+}
 void resetTable(string sLeague, string tids, string tnames)
 {
     char sql[500];
     sprintf(sql,"update f_teams set team_updated=0,team_date=NOW() where (team_league='%s') and (team_id not in (%s)) and (team_name not in (%s))",sLeague.c_str(),tids.c_str(),tnames.c_str());
     executesql(sql);
 }
-void getTable(string sLeague)
+void getTable(string sLeague) //sLeague includes slug & id
 {
     shtml m,t,n,nh;
     string teamlist="0";
-
-    //m.loadfromfile("tables.htm");
-	if (!m.loadFromURL((string("http://espnfc.com/tables?league=")+sLeague).c_str())) return;
+    tleague = sLeague;
+    size_t ix = tleague.find("/");
+    if (ix!=string::npos)
+        tleague.erase(0,ix+1);
+    //m.loadfromfile("http://www.espnfc.com/league-of-ireland-premier-division/116/table");
+	if (!m.loadFromURL((string("http://www.espnfc.com/")+sLeague+string("/table")).c_str())) return;
     m.removeBetween("<!--","-->",-1);
     t=m.cutTagByName("div");
     while (!t.isEmpty())
     {
-        if (t.containAttr("bg-elements"))
+        if (t.containAttr("site"))
         {
-            //sh.setContent(t.getContent());
             m=t;
             break;
         }
@@ -200,52 +214,70 @@ void getTable(string sLeague)
         t=m.cutTagByName("div");
     }
     //sh.viewContent();
-    m.retainTagByName("div",2);
+    m.retainTagByName("div");
+    m.retainTagByName("div",3);
     m.retainTagByName("div");
     m.retainTagByName("div",2);
     m.retainTagByName("div");
-    m.retainTagByName("div",2);
+    m.retainTagByName("div");
+    m.retainTagByName("div");
+    m.retainTagByName("div",4);
+    m.retainTagByName("div");
+    m.retainTagByName("div");
+    m.retainTagByName("div",3);
+
     t=m.cutTagByName("div");
     while (!t.isEmpty())
     {
-
-        t.retainTagByName("table");
-        n.setContent(t.getAttr());
-        group=n.getBetween("Live_false_group_","\"");
-        if (!group.empty())
+        if (t.containAttr("responsive-table")) //t=each group
         {
-            //cout<<"Group "<<group<<endl;
-            n=t.cutTagByName("thead");
-            if (n.contain("Overall")) tabletype=1;
-            else tabletype=0;
-            //t.retainTagByName("tbody");
+            t.retainTagByName("table");
+            n=t.getTagByName("thead");
+            n.retainTagByName("tr");
+            n.retainTagByName("th");
+            if (n.containTag("a"))
+            {
+                n.retainTagByName("a");
+                group=n.getContent();
+            }
+            else
+            {
+                group="";
+            }
+            t.retainTagByName("tbody");
             n=t.cutTagByName("tr");
             while (!n.isEmpty())
             {
-                nh=n.cutTagByName("td");
-                pos=nh.toInt();
-                nh=n.cutTagByName("td");
-                nh=n.cutTagByName("td");
-                if (nh.containTag("a")) nh.retainTagByName("a");
-                nh.replace("'","\\'",-1);
-                teamname = nh.getContent();
-                nh.setContent(nh.getAttr());
-                teamid = nh.getBetween("/id/","/");
-                nh=n.cutTagByName("td");
-                play=nh.toInt();
-                nh=n.cutTagByName("td");
-                ow=nh.toInt();
-                nh=n.cutTagByName("td");
-                od=nh.toInt();
-                nh=n.cutTagByName("td");
-                ol=nh.toInt();
-                nh=n.cutTagByName("td");
-                of=nh.toInt();
-                nh=n.cutTagByName("td");
-                oa=nh.toInt();
-                nh=n.cutTagByName("td");//remove
-                if (tabletype==1)
+                if (n.containAttr("background-color"))
                 {
+                    nh=n.cutTagByName("td");
+                    pos=nh.toInt();
+                    nh=n.cutTagByName("td");
+                    if (nh.containTag("a"))
+                        nh.retainTagByName("a");
+                    teamname=nh.getContent();
+                    team_slug=nh.getBetweenAttr("/","/",2);
+                    teamid=nh.getBetweenAttr("/","/",3);
+                    teamlist+=","+teamid;
+                    nh=n.cutTagByName("td");
+                    nh=n.cutTagByName("td");
+                    pts=nh.toInt();
+                    nh=n.cutTagByName("td");
+                    gd=nh.toInt();
+                    nh=n.cutTagByName("td");
+                    nh=n.cutTagByName("td");
+                    play=nh.toInt();
+                    nh=n.cutTagByName("td");
+                    ow=nh.toInt();
+                    nh=n.cutTagByName("td");
+                    od=nh.toInt();
+                    nh=n.cutTagByName("td");
+                    ol=nh.toInt();
+                    nh=n.cutTagByName("td");
+                    of=nh.toInt();
+                    nh=n.cutTagByName("td");
+                    oa=nh.toInt();
+                    nh=n.cutTagByName("td");
                     nh=n.cutTagByName("td");
                     hw=nh.toInt();
                     nh=n.cutTagByName("td");
@@ -256,47 +288,33 @@ void getTable(string sLeague)
                     hf=nh.toInt();
                     nh=n.cutTagByName("td");
                     ha=nh.toInt();
-                    nh=n.cutTagByName("td");//remove
-                    nh=n.cutTagByName("td");
-                    aw=nh.toInt();
-                    nh=n.cutTagByName("td");
-                    ad=nh.toInt();
-                    nh=n.cutTagByName("td");
-                    al=nh.toInt();
-                    nh=n.cutTagByName("td");
-                    af=nh.toInt();
-                    nh=n.cutTagByName("td");
-                    aa=nh.toInt();
-                    nh=n.cutTagByName("td");
+                    aw=ow-hw;
+                    ad=od-hd;
+                    al=ol-hl;
+                    af=of-hf;
+                    aa=oa-ha;
+                    addTeam(teamid,teamname,team_slug);
                 }
-                nh=n.cutTagByName("td");
-                gd=nh.toInt();
-                nh=n.cutTagByName("td");
-                pts=nh.toInt();
-                if (DEBUG) cout<<pos<<"/"<<teamid<<"/"<<teamname<<"/"<<play<<"/"<<ow<<"/"<<od<<"/"<<ol<<"/"<<of<<"/"<<oa<<"/"<<hw<<"/"<<hd<<"/"<<hl<<"/"<<hf<<"/"<<ha<<"/"<<aw<<"/"<<ad<<"/"<<al<<"/"<<af<<"/"<<aa<<"/"<<gd<<"/"<<pts<<endl;
-                if (!teamid.empty())
-                {
-                    teamlist+=","+teamid;
-                }
-
-                addTeam(teamid,teamname,tabletype);
-                //cout<<"Continue"<<endl;
                 n=t.cutTagByName("tr");
             }
         }
         t=m.cutTagByName("div");
     }
     //m.viewContent();
-    resetTable(sLeague, teamlist,teamlistname);
+    resetTable(tleague, teamlist,teamlistname);
 }
 int main(int argc, char** argv)
 {
+
     if (argc>1)
     {
         if (argc>2) DEBUG=true;
-        tleague = argv[1];
-        init_mysql_conf();
-        init_mysql();
+
+        if (!DEBUG)
+        {
+            init_mysql_conf();
+            init_mysql();
+        }
         getTable(argv[1]);
     }
 	else
