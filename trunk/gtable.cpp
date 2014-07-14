@@ -10,7 +10,7 @@ static char user_name[BUFFER_SIZE];
 static char password [BUFFER_SIZE];
 static char db_name  [BUFFER_SIZE];
 static int port_number;
-static int DEBUG=0;
+static bool DEBUG=false;
 
 static MYSQL *conn;
 
