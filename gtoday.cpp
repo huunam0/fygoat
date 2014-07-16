@@ -601,8 +601,11 @@ void getToday(string sDay="")
                 nh.setContent(n.getAttr());
                 nh.retainBetween("href=\"","\"");
                 //nh.viewContent();
-                league_slug=nh.getBetween("/","/");
-                league=nh.getBetween("/","/",2); //id
+                int shift = 0;
+                if (nh.contain("http://www.espnfc.com/"))
+                    shift=2;
+                league_slug=nh.getBetween("/","/",shift+1);
+                league=nh.getBetween("/","/",shift+2); //id
                 //league=nh.getContent();
                 if (liveTable)
                 {
