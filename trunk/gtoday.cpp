@@ -228,6 +228,11 @@ void getTable(string sLeague)
     char cmd[500];
     write_log_call("Get table %s ",sLeague.c_str());
     sprintf(cmd,"%sgtable %s &",f_home,sLeague.c_str());
+    if (DEBUG)
+    {
+        cout<<cmd<<endl;
+        return;
+    }
     system(cmd);
 }
 //from june 2014, add slug
@@ -455,7 +460,11 @@ void getMatch(int mId)
     char cmd[500];
     write_log_call("Get Match %d ",mId);
     sprintf(cmd,"%sgmatch %d &",f_home,mId);
-    //cout<<cmd<<endl;
+    if (DEBUG)
+    {
+        cout<<cmd<<endl;
+        return;
+    }
     system(cmd);
     RELOAD=true;
 }
@@ -629,7 +638,7 @@ void getToday(string sDay="")
                         if (nh.containAttr("score-box"))
                         {
                             nh.retainTagByName("div");
-                            gid=nh.getBetween("data-gameId=\"","\"");
+                            gid=nh.getBetweenAttr("data-gameId=\"","\"");
                             matchid=atoi(gid.c_str());
                             if (matchid!=matchs[iNo].mid) isNewDay=true;
                             if (nh.containAttr("score complete full"))
@@ -663,7 +672,7 @@ void getToday(string sDay="")
                                 //addMatch(matchid,league,group,homeid,awayid,iStatus,hscore,ascore);
                                 addMatch(matchid,league,group,iStatus);
                                 if (iStatus>0) getMatch(matchid);
-                                if (DEBUG) cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", Satus="<<iStatus<<endl;
+                                if (DEBUG) cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", Satus="<<iStatus<<", DATE: "<<match_date<<endl;
                             }
                             else
                             {
