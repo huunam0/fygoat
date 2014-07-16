@@ -588,6 +588,14 @@ shtml shtml::cutTagByName(string sTag, int iIndex)
 }
 void shtml::retainTagByName(string sTag, int iIndex)
 {
+    /*
+    if (iIndex<1) return;
+    while (iIndex>1)
+    {
+        removeTagByName(sTag);
+        iIndex--;
+    }
+    */
     string s = getPairBetween(string("<")+sTag,string("</")+sTag+string(">"),iIndex);
     int v = s.find(">");
     if (v!=string::npos)
