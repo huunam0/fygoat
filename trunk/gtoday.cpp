@@ -658,7 +658,9 @@ void getToday(string sDay="")
                                 nh.retainTagByName("div",3);
                                 nh.replace("T"," ");
                                 //nh.viewContent();
-                                match_date=nh.getBetween("data-time=\"",".");
+                                match_date=cday;
+                                if (iStatus==0)
+                                    match_date=nh.getBetween("data-time=\"",".");
                                 //match_date.replace(9,1," ");
                                 matchs[iNo].status=iStatus;
                                 matchs[iNo].mid=matchid;
