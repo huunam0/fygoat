@@ -646,6 +646,10 @@ void getToday(string sDay="")
                                 iStatus=7;
                                 //+Postp
                             }
+                            else if (nh.containAttr("score live full"))
+                            {
+                                iStatus=1;
+                            }
                             else if (nh.containAttr("score upcoming full"))
                             {
                                 iStatus=0;
