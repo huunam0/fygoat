@@ -268,7 +268,7 @@ void parseStatus2(shtml stat)
     {
         status=1;
     }
-    else if (stat.contain(":"))//
+    else if (stat.contain(":")||(stat.contain("nbsp")))//
     {
         status=0;
     }
@@ -292,8 +292,15 @@ void parseStatus2(shtml stat)
 void addTeam(string teamid, string tname, string league,string group)
 {
     char sql[1000];
-    sprintf(sql,"INSERT INORGE INTO f_teams (team_id,team_name,team_league,team_group,team_date,team_updated) VALUE (%s,'%s','%s','%s',NOW(),0) ON DUPLICATE KEY UPDATE team_name='%s',team_league='%s',team_group='%s',team_date=NOW(),team_updated=0;",teamid.c_str(),tname.c_str(),league.c_str(),group.c_str(),tname.c_str(),league.c_str(),group.c_str());
+    sprintf(sql,"INSERT IGNORE INTO f_teams (team_id,team_name,team_league,team_group,team_date,team_updated) VALUE (%s,'%s','%s','%s',NOW(),0) ON DUPLICATE KEY UPDATE team_name='%s',team_league='%s',team_group='%s',team_date=NOW(),team_updated=0;",teamid.c_str(),tname.c_str(),league.c_str(),group.c_str(),tname.c_str(),league.c_str(),group.c_str());
     //write_log("Add new team %d %s",teamid,tname.c_str());
+    executesql(sql);
+}
+//update home team, away team  of the match
+void updateha(int m_id, int home_id, int away_id)
+{
+    char sql[1000];
+    sprintf(sql,"UPDATE f_matches set hteam=%d, ateam=%d where match_id=%d;",home_id,away_id,m_id);
     executesql(sql);
 }
 bool getMatch(int id) //for major league
@@ -328,20 +335,21 @@ bool getMatch(int id) //for major league
     if (isFirstTime) //get teams
     {
         n=t.cutTagByName("div");//away team
-        a_id=n.getBetweenAttr("teamId-","\"");
+        h_id=n.getBetweenAttr("teamId-","\"");
         n.retainTagByName("p");
         n.retainTagByName("a");
-        aname=n.getContent();
-        addTeam(a_id,aname,"","");
+        hname=n.getContent();
+        addTeam(h_id,hname,"","");
         n=t.cutTagByName("div");//score & time
 
 
         t.retainTagByName("div");//home team
-        h_id=t.getBetweenAttr("teamId-","\"");
+        a_id=t.getBetweenAttr("teamId-","\"");
         t.retainTagByName("p");
         t.retainTagByName("a");
-        hname=t.getContent();
-        addTeam(h_id,hname,"","");
+        aname=t.getContent();
+        addTeam(a_id,aname,"","");
+        updateha(id,h_id,a_id);
     }
     else //only get time & status
     {
@@ -366,9 +374,13 @@ bool getMatch(int id) //for major league
     set2Value(0,sc[0],sc[1]);
     nh=n.cutTagByName("p");
     nh.trim();
-
+    if (status>0)
     parseStatus2(nh);
     set2Value(8,status,minutes);
+    if (status==0)
+    {
+        return false;
+    }
     if (status==1) //first half
     {
         sc1[0]=sc[0];
@@ -397,114 +409,6 @@ bool getMatch(int id) //for major league
     v[1]=nh.count("soccer-icons-redcard");
     set2Value(2,v[0],v[1]);
 
-    /*
-    if (t.contain("Match Stats")) {
-        if (DEBUG) cout<<"->Match Stats"<<endl;
-        t.retainTagByName("table");
-        n=t.cutTagByName("tr");
-        //if (DEBUG) n.viewContent();
-        if (n.contain("Shots"))
-        {
-            for (i=0;i<2;i++)
-            {
-                nh=n.cutTagByName("td",i+1);
-                nh.trim();
-                //if (DEBUG) nh.viewContent();
-                if (nh.contain("-")) v[i]=0;
-                else v[i]=nh.toInt();
-                //setValue(4,v,i);
-                nh.retainBetween("(",")");
-                g[i]=nh.toInt();
-                //setValue(5,v,i);
-            }
-            set2Value(4,v[0],v[1]);
-            set2Value(5,g[0],g[1]);
-            n=t.cutTagByName("tr");
-        }
-        if (n.contain("Fouls"))
-        {
-            n=t.cutTagByName("tr");
-        }
-        if (n.contain("Corner kicks"))
-        {
-            for (i=0;i<2;i++)
-            {
-                nh=n.cutTagByName("td",i+1);
-                nh.trim();
-                if (nh.contain("-")) v[i]=0;
-                else v[i]=nh.toInt();
-                //setValue(6,v,i);
-            }
-            set2Value(6,v[0],v[1]);
-            n=t.cutTagByName("tr");
-        }
-        if (n.contain("Offsides"))
-        {
-            n=t.cutTagByName("tr");
-        }
-        if (n.contain("Time of Possession"))
-        {
-            for (i=0;i<2;i++)
-            {
-                nh=n.cutTagByName("td",i+1);
-                nh.trim();
-                if (nh.contain("-")) v[i]=0;
-                else v[i]=nh.toInt();
-                //setValue(7,v,i);
-            }
-            set2Value(7,v[0],v[1]);
-            n=t.cutTagByName("tr");
-        }
-        if (n.contain("Yellow Cards"))
-        {
-            for (i=0;i<2;i++)
-            {
-                nh=n.cutTagByName("td",i+1);
-                nh.trim();
-                if (nh.contain("-")) v[i]=0;
-                else v[i]=nh.toInt();
-                if (v[i]>0) reCard=false;
-                //setValue(3,v,i);
-            }
-            set2Value(3,v[0],v[1]);
-            n=t.cutTagByName("tr");
-        }
-        if (n.contain("Red Cards"))
-        {
-            for (i=0;i<2;i++)
-            {
-                nh=n.cutTagByName("td",i+1);
-                nh.trim();
-                if (nh.contain("-")) v[i]=0;
-                else v[i]=nh.toInt();
-                if (reCard) if (v[i]>0) reCard=false;
-                //setValue(2,v,i);
-            }
-            set2Value(2,v[0],v[1]);
-            n=t.cutTagByName("tr");
-        }
-
-        t=sh.cutTagByName("section");
-    }
-    t=sh.cutTagByName("section");
-    if (!t.isEmpty()) t=sh.cutTagByName("section");
-    if (t.contain("Yellow Cards"))
-    {
-        for(i=0;i<2;i++)
-        {
-            n=t.cutTagByName("div");
-            v[i]=n.count("soccer-icons-yellowcard");
-        }
-        set2Value(3,v[0],v[1]);
-
-        for(i=0;i<2;i++)
-        {
-            n=t.cutTagByName("div");
-            v[i]=n.count("soccer-icons-redcard");
-        }
-        set2Value(2,v[0],v[1]);
-    }
-    */
     isFirstTime=false;
     //cout<<"End of get data"<<endl;
     return true;
@@ -531,7 +435,6 @@ void killSame(int sid)
 }
 int main(int argc, char** argv)
 {
-    //int iMatch;
     if (argc>1)
     {
         int kt=0;
@@ -555,8 +458,8 @@ int main(int argc, char** argv)
         if (status>0) setEvent2(10);
         while (status<7)
         {
-            init_mysql();
-            getMatch(mid);
+            if (!init_mysql()) break;
+            if (!getMatch(mid)) break;
             sleep(3);
             kt++;
             if (kt>5400)
@@ -570,16 +473,10 @@ int main(int argc, char** argv)
             deleteTimeline(mid);
             //setEvent2(12,status);
         }
-
-        if (argc>2)
-        {
-            //getTable(argv[2]);
-        }
-
     }
     else
     {
-        cout<<"Usage: gmatch <match_id> [<league>] "<<endl;
+        cout<<"Usage: gmatch <match_id> "<<endl;
         cout<<"by Tran Huu Nam, huunam0@gmail.com, 2012"<<endl;
     }
 }
