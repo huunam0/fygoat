@@ -662,9 +662,11 @@ void getToday(string sDay="")
                                 nh.retainTagByName("div",3);
                                 nh.replace("T"," ");
                                 //nh.viewContent();
-                                match_date=cday;
+                                //match_date=cday;
                                 if (iStatus==0)
                                     match_date=nh.getBetween("data-time=\"",".");
+                                else
+                                    match_date=currentdate;
                                 //match_date.replace(9,1," ");
                                 matchs[iNo].status=iStatus;
                                 matchs[iNo].mid=matchid;
@@ -775,6 +777,23 @@ void restart_ftrigger()
 {
     system("service ftriggers restart");
 }
+void test_mysql()
+{
+    init_mysql_conf();
+    cout<<"HOST: "<<host_name<<endl;
+    cout<<"USER: "<<user_name<<endl;
+    cout<<"PASS: "<<password<<endl;
+    cout<<"DB:   "<<db_name<<endl;
+    cout<<"PORT: "<<port_number<<endl;
+    if(init_mysql(false))
+    {
+        cout<<"Init OK";
+    }
+    else
+    {
+        cout<<"Init fail";
+    }
+}
 int main(int argc, char** argv)
 {
     bool bForce = false;
@@ -819,7 +838,7 @@ int main(int argc, char** argv)
                 //restart_ftrigger();
             }
             getToday(sDate);
-            break;//debug
+            //break;//debug
             if (RELOAD)
             {
                 RELOAD=false;
@@ -842,6 +861,11 @@ int main(int argc, char** argv)
             {
                 isTimeLineFull=true;
             }
+        }
+        else
+        {
+            write_log("Cannot init mysql");
+            break;
         }
         sleep(sleep_time);
         //break;//for debug
