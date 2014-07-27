@@ -203,6 +203,7 @@ bool init_mysql(bool bForce = false) {
     {
 		if(!bForce)
         {
+			write_log("Force Init Mysql");
 			return init_mysql(true);
 		}
 		else
@@ -443,13 +444,13 @@ void parseDate(string sDate)
 }
 void parseDate8(string sDate)
 {
-    //cout<<"Parse "<<sDate;
+    //cout<<"Parse "<<sDate;//20140724
     string p;
     p=sDate.substr(0,4);
     year = atoi(p.c_str());
-    p=sDate.substr(2,2);
-    month=atoi(p.c_str());
     p=sDate.substr(4,2);
+    month=atoi(p.c_str());
+    p=sDate.substr(6,2);
     day=atoi(p.c_str());
     //cout<<", day:"<<day;
     sprintf(currentdate,"%d-%s%d-%s%d",year,(month<=9?"0":""),month,day<=9?"0":"",day);
@@ -471,7 +472,6 @@ void getMatch(int mId)
 void setEvent(int iEvent,int iValue=0)
 {
     char sql[500];
-    //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
     sprintf(sql,"INSERT INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `value`=%d,`date`=NOW();",iEvent,iValue,0,0,iValue);
     executesql(sql);
 
@@ -479,8 +479,7 @@ void setEvent(int iEvent,int iValue=0)
 void setEvent2(int iEvent,int iValue0=0,int iValue1=0)
 {
     char sql[500];
-    //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
-    sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `home`=%d,`away`=%d,`date`=NOW();",iEvent,iValue0,iValue1,0,iValue0,iValue1);
+    sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW());",iEvent,iValue0,iValue1,0);
     executesql(sql);
 
 }
@@ -577,12 +576,7 @@ void getToday(string sDay="")
 
     if (isFirstTime)
     {
-        //
-        //t.deleteTo("<");
-        //t.retainBetween("\"","\"");
-        //bEOM = t.contain(" 1 ");
         parseDate8(cday);
-        //deleteTimeline();
         if ((day==0)||(month==0)||(year==0))
         {
             write_log("errorindate %s",cday.c_str());
@@ -677,7 +671,7 @@ void getToday(string sDay="")
                                 //matchs[iNo].hgoal=hscore;
                                 //matchs[iNo].agoal=ascore;
 
-                                //addMatch(matchid,league,group,homeid,awayid,iStatus,hscore,ascore);
+
                                 addMatch(matchid,league,group,iStatus);
                                 if (iStatus>0) getMatch(matchid);
                                 if (DEBUG) cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", Satus="<<iStatus<<", DATE: "<<match_date<<endl;
@@ -843,7 +837,7 @@ int main(int argc, char** argv)
             {
                 RELOAD=false;
                 //reload_ftrigger();
-                restart_ftrigger();
+                //restart_ftrigger();
             }
             //isFirstTime=false;
             bForce=(stat0==0);
@@ -853,6 +847,7 @@ int main(int argc, char** argv)
             {
                 if (isTimeLineFull)
                 {
+                    sleep(20);
                     deleteTimeline();
                     isTimeLineFull=false;
                 }
