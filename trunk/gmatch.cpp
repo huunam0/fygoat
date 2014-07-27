@@ -155,7 +155,7 @@ void emit2Event(int iIndex, int iValue0, int iValue1)
     }
 
     //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iIndex,iValue,iTeam,mid);
-    sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `home`=%d,`away`=%d,`date`=NOW(); ",iIndex,iValue0,iValue1,mid,iValue0,iValue1);
+    sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()); ",iIndex,iValue0,iValue1,mid);
     executesql(sql);
     string field;
     switch (iIndex)
@@ -207,7 +207,7 @@ void setEvent2(int iEvent,int iValue0=0,int iValue1=0) //special events
 {
     char sql[300];
     //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
-    sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `home`=%d,`away`=%d,`date`=NOW();",iEvent,iValue0,iValue1,mid,iValue0,iValue1);
+    sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW());",iEvent,iValue0,iValue1,mid);
     executesql(sql);
 
 }
@@ -279,14 +279,16 @@ void parseStatus2(shtml stat)
         {
             status=1;
         }
-        else if (minutes<91)
+        else //if (minutes<91)
         {
             status=3;
         }
+        /*
         else
         {
             status=0;
         }
+        */
     }
 }
 void addTeam(string teamid, string tname, string league,string group)
@@ -297,10 +299,10 @@ void addTeam(string teamid, string tname, string league,string group)
     executesql(sql);
 }
 //update home team, away team  of the match
-void updateha(int m_id, int home_id, int away_id)
+void updateha(const int m_id,const string home_id,const string away_id)
 {
     char sql[1000];
-    sprintf(sql,"UPDATE f_matches set hteam=%d, ateam=%d where match_id=%d;",home_id,away_id,m_id);
+    sprintf(sql,"UPDATE f_matches set hteam=%s, ateam=%s where match_id=%d;",home_id.c_str(),away_id.c_str(),m_id);
     executesql(sql);
 }
 bool getMatch(int id) //for major league
@@ -371,7 +373,6 @@ bool getMatch(int id) //for major league
         sc[1]=nh.toInt();
         status=1;
     }
-    set2Value(0,sc[0],sc[1]);
     nh=n.cutTagByName("p");
     nh.trim();
     if (status>0)
@@ -386,6 +387,7 @@ bool getMatch(int id) //for major league
         sc1[0]=sc[0];
         sc1[1]=sc[1];
     }
+    set2Value(0,sc[0],sc[1]);
     set2Value(1,sc1[0],sc1[1]);
 
     t=sh.cutTagByName("section");//omit
