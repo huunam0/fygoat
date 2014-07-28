@@ -175,7 +175,7 @@ bool executesql(const char * sql)
 {
 	if (mysql_real_query(conn,sql,strlen(sql)))
     {
-		write_log("Error in sql %s:%s",sql,mysql_error(conn));
+		write_log("Error in sql %s; %d: %s",sql,mysql_errno(conn),mysql_error(conn));
 		sleep(20);
 		conn=NULL;
 		return false;
@@ -194,7 +194,7 @@ bool init_mysql(bool bForce = false) {
 
 		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
         {
-			write_log("Error init mysql with host=%s,user=%s,pass=%s,db=%s: %s",host_name,user_name,password,db_name,mysql_error(conn));
+			write_log("Error init mysql with host=%s,user=%s,pass=%s,db=%s; %d: %s",host_name,user_name,password,db_name,mysql_errno(conn),mysql_error(conn));
 			sleep(20);
 			return false;
 		}
@@ -249,8 +249,7 @@ void getTable(const string sLeague_id, const string sLeague_slug)
 void addLeague(string lid, string lname,string lslug)
 {
     char sql[1000];
-    sprintf(sql,"INSERT IGNORE INTO f_leagues2 (`league_id`,`league_slug`,`league_name`) VALUE ('%s','%s','%s')",lid.c_str(),lslug.c_str(),lname.c_str());
-    //if (DEBUG) cout<<"Add league "<<lid<<" / "<<lname<<endl;
+    sprintf(sql,"INSERT IGNORE INTO f_leagues2 (`league_id`,`league_slug`,`league_name`) VALUE ('%s','%s','%s');",lid.c_str(),lslug.c_str(),lname.c_str());
     executesql(sql);
     getTable(lid,lslug);
 }
@@ -714,6 +713,7 @@ void getToday(string sDay="")
             //if (DEBUG) cout<<"End get league "<<endl;
         }
         //if (DEBUG) cout<<"Get NEXT league "<<endl;
+        sleep(1);
         t=m.cutTagByName("div");
     }
     //m.viewContent();
