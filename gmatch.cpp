@@ -291,11 +291,10 @@ void parseStatus2(shtml stat)
         */
     }
 }
-void addTeam(string teamid, string tname, string league,string group)
+void addTeam(const string teamid, const string tname, const string slug, const string league,const string group)
 {
     char sql[1000];
-    sprintf(sql,"INSERT IGNORE INTO f_teams (team_id,team_name,team_league,team_group,team_date,team_updated) VALUE (%s,'%s','%s','%s',NOW(),0) ON DUPLICATE KEY UPDATE team_name='%s',team_league='%s',team_group='%s',team_date=NOW(),team_updated=0;",teamid.c_str(),tname.c_str(),league.c_str(),group.c_str(),tname.c_str(),league.c_str(),group.c_str());
-    //write_log("Add new team %d %s",teamid,tname.c_str());
+    sprintf(sql,"INSERT IGNORE INTO f_teams (team_id,team_name,team_slug,team_league,team_group,team_date,team_updated) VALUE (%s,'%s','%s','%s','%s',NOW(),0) ON DUPLICATE KEY UPDATE team_name='%s',team_slug='%s',team_league='%s',team_group='%s',team_date=NOW(),team_updated=0;",teamid.c_str(),tname.c_str(),slug.c_str(),league.c_str(),group.c_str(),tname.c_str(),slug.c_str(),league.c_str(),group.c_str());
     executesql(sql);
 }
 //update home team, away team  of the match
@@ -308,7 +307,7 @@ void updateha(const int m_id,const string home_id,const string away_id)
 bool getMatch(int id) //for major league
 {
     shtml sh,t,n,nh,nh2;
-    string hname, h_id, aname, a_id;
+    string hname, h_id, aname, a_id, slug;
     int i=0,v[2],g[2];
     int sc[2]={0,0};
     int sc1[2]={0,0};
@@ -336,21 +335,25 @@ bool getMatch(int id) //for major league
     t.removeTagByName("div");
     if (isFirstTime) //get teams
     {
-        n=t.cutTagByName("div");//away team
+        n=t.cutTagByName("div");//home team
         h_id=n.getBetweenAttr("teamId-","\"");
         n.retainTagByName("p");
         n.retainTagByName("a");
+        slug = n.getBetweenAttr("/","/",2);
         hname=n.getContent();
-        addTeam(h_id,hname,"","");
+        //n.setContent(slug);
+        //slug=n.getBetween()
+        addTeam(h_id,hname,slug,"","");
         n=t.cutTagByName("div");//score & time
 
 
-        t.retainTagByName("div");//home team
+        t.retainTagByName("div");//away team
         a_id=t.getBetweenAttr("teamId-","\"");
         t.retainTagByName("p");
         t.retainTagByName("a");
+        slug = n.getBetweenAttr("/","/",2);
         aname=t.getContent();
-        addTeam(a_id,aname,"","");
+        addTeam(a_id,aname,slug,"","");
         updateha(id,h_id,a_id);
     }
     else //only get time & status
@@ -377,11 +380,12 @@ bool getMatch(int id) //for major league
     nh.trim();
     if (status>0)
     parseStatus2(nh);
-    set2Value(8,status,minutes);
+
     if (status==0)
     {
         return false;
     }
+    set2Value(8,status,minutes);
     if (status==1) //first half
     {
         sc1[0]=sc[0];
@@ -457,17 +461,19 @@ int main(int argc, char** argv)
         killSame(mid);
         //setEvent(10);
         getMatch(mid);
-        if (status>0) setEvent2(10);
-        while (status<7)
-        {
-            if (!init_mysql()) break;
-            if (!getMatch(mid)) break;
-            sleep(3);
-            kt++;
-            if (kt>5400)
+        if (status>0) {
+            setEvent2(10);
+            while (status<7)
             {
-                write_log("Overtime match %d:%d times",mid,kt);
-                break;
+                if (!init_mysql()) break;
+                if (!getMatch(mid)) break;
+                sleep(3);
+                kt++;
+                if (kt>5400)
+                {
+                    write_log("Overtime match %d:%d times",mid,kt);
+                    break;
+                }
             }
         }
         if (status>=7)

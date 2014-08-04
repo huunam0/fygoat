@@ -9,7 +9,7 @@
 #include <errno.h>
 
 twitCurl twitterObj;
-string t_name, t_pass, t_key, t_secret, t_token, t_tokensecret,replyMsg;
+string t_name, t_pass, t_key, t_secret, t_token, t_tokensecret,replyMsg, fb_page_email;
 #define BUFFER_SIZE 1024
 static char host_name[BUFFER_SIZE];
 static char user_name[BUFFER_SIZE];
@@ -101,7 +101,7 @@ bool init_conf()
     char consumersecret [BUFFER_SIZE];
     char token[BUFFER_SIZE];
     char tokensecret[BUFFER_SIZE];
-
+    char fb_pg_email[BUFFER_SIZE];
 
 	t_username[0]=0;
 	t_password[0]=0;
@@ -111,6 +111,7 @@ bool init_conf()
 	user_name[0]=0;
 	password[0]=0;
 	db_name[0]=0;
+	fb_pg_email[0]=0;
 	port_number=3306;
 
 	fp = fopen("/etc/footygoat/footygoat.conf", "r");
@@ -118,18 +119,18 @@ bool init_conf()
     {
         while (fgets(buf, BUFFER_SIZE - 1, fp))
         {
-            //read_buf(buf, "F_T_UNAME",t_username);
-            //read_buf(buf, "F_T_PASS",t_password);
-            read_buf(buf,"F_HOST_NAME",host_name);
+            read_buf(buf, "F_HOST_NAME",host_name);
             read_buf(buf, "F_USER_NAME",user_name);
             read_buf(buf, "F_PASSWORD",password);
             read_buf(buf, "F_DB_NAME",db_name);
-            read_int(buf , "F_PORT_NUMBER", &port_number);
+            read_int(buf, "F_PORT_NUMBER", &port_number);
+            read_buf(buf, "F_FB_EMAIL",fb_pg_email);
             read_buf(buf, "F_T_C_KEY",consumerkey);
             read_buf(buf, "F_T_C_SECRET",consumersecret);
             read_buf(buf, "F_T_ATOKEN_KEY",token);
             read_buf(buf, "F_T_ATOKEN_SECRET",tokensecret);
         }
+        fb_page_email=std::string(fb_pg_email);
         t_name=std::string(t_username);
         t_pass=std::string(t_password);
         t_key=std::string(consumerkey);
@@ -137,7 +138,7 @@ bool init_conf()
         t_token=std::string(token);
         t_tokensecret=std::string(tokensecret);
 		return true;
-	//	fclose(fp);
+		fclose(fp);
     }
     else
     {
@@ -150,8 +151,8 @@ bool executesql(const char * sql)
 	if (mysql_real_query(conn,sql,strlen(sql)))
     {
 		//sleep(20);
-		write_log("Error in sql %s:%s",sql,mysql_error(conn));
-		//conn=NULL;
+		write_log("Error in sql %s; %d: %s",sql,mysql_errno(conn),mysql_error(conn));
+		conn=NULL;
 		return false;
 	}
 	else
@@ -349,7 +350,7 @@ void tweet_match(char *user_id, char *user_twitter, char *match_id, char *match_
             int p_id=post_blog(match_id);
             sprintf(tweet,"%s/?p=%d",msg,p_id);
             postTweet(string(tweet));
-            postfb(p_id);
+            //postfb(p_id);
         }
     }
     else

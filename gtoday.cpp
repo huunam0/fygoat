@@ -257,7 +257,6 @@ void addMatch(int mid, string league,string group,int hteam, int ateam,int statu
 {
     char sql[1000];
     sprintf(sql,"INSERT INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`,`viewdate`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s','%s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d,viewdate='%s',`order`=%d",mid,league.c_str(),group.c_str(),hteam,ateam,status,hscore,ascore,iNo,year2,month2,day2,momment.c_str(),currentdate,hteam,ateam,currentdate,iNo);
-    ///cout<<sql<<endl;
     executesql(sql);
 
 }
@@ -265,16 +264,6 @@ void addMatch(int mid, string league,string group,int status=0)
 {
     char sql[1000];
     sprintf(sql,"INSERT INTO f_matches (match_id,league_id,`group`,status,`order`,`match_date`,`viewdate`) VALUE ('%d','%s','%s','%d',%d,'%s','%s') ON DUPLICATE KEY UPDATE viewdate='%s',`order`=%d",mid,league.c_str(),group.c_str(),status,iNo,match_date.c_str(),currentdate,currentdate,iNo);
-    //cout<<sql<<endl;
-    executesql(sql);
-
-}
-
-void addTeam(string teamid, string tname, string league,string group)
-{
-    char sql[1000];
-    sprintf(sql,"INSERT INTO f_teams (team_id,team_name,team_league,team_group,team_date,team_updated) VALUE (%s,'%s','%s','%s',NOW(),0) ON DUPLICATE KEY UPDATE team_name='%s',team_league='%s',team_group='%s',team_date=NOW(),team_updated=0;",teamid.c_str(),tname.c_str(),league.c_str(),group.c_str(),tname.c_str(),league.c_str(),group.c_str());
-    //write_log("Add new team %d %s",teamid,tname.c_str());
     executesql(sql);
 }
 
@@ -485,9 +474,9 @@ void setEvent2(int iEvent,int iValue0=0,int iValue1=0)
 void deleteTimeline()
 {
     write_log_call("Empty timeline...");
-    char sql[]="delete  from `f_timeline2` where `event` < 100;";
+    char sql[]="delete  from `f_timeline2`";
     executesql(sql);
-    char sql2[]="ALTER TABLE f_timeline2 AUTO_INCREMENT = 2;";
+    char sql2[]="ALTER TABLE f_timeline2 AUTO_INCREMENT = 1;";
     executesql(sql2);
 }
 void setCurrentDate(string refDate="")
@@ -672,7 +661,7 @@ void getToday(string sDay="")
 
 
                                 addMatch(matchid,league,group,iStatus);
-                                if (iStatus>0) getMatch(matchid);
+                                getMatch(matchid);
                                 if (DEBUG) cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", Satus="<<iStatus<<", DATE: "<<match_date<<endl;
                             }
                             else
