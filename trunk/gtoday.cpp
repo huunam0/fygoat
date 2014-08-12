@@ -1,5 +1,5 @@
 #include <time.h>
-#include <mysql/mysql.h>
+//#include <mysql/mysql.h>
 #include <string.h>
 #include "shtml.h"
 #include <stdarg.h>
@@ -14,12 +14,12 @@ static char user_name[BUFFER_SIZE];
 static char password [BUFFER_SIZE];
 static char db_name  [BUFFER_SIZE];
 static char f_home  [BUFFER_SIZE];
-static int port_number;
+//static int port_number;
 static bool DEBUG=false;
 static bool RELOAD=false;
 #define LOCKFILE "/var/run/footygoat.pid"
 #define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
-static MYSQL *conn;
+//static MYSQL *conn;
 
 string  teamname,group;
 int iMinute;
@@ -29,11 +29,11 @@ string sDate;
 struct Fmatch
 {
     int mid;
-    string league;
-    string group;
-    int hteam, ateam;
+    //string league;
+    //string group;
+    //int hteam, ateam;
     int status;
-    int hgoal, agoal;
+    //int hgoal, agoal;
 };
 const int mmax=300;
 Fmatch matchs[mmax];
@@ -148,7 +148,7 @@ bool init_mysql_conf()
 	user_name[0]=0;
 	password[0]=0;
 	db_name[0]=0;
-	port_number=3306;
+	//port_number=3306;
 
 	fp = fopen("/etc/footygoat/footygoat.conf", "r");
 	if(fp!=NULL)
@@ -159,7 +159,7 @@ bool init_mysql_conf()
             read_buf(buf, "F_USER_NAME",user_name);
             read_buf(buf, "F_PASSWORD",password);
             read_buf(buf, "F_DB_NAME",db_name);
-            read_int(buf , "F_PORT_NUMBER", &port_number);
+            //read_int(buf , "F_PORT_NUMBER", &port_number);
             read_buf(buf , "F_HOME", f_home);
         }
 		return true;
@@ -171,7 +171,7 @@ bool init_mysql_conf()
         return false;
     }
 }
-bool executesql(const char * sql)
+/*bool executesql(const char * sql)
 {
 	if (mysql_real_query(conn,sql,strlen(sql)))
     {
@@ -182,13 +182,17 @@ bool executesql(const char * sql)
 	}
 	else
 	    return true;
+}*/
+void executesql(const char * sql){
+    char cmd[1000];
+    sprintf(cmd,"mysql %s -u%s -p%s -s -N -e \"%s;\" &",db_name,user_name,password,sql);
+    system(cmd);
 }
-
+/*
 bool init_mysql(bool bForce = false) {
     if((conn==NULL) || (bForce) )
     {
 		conn=mysql_init(NULL);		// init the database connection
-		/* connect the database */
 		const char timeout=50;
 		mysql_options(conn,MYSQL_OPT_CONNECT_TIMEOUT,&timeout);
 
@@ -212,8 +216,9 @@ bool init_mysql(bool bForce = false) {
 
 	return true;
 }
+*/
 //Xu li chinh
-void getTable(string sLeague, bool isLive = false)
+void getTable(const string sLeague,const  bool isLive = false)
 {
     //if (DEBUG) cout<<"Get table "<<sLeague<<endl;
     if (sLeague.empty()) return;
@@ -222,7 +227,7 @@ void getTable(string sLeague, bool isLive = false)
     sprintf(cmd,"%sg%stable %s &",f_home,(isLive?"live":""),sLeague.c_str());
     system(cmd);
 }
-void getTable(string sLeague)
+void getTable(const string sLeague)
 {
     //if (DEBUG) cout<<"Get table "<<sLeague<<endl;
     if (sLeague.empty()) return;
@@ -246,28 +251,21 @@ void getTable(const string sLeague_id, const string sLeague_slug)
     sprintf(cmd,"%sgtable %s %s &",f_home,sLeague_id.c_str(), sLeague_slug.c_str());
     system(cmd);
 }
-void addLeague(string lid, string lname,string lslug)
+void addLeague(const string lid,const  string lname,const string lslug)
 {
     char sql[1000];
-    sprintf(sql,"INSERT IGNORE INTO f_leagues2 (`league_id`,`league_slug`,`league_name`) VALUE ('%s','%s','%s');",lid.c_str(),lslug.c_str(),lname.c_str());
+    sprintf(sql,"INSERT IGNORE INTO f_leagues2 (league_id,league_slug,league_name) VALUE ('%s','%s','%s');",lid.c_str(),lslug.c_str(),lname.c_str());
     executesql(sql);
     getTable(lid,lslug);
 }
-void addMatch(int mid, string league,string group,int hteam, int ateam,int status=0, int hscore=0, int ascore=0)
+void addMatch(const int mid,const  string league,const string group,const int status=0)
 {
     char sql[1000];
-    sprintf(sql,"INSERT INTO f_matches (match_id,league_id,`group`,hteam,ateam,status,hgoals,agoals,`order`,`match_date`,`viewdate`) VALUE ('%d','%s','%s','%d','%d','%d','%d','%d',%d,'%d-%d-%d %s','%s') ON DUPLICATE KEY UPDATE hteam=%d,ateam=%d,viewdate='%s',`order`=%d",mid,league.c_str(),group.c_str(),hteam,ateam,status,hscore,ascore,iNo,year2,month2,day2,momment.c_str(),currentdate,hteam,ateam,currentdate,iNo);
-    executesql(sql);
-
-}
-void addMatch(int mid, string league,string group,int status=0)
-{
-    char sql[1000];
-    sprintf(sql,"INSERT INTO f_matches (match_id,league_id,`group`,status,`order`,`match_date`,`viewdate`) VALUE ('%d','%s','%s','%d',%d,'%s','%s') ON DUPLICATE KEY UPDATE viewdate='%s',`order`=%d",mid,league.c_str(),group.c_str(),status,iNo,match_date.c_str(),currentdate,currentdate,iNo);
+    sprintf(sql,"INSERT INTO f_matches (match_id,league_id,group,status,order,match_date,viewdate) VALUE ('%d','%s','%s','%d',%d,'%s','%s') ON DUPLICATE KEY UPDATE viewdate='%s',order=%d",mid,league.c_str(),group.c_str(),status,iNo,match_date.c_str(),currentdate,currentdate,iNo);
     executesql(sql);
 }
 
-int parseStatus(string status)
+int parseStatus(const string status)
 {
     shtml sh(status);
     momment="07:00";
@@ -364,73 +362,8 @@ int parseStatus(string status)
         return 0;
     }
 }
-void parseDate(string sDate)
-{
-    //cout<<"Parse "<<sDate;
-    shtml sh(sDate);
-    shtml st(sh.cutBetween(",",","));
-    if (st.contain("Jan"))
-    {
-        month=1;
-    }
-    else if (st.contain("Feb"))
-    {
-        month=2;
-    }
-    else if (st.contain("Mar"))
-    {
-        month=3;
-    }
-    else if (st.contain("Apr"))
-    {
-        month=4;
-    }
-    else if (st.contain("May"))
-    {
-        month=5;
-    }
-    else if (st.contain("Jun"))
-    {
-        month=6;
-    }
-    else if (st.contain("Jul"))
-    {
-        month=7;
-    }
-    else if (st.contain("Aug"))
-    {
-        month=8;
-    }
-    else if (st.contain("Sep"))
-    {
-        month=9;
-    }
-    else if (st.contain("Oct"))
-    {
-        month=10;
-    }
-    else if (st.contain("Nov"))
-    {
-        month=11;
-    }
-    else if (st.contain("Dec"))
-    {
-        month=12;
-    }
-    else
-    {
-        month=0;
-    }
-    //cout<<", month:"<<month;
-    st.deleteTo(" ",2);
-    day = st.toInt();
-    //cout<<", day:"<<day;
-    sh.deleteTo(" ");
-    year = sh.toInt();
-    //cout<<", year:"<<year<<endl;
-    sprintf(currentdate,"%d-%s%d-%s%d",year,(month<=9?"0":""),month,day<=9?"0":"",day);
-}
-void parseDate8(string sDate)
+
+void parseDate8(const string sDate)
 {
     //cout<<"Parse "<<sDate;//20140724
     string p;
@@ -443,7 +376,7 @@ void parseDate8(string sDate)
     //cout<<", day:"<<day;
     sprintf(currentdate,"%d-%s%d-%s%d",year,(month<=9?"0":""),month,day<=9?"0":"",day);
 }
-void getMatch(int mId)
+void getMatch(const int mId)
 {
     if (mId<=0) return;
     char cmd[500];
@@ -457,36 +390,24 @@ void getMatch(int mId)
     system(cmd);
     RELOAD=true;
 }
-void setEvent(int iEvent,int iValue=0)
+void setEvent100()
 {
-    char sql[500];
-    sprintf(sql,"INSERT INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()) ON DUPLICATE KEY UPDATE `value`=%d,`date`=NOW();",iEvent,iValue,0,0,iValue);
-    executesql(sql);
-
-}
-void setEvent2(int iEvent,int iValue0=0,int iValue1=0)
-{
-    char sql[500];
-    sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW());",iEvent,iValue0,iValue1,0);
-    executesql(sql);
-
+    executesql("INSERT INTO f_timeline2 (event, home, away, match_id) VALUE (100,0,0,0);");
 }
 void deleteTimeline()
 {
     write_log_call("Empty timeline...");
-    char sql[]="delete  from `f_timeline2`";
-    executesql(sql);
-    char sql2[]="ALTER TABLE f_timeline2 AUTO_INCREMENT = 1;";
-    executesql(sql2);
+    executesql("DELETE  FROM f_timeline2;");
+    executesql("ALTER TABLE f_timeline2 AUTO_INCREMENT = 1;");
 }
-void setCurrentDate(string refDate="")
+void setCurrentDate(const string refDate="")
 {
     char sql[500];
     sprintf(sql,"update f_params set p_value='%s' where p_name='currentdate';",currentdate);
     executesql(sql);
     write_log_call(" New day %s -> %s",currentdate,refDate.c_str());
 }
-void getToday(string sDay="")
+void getToday(const string sDay="")
 {
     shtml m,t,n,nh;
     string status,hteam,ateam,score,league,league_slug,league_name,gid,group,hname,aname, cday;
@@ -652,13 +573,8 @@ void getToday(string sDay="")
                                 //match_date.replace(9,1," ");
                                 matchs[iNo].status=iStatus;
                                 matchs[iNo].mid=matchid;
-                                matchs[iNo].league=league;
-                                matchs[iNo].group=group;
-                                //matchs[iNo].hteam=atoi(hteam.c_str());
-                                //matchs[iNo].ateam=atoi(ateam.c_str());
-                                //matchs[iNo].hgoal=hscore;
-                                //matchs[iNo].agoal=ascore;
-
+                                //matchs[iNo].league=league;
+                                //matchs[iNo].group=group;
 
                                 addMatch(matchid,league,group,iStatus);
                                 getMatch(matchid);
@@ -709,7 +625,7 @@ void getToday(string sDay="")
     isFirstTime = false;
 }
 //For daemon:
-int lockfile(int fd)
+int lockfile(const int fd)
 {
 	struct flock fl;
 	fl.l_type = F_WRLCK;
@@ -807,49 +723,41 @@ int main(int argc, char** argv)
 	write_log_call("Starting...");
     while (!STOP)
     {
-		if (init_mysql(bForce))
+        if (!isFirstTime)
         {
-            if (!isFirstTime)
-            {
-                isFirstTime=isNewDay;
-            }
-            if ((isFirstTime))
-            {
+            isFirstTime=isNewDay;
+        }
+        if ((isFirstTime))
+        {
 
-                setEvent2(100);
-                write_log_call("is First Time or new day");
-                //restart_ftrigger();
-            }
-            getToday(sDate);
-            //break;//debug
-            if (RELOAD)
+            setEvent100();
+            write_log_call("is First Time or new day");
+            //restart_ftrigger();
+        }
+        getToday(sDate);
+        //break;//debug
+        if (RELOAD)
+        {
+            RELOAD=false;
+            //reload_ftrigger();
+            //restart_ftrigger();
+        }
+        //isFirstTime=false;
+        bForce=(stat0==0);
+        sleep_time=(bForce?1000:10);
+        //cout<<"wait "<<sleep_time<<"seconds..."<<endl;
+        if ((stat1==0)  )
+        {
+            if (isTimeLineFull)
             {
-                RELOAD=false;
-                //reload_ftrigger();
-                //restart_ftrigger();
-            }
-            //isFirstTime=false;
-            bForce=(stat0==0);
-            sleep_time=(bForce?3600:10);
-            //cout<<"wait "<<sleep_time<<"seconds..."<<endl;
-            if ((stat1==0)  )
-            {
-                if (isTimeLineFull)
-                {
-                    sleep(20);
-                    deleteTimeline();
-                    isTimeLineFull=false;
-                }
-            }
-            else
-            {
-                isTimeLineFull=true;
+                sleep(20);
+                deleteTimeline();
+                isTimeLineFull=false;
             }
         }
         else
         {
-            write_log("Cannot init mysql");
-            break;
+            isTimeLineFull=true;
         }
         sleep(sleep_time);
         //break;//for debug
