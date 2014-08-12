@@ -1,5 +1,4 @@
 #include <time.h>
-#include <mysql/mysql.h>
 #include <string.h>
 #include "shtml.h"
 #include <stdarg.h>
@@ -9,10 +8,7 @@ static char host_name[BUFFER_SIZE];
 static char user_name[BUFFER_SIZE];
 static char password [BUFFER_SIZE];
 static char db_name  [BUFFER_SIZE];
-static int port_number;
 static int DEBUG=false;
-
-static MYSQL *conn;
 
 int m[2][10];
 int status=0;
@@ -87,7 +83,6 @@ bool init_mysql_conf()
 	user_name[0]=0;
 	password[0]=0;
 	db_name[0]=0;
-	port_number=3306;
 
 	fp = fopen("/etc/footygoat/footygoat.conf", "r");
 	if(fp!=NULL)
@@ -98,7 +93,6 @@ bool init_mysql_conf()
             read_buf(buf, "F_USER_NAME",user_name);
             read_buf(buf, "F_PASSWORD",password);
             read_buf(buf, "F_DB_NAME",db_name);
-            read_int(buf , "F_PORT_NUMBER", &port_number);
         }
 		return true;
 	//	fclose(fp);
@@ -109,43 +103,14 @@ bool init_mysql_conf()
         return false;
     }
 }
-bool executesql(const char * sql){
-    if (DEBUG)
-    {
-        cout<<"SQL: "<<sql<<endl;
-        return true;
-    }
-	if (mysql_real_query(conn,sql,strlen(sql)))
-    {
-		//sleep(20);
-		write_log("Error iin sql %s:%s",sql,mysql_error(conn));
-		//conn=NULL;
-		return false;
-	}
-	else
-	    return true;
-}
-int init_mysql() {
-    if(conn==NULL)
-    {
-		conn=mysql_init(NULL);		// init the database connection
-		/* connect the database */
-		const char timeout=30;
-		mysql_options(conn,MYSQL_OPT_CONNECT_TIMEOUT,&timeout);
 
-		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
-        {
-			write_log("Error init mysql: %s",mysql_error(conn));
-			//sleep(20);
-			return false;
-		}
-	}
-	if (!executesql("set names utf8"))
-        return false;
-	return true;
+void executesql(const char * sql){
+    char cmd[1000];
+    sprintf(cmd,"mysql %s -u%s -p%s -s -N -e \"%s;\" &",db_name,user_name,password,sql);
+    system(cmd);
 }
 
-void emit2Event(int iIndex, int iValue0, int iValue1)
+void emit2Event(const int iIndex,const int iValue0,const int iValue1)
 {
     char sql[300];
     if (DEBUG)
@@ -155,7 +120,7 @@ void emit2Event(int iIndex, int iValue0, int iValue1)
     }
 
     //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iIndex,iValue,iTeam,mid);
-    sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW()); ",iIndex,iValue0,iValue1,mid);
+    sprintf(sql,"INSERT INTO f_timeline2 (event, home, away, match_id) VALUE (%d,%d,%d,%d); ",iIndex,iValue0,iValue1,mid);
     executesql(sql);
     string field;
     switch (iIndex)
@@ -203,16 +168,15 @@ void emit2Event(int iIndex, int iValue0, int iValue1)
 
 }
 
-void setEvent2(int iEvent,int iValue0=0,int iValue1=0) //special events
+void setEvent2(const int iEvent,const int iValue0=0,const int iValue1=0) //special events
 {
     char sql[300];
-    //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iEvent,iValue,0,mid);
-    sprintf(sql,"INSERT INTO f_timeline2 (`event`, `home`, `away`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW());",iEvent,iValue0,iValue1,mid);
+    sprintf(sql,"INSERT INTO f_timeline2 (event, home, away, match_id) VALUE (%d,%d,%d,%d);",iEvent,iValue0,iValue1,mid);
     executesql(sql);
 
 }
 
-void set2Value(int iIndex, int iValue0=0, int iValue1=0)
+void set2Value(const int iIndex, const int iValue0=0, const int iValue1=0)
 {
     if (DEBUG)
     {
@@ -227,7 +191,7 @@ void set2Value(int iIndex, int iValue0=0, int iValue1=0)
     }
 }
 
-void parseStatus2(shtml stat)
+void parseStatus2(const shtml stat)
 {
     if (stat.contain("FT-Pens"))
     {
@@ -283,12 +247,6 @@ void parseStatus2(shtml stat)
         {
             status=3;
         }
-        /*
-        else
-        {
-            status=0;
-        }
-        */
     }
 }
 void addTeam(const string teamid, const string tname, const string slug, const string league,const string group)
@@ -304,15 +262,14 @@ void updateha(const int m_id,const string home_id,const string away_id)
     sprintf(sql,"UPDATE f_matches set hteam=%s, ateam=%s where match_id=%d;",home_id.c_str(),away_id.c_str(),m_id);
     executesql(sql);
 }
-bool getMatch(int id) //for major league
+bool getMatch(const int id) //for major league
 {
     shtml sh,t,n,nh,nh2;
     string hname, h_id, aname, a_id, slug;
-    int i=0,v[2],g[2];
+    int v[2];
     int sc[2]={0,0};
     int sc1[2]={0,0};
     char url[300];
-    bool reCard = true;
     sprintf(url,"http://www.espnfc.com/gamecast/statistics/id/%d/statistics.html",id);
     if (DEBUG)
         cout<<"Loading from "<<url<<endl;
@@ -419,18 +376,18 @@ bool getMatch(int id) //for major league
     //cout<<"End of get data"<<endl;
     return true;
 }
-void getTable(string sLeague)
+void getTable(const string sLeague)
 {
     if (DEBUG) cout<<"Get table (X) "<<sLeague<<endl;
 }
-void deleteTimeline(int maid)
+void deleteTimeline(const int maid)
 {
     write_log("Empty timeline for %d",maid);
     char sql[200];
-    sprintf(sql, "delete  from `f_timeline2` where `match`='%d';",maid);
+    sprintf(sql, "delete  from f_timeline2 where match_id='%d';",maid);
     executesql(sql);
 }
-void killSame(int sid)
+void killSame(const int sid)
 {
     char cmd[200];
     //write_log_call("Get Match %d ",mId);
@@ -455,7 +412,6 @@ int main(int argc, char** argv)
         if (!DEBUG)
         {
             init_mysql_conf();
-            init_mysql();
         }
         mid = atoi(argv[1]);
         killSame(mid);

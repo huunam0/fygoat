@@ -4,11 +4,11 @@ shtml::shtml()
 {
     //ctor
 }
-shtml::shtml(string _s)
+shtml::shtml(const string _s)
 {
     htm=_s;
 }
-shtml::shtml(string _s, string _a)
+shtml::shtml(const string _s,const  string _a)
 {
     htm=_s;
     attr=_a;
@@ -18,7 +18,7 @@ shtml::~shtml()
     htm.clear();
 }
 
-void shtml::setContent(string sht)
+void shtml::setContent(const string sht)
 {
     htm = sht;
 }
@@ -45,7 +45,7 @@ void shtml::viewContent()
  * Author: Tran Huu Nam - huunam0@gmail.com
  * Date: 19 July 2012
  */
-string shtml::getBetween(string sFrom, string sTo, int iIndex)
+string shtml::getBetween(const string sFrom, const string sTo, const int iIndex)
 {
     int iPosFrom = htm.find(sFrom);
     int iFromLength=sFrom.length();
@@ -72,10 +72,10 @@ string shtml::getBetween(string sFrom, string sTo, int iIndex)
         }
     }
 }
-string shtml::getBetweenAttr(string sFrom, string sTo, int iIndex)
+string shtml::getBetweenAttr(const string sFrom, const string sTo,const  int iIndex)
 {
-    int iPosFrom = attr.find(sFrom);
-    int iFromLength=sFrom.length();
+    unsigned int iPosFrom = attr.find(sFrom);
+    unsigned int iFromLength=sFrom.length();
     while ((iPosFrom!=string::npos) && (iIndex>1))
     {
         iIndex--;
@@ -88,7 +88,7 @@ string shtml::getBetweenAttr(string sFrom, string sTo, int iIndex)
     else
     {
         iPosFrom+=iFromLength;
-        int iPosTo = attr.find(sTo,iPosFrom);
+        unsigned int iPosTo = attr.find(sTo,iPosFrom);
         if (iPosTo==string::npos)
         {
             return attr.substr(iPosFrom);
@@ -106,16 +106,16 @@ string shtml::getBetweenAttr(string sFrom, string sTo, int iIndex)
  * Author: Tran Huu Nam - huunam0@gmail.com
  * Date: 19 July 2012
  */
-string shtml::getPairBetween(string sFrom, string sTo, int iIndex )
+string shtml::getPairBetween(const string sFrom, const string sTo, const int iIndex )
 {
     if (htm.empty()) return "";
-    int iPosFrom = htm.find(sFrom);
+    unsigned int iPosFrom = htm.find(sFrom);
     int iMatch=0;
-    int iPosTo =iPosFrom;
+    unsigned int iPosTo =iPosFrom;
     int iFromLength = sFrom.length();
     int iToLength = sTo.length();
     int iAdd = iFromLength;
-    int v1,v2;
+    unsigned int v1,v2;
     if (iPosFrom!=string::npos) iMatch=1;
     else return "";
     while (iPosFrom!=string::npos)
@@ -160,16 +160,16 @@ string shtml::getPairBetween(string sFrom, string sTo, int iIndex )
     return ("");
 
 }
-int shtml::getLastPairBetween(string sFrom, string sTo, int iIndex )
+unsigned int shtml::getLastPairBetween(const string sFrom, const string sTo, const int iIndex )
 {
     if (htm.empty()) return string::npos;
-    int iPosFrom = htm.find(sFrom);
+    unsigned int iPosFrom = htm.find(sFrom);
     int iMatch=0;
-    int iPosTo =iPosFrom;
+    unsigned int iPosTo =iPosFrom;
     int iFromLength = sFrom.length();
     int iToLength = sTo.length();
     int iAdd = iFromLength;
-    int v1,v2;
+    unsigned int v1,v2;
     if (iPosFrom!=string::npos) iMatch=1;
     else return string::npos;
     while (iPosFrom!=string::npos)
@@ -221,9 +221,9 @@ int shtml::getLastPairBetween(string sFrom, string sTo, int iIndex )
  * Author: Tran Huu Nam - huunam0@gmail.com
  * Date: 19 July 2012
  */
-string shtml::cutBetween(string sFrom, string sTo, int iIndex)
+string shtml::cutBetween(const string sFrom, const string sTo, const int iIndex)
 {
-    int iPosFrom = htm.find(sFrom);
+    unsigned int iPosFrom = htm.find(sFrom);
     int iFromLength=sFrom.length();
     while ((iPosFrom!=string::npos) && (iIndex>1))
     {
@@ -237,7 +237,7 @@ string shtml::cutBetween(string sFrom, string sTo, int iIndex)
     else
     {
         iPosFrom+=iFromLength;
-        int iPosTo = htm.find(sTo,iPosFrom);
+        unsigned int iPosTo = htm.find(sTo,iPosFrom);
         if (iPosTo==string::npos)
         {
             string sRet =htm.substr(iPosFrom);
@@ -259,16 +259,16 @@ string shtml::cutBetween(string sFrom, string sTo, int iIndex)
  * Author: Tran Huu Nam - huunam0@gmail.com
  * Date: 19 July 2012
  */
-string shtml::cutPairBetween(string sFrom, string sTo, int iIndex )
+string shtml::cutPairBetween(const string sFrom, const string sTo, const int iIndex )
 {
     if (htm.empty()) return "";
-    int iPosFrom = htm.find(sFrom);
+    unsigned int iPosFrom = htm.find(sFrom);
     int iMatch=0;
-    int iPosTo =iPosFrom;
+    unsigned int iPosTo =iPosFrom;
     int iFromLength = sFrom.length();
     int iToLength = sTo.length();
     int iAdd = iFromLength;
-    int v1,v2;
+    unsigned int v1,v2;
     if (iPosFrom!=string::npos) iMatch=1;
     else return "";
     string sRet;
@@ -281,10 +281,6 @@ string shtml::cutPairBetween(string sFrom, string sTo, int iIndex )
         if ((v2<v1)||(v1==string::npos))
         {
             iMatch--;
-            if (iMatch<3)
-            {
-                int xx=0;
-            }
             iPosTo=v2;
             iAdd=iToLength;
         }
@@ -334,9 +330,9 @@ string shtml::cutPairBetween(string sFrom, string sTo, int iIndex )
  * Author: Tran Huu Nam - huunam0@gmail.com
  * Date: 19 July 2012
  */
-void shtml::retainBetween(string sFrom, string sTo, int iIndex)
+void shtml::retainBetween(const string sFrom, const string sTo, const int iIndex)
 {
-    int iPosFrom = htm.find(sFrom);
+    unsigned int iPosFrom = htm.find(sFrom);
     int iFromLength=sFrom.length();
     while ((iPosFrom!=string::npos) && (iIndex>1))
     {
@@ -346,7 +342,7 @@ void shtml::retainBetween(string sFrom, string sTo, int iIndex)
     if (iPosFrom!=string::npos)
     {
         iPosFrom+=iFromLength;
-        int iPosTo = htm.find(sTo,iPosFrom);
+        unsigned int iPosTo = htm.find(sTo,iPosFrom);
         if (iPosTo==string::npos)
         {
             htm.erase(0,iPosFrom);
@@ -366,15 +362,15 @@ void shtml::retainBetween(string sFrom, string sTo, int iIndex)
  * Author: Tran Huu Nam - huunam0@gmail.com
  * Date: 19 July 2012
  */
-void shtml::retainPairBetween(string sFrom, string sTo, int iIndex )
+void shtml::retainPairBetween(const string sFrom, const string sTo, const int iIndex )
 {
-    int iPosFrom = htm.find(sFrom);
+    unsigned int iPosFrom = htm.find(sFrom);
     int iMatch=0;
-    int iPosTo =iPosFrom;
+    unsigned int iPosTo =iPosFrom;
     int iFromLength = sFrom.length();
     int iToLength = sTo.length();
     int iAdd = iFromLength;
-    int v1,v2;
+    unsigned int v1,v2;
     if (iPosFrom!=string::npos) iMatch=1;
     while (iPosFrom!=string::npos)
     {
@@ -427,11 +423,11 @@ void shtml::retainPairBetween(string sFrom, string sTo, int iIndex )
  * Author: Tran Huu Nam - huunam0@gmail.com
  * Date: 19 July 2012
  */
-void shtml::removeBetween(string sFrom, string sTo, int iTimes)
+void shtml::removeBetween(const string sFrom, const string sTo,const  int iTimes)
 {
-    int iPosFrom = htm.find(sFrom);
+    unsigned int iPosFrom = htm.find(sFrom);
     int iFromLength=sFrom.length();
-    int iPosTo;
+    unsigned int iPosTo;
     int iToLength=sTo.length();
     while ((iTimes!=0) && (iPosFrom!=string::npos) )
     {
@@ -458,16 +454,16 @@ void shtml::removeBetween(string sFrom, string sTo, int iTimes)
  * Author: Tran Huu Nam - huunam0@gmail.com
  * Date: 19 July 2012
  */
-bool shtml::removePairBetween(string sFrom, string sTo, int iIndex )
+bool shtml::removePairBetween(const string sFrom, const string sTo, const int iIndex )
 {
     if (htm.empty()) return false;
-    int iPosFrom = htm.find(sFrom);
+    unsigned int iPosFrom = htm.find(sFrom);
     int iMatch=0;
-    int iPosTo =iPosFrom;
+    unsigned int iPosTo =iPosFrom;
     int iFromLength = sFrom.length();
     int iToLength = sTo.length();
     int iAdd = iFromLength;
-    int v1,v2;
+    unsigned int v1,v2;
     if (iPosFrom!=string::npos) iMatch=1;
     else return false;
     string sRet;
@@ -524,9 +520,9 @@ bool shtml::removePairBetween(string sFrom, string sTo, int iIndex )
  * Author: Tran Huu Nam - huunam0@gmail.com
  * Date: 19 July 2012
  */
-void shtml::deleteTo(string sSub, int iIndex)
+void shtml::deleteTo(const string sSub, const int iIndex)
 {
-    int iPosFrom = htm.find(sSub);
+    unsigned int iPosFrom = htm.find(sSub);
     int iFromLength=sSub.length();
     while ((iPosFrom!=string::npos) && (iIndex>1))
     {
@@ -545,10 +541,10 @@ void shtml::deleteTo(string sSub, int iIndex)
  * Author: Tran Huu Nam - huunam0@gmail.com
  * Date: 19 July 2012
  */
-shtml shtml::getTagByName(string sTag, int iIndex)
+shtml shtml::getTagByName(const string sTag,const  int iIndex)
 {
     string s = getPairBetween(string("<")+sTag,string("</")+sTag+string(">"),iIndex);
-    int v = s.find(">");
+    unsigned int v = s.find(">");
     if (v!=string::npos)
     {
         //attr=s.substr(0,v);
@@ -575,10 +571,10 @@ shtml shtml::getTagByOrder(int iOrder)
  * Author: Tran Huu Nam - huunam0@gmail.com
  * Date: 19 July 2012
  */
-shtml shtml::cutTagByName(string sTag, int iIndex)
+shtml shtml::cutTagByName(const string sTag, const int iIndex)
 {
     string s = cutPairBetween(string("<")+sTag,string("</")+sTag+string(">"),iIndex);
-    int v = s.find(">");
+    unsigned int v = s.find(">");
     if (v!=string::npos)
     {
         //attr=s.substr(0,v);
@@ -586,18 +582,10 @@ shtml shtml::cutTagByName(string sTag, int iIndex)
     }
     return shtml(s);
 }
-void shtml::retainTagByName(string sTag, int iIndex)
+void shtml::retainTagByName(const string sTag, const int iIndex)
 {
-    /*
-    if (iIndex<1) return;
-    while (iIndex>1)
-    {
-        removeTagByName(sTag);
-        iIndex--;
-    }
-    */
     string s = getPairBetween(string("<")+sTag,string("</")+sTag+string(">"),iIndex);
-    int v = s.find(">");
+    unsigned int v = s.find(">");
     if (v!=string::npos)
     {
         htm=s.substr(v+1);
@@ -609,7 +597,7 @@ void shtml::retainTagByName(string sTag, int iIndex)
         attr="";
     }
 }
-void shtml::removeTagByName(string sTag, int iTime)
+void shtml::removeTagByName(const string sTag, const int iTime)
 {
     while ((iTime--!=0) && removePairBetween(string("<")+sTag,string("</")+sTag+string(">")))
     {
@@ -654,7 +642,7 @@ bool shtml::loadfromfile(const string fileName)
 	myFile.close();
 	return true;
 }
-bool shtml::loadFromURL(const string sUrl, bool bconv)
+bool shtml::loadFromURL(const string sUrl,const  bool bconv)
 {
     FILE *in;
     char buff[10240];
@@ -714,15 +702,15 @@ bool shtml::isEmpty()
     return htm.empty() && attr.empty();
 }
 
-bool shtml::contain(string sSub)
+bool shtml::contain(const string sSub)
 {
     return htm.find(sSub)!=string::npos;
 }
-bool shtml::containAttr(string sSub)
+bool shtml::containAttr(const string sSub)
 {
     return attr.find(sSub)!=string::npos;
 }
-bool shtml::containTag(string sTag)
+bool shtml::containTag(const string sTag)
 {
     return contain(string("<")+sTag);
 }
@@ -736,9 +724,9 @@ float shtml::toFloat()
     return atof(htm.c_str());
 }
 
-void shtml::replace(string sFind, string sReplace, int iTime)
+void shtml::replace(const string sFind, const string sReplace, const int iTime)
 {
-    int iFind = htm.find(sFind);
+    unsigned int iFind = htm.find(sFind);
     int iFindLength = sFind.length();
     int iReplaceLength = sReplace.length();
     while ((iTime!=0) && (iFind!=string::npos))
@@ -753,9 +741,9 @@ void shtml::trim()
     htm.erase(remove(htm.begin(), htm.end(), '\t'), htm.end());
 }
 
-int shtml::count(string sSub)
+int shtml::count(const string sSub)
 {
-    int v=htm.find(sSub);
+    unsigned int v=htm.find(sSub);
     int iLen = sSub.length();
     int count=0;
     while (v!=string::npos)
