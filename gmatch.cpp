@@ -191,7 +191,7 @@ void set2Value(const int iIndex, const int iValue0=0, const int iValue1=0)
     }
 }
 
-void parseStatus2(const shtml stat)
+void parseStatus2(shtml stat)
 {
     if (stat.contain("FT-Pens"))
     {
@@ -421,9 +421,9 @@ int main(int argc, char** argv)
             setEvent2(10);
             while (status<7)
             {
-                if (!init_mysql()) break;
+                
                 if (!getMatch(mid)) break;
-                sleep(3);
+                sleep(5);
                 kt++;
                 if (kt>5400)
                 {

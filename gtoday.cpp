@@ -261,7 +261,7 @@ void addLeague(const string lid,const  string lname,const string lslug)
 void addMatch(const int mid,const  string league,const string group,const int status=0)
 {
     char sql[1000];
-    sprintf(sql,"INSERT INTO f_matches (match_id,league_id,group,status,order,match_date,viewdate) VALUE ('%d','%s','%s','%d',%d,'%s','%s') ON DUPLICATE KEY UPDATE viewdate='%s',order=%d",mid,league.c_str(),group.c_str(),status,iNo,match_date.c_str(),currentdate,currentdate,iNo);
+    sprintf(sql,"INSERT INTO f_matches (match_id,league_id,\\`group\\`,status,\\`order\\`,match_date,viewdate) VALUE ('%d','%s','%s','%d',%d,'%s','%s') ON DUPLICATE KEY UPDATE viewdate='%s',\\`order\\`=%d",mid,league.c_str(),group.c_str(),status,iNo,match_date.c_str(),currentdate,currentdate,iNo);
     executesql(sql);
 }
 
@@ -411,9 +411,9 @@ void getToday(const string sDay="")
 {
     shtml m,t,n,nh;
     string status,hteam,ateam,score,league,league_slug,league_name,gid,group,hname,aname, cday;
-    int v, iStatus, hscore, ascore;
-    bool noId,bRet;
-    int homeid,awayid;
+    int iStatus;
+    bool bRet;
+    //int homeid,awayid;
 
     //m.loadfromfile("scores2.htm");
     stat1=100;
@@ -676,23 +676,7 @@ void restart_ftrigger()
 {
     system("service ftriggers restart");
 }
-void test_mysql()
-{
-    init_mysql_conf();
-    cout<<"HOST: "<<host_name<<endl;
-    cout<<"USER: "<<user_name<<endl;
-    cout<<"PASS: "<<password<<endl;
-    cout<<"DB:   "<<db_name<<endl;
-    cout<<"PORT: "<<port_number<<endl;
-    if(init_mysql(false))
-    {
-        cout<<"Init OK";
-    }
-    else
-    {
-        cout<<"Init fail";
-    }
-}
+
 int main(int argc, char** argv)
 {
     bool bForce = false;
