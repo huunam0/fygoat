@@ -361,7 +361,7 @@ bool getMatch(const int id) //for major league
     n=t.cutTagByName("section");//omit
     n=t.cutTagByName("section");//yellow & red card(s)
     nh=n.cutTagByName("div"); // home-yellow
-    nh.viewContent();
+    //nh.viewContent();
     v[0]=nh.count("soccer-icons-yellowcard");
     nh=n.cutTagByName("div");
     v[1]=nh.count("soccer-icons-yellowcard");
@@ -409,10 +409,7 @@ int main(int argc, char** argv)
                 break;
             }
         }
-        if (!DEBUG)
-        {
-            init_mysql_conf();
-        }
+        init_mysql_conf();
         mid = atoi(argv[1]);
         killSame(mid);
         //setEvent(10);
@@ -421,7 +418,7 @@ int main(int argc, char** argv)
             setEvent2(10);
             while (status<7)
             {
-                
+
                 if (!getMatch(mid)) break;
                 sleep(5);
                 kt++;

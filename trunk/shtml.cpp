@@ -544,7 +544,7 @@ void shtml::deleteTo(const string sSub, int iIndex)
 shtml shtml::getTagByName(const string sTag,const  int iIndex)
 {
     string s = getPairBetween(string("<")+sTag,string("</")+sTag+string(">"),iIndex);
-    unsigned int v = s.find(">");
+    size_t v = s.find(">");
     if (v!=string::npos)
     {
         //attr=s.substr(0,v);
@@ -574,7 +574,7 @@ shtml shtml::getTagByOrder(int iOrder)
 shtml shtml::cutTagByName(const string sTag, const int iIndex)
 {
     string s = cutPairBetween(string("<")+sTag,string("</")+sTag+string(">"),iIndex);
-    unsigned int v = s.find(">");
+    size_t v = s.find(">");
     if (v!=string::npos)
     {
         //attr=s.substr(0,v);
@@ -585,7 +585,7 @@ shtml shtml::cutTagByName(const string sTag, const int iIndex)
 void shtml::retainTagByName(const string sTag, const int iIndex)
 {
     string s = getPairBetween(string("<")+sTag,string("</")+sTag+string(">"),iIndex);
-    unsigned int v = s.find(">");
+    size_t v = s.find(">");
     if (v!=string::npos)
     {
         htm=s.substr(v+1);
@@ -726,7 +726,7 @@ float shtml::toFloat()
 
 void shtml::replace(const string sFind, const string sReplace,  int iTime)
 {
-    unsigned int iFind = htm.find(sFind);
+    size_t iFind = htm.find(sFind);
     int iFindLength = sFind.length();
     int iReplaceLength = sReplace.length();
     while ((iTime!=0) && (iFind!=string::npos))
@@ -743,7 +743,7 @@ void shtml::trim()
 
 int shtml::count(const string sSub)
 {
-    unsigned int v=htm.find(sSub);
+    size_t v=htm.find(sSub);
     int iLen = sSub.length();
     int count=0;
     while (v!=string::npos)
