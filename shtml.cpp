@@ -115,7 +115,7 @@ string shtml::getPairBetween(const string sFrom, const string sTo, int iIndex )
     int iFromLength = sFrom.length();
     int iToLength = sTo.length();
     int iAdd = iFromLength;
-    unsigned int v1,v2;
+    size_t v1,v2;
     if (iPosFrom!=string::npos) iMatch=1;
     else return "";
     while (iPosFrom!=string::npos)
@@ -169,7 +169,7 @@ unsigned int shtml::getLastPairBetween(const string sFrom, const string sTo, int
     int iFromLength = sFrom.length();
     int iToLength = sTo.length();
     int iAdd = iFromLength;
-    unsigned int v1,v2;
+    size_t v1,v2;
     if (iPosFrom!=string::npos) iMatch=1;
     else return string::npos;
     while (iPosFrom!=string::npos)
@@ -268,7 +268,7 @@ string shtml::cutPairBetween(const string sFrom, const string sTo, int iIndex )
     int iFromLength = sFrom.length();
     int iToLength = sTo.length();
     int iAdd = iFromLength;
-    unsigned int v1,v2;
+    size_t v1,v2;
     if (iPosFrom!=string::npos) iMatch=1;
     else return "";
     string sRet;
@@ -370,7 +370,7 @@ void shtml::retainPairBetween(const string sFrom, const string sTo, int iIndex )
     int iFromLength = sFrom.length();
     int iToLength = sTo.length();
     int iAdd = iFromLength;
-    unsigned int v1,v2;
+    size_t v1,v2;
     if (iPosFrom!=string::npos) iMatch=1;
     while (iPosFrom!=string::npos)
     {
@@ -463,7 +463,7 @@ bool shtml::removePairBetween(const string sFrom, const string sTo, int iIndex )
     int iFromLength = sFrom.length();
     int iToLength = sTo.length();
     int iAdd = iFromLength;
-    unsigned int v1,v2;
+    size_t v1,v2;
     if (iPosFrom!=string::npos) iMatch=1;
     else return false;
     string sRet;

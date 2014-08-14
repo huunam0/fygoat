@@ -578,6 +578,7 @@ void getToday(const string sDay="")
 
                                 addMatch(matchid,league,group,iStatus);
                                 getMatch(matchid);
+								sleep(1);
                                 if (DEBUG) cout<<iNo<<" id="<<matchid<<", league="<<league<<", group="<<group<<", Satus="<<iStatus<<", DATE: "<<match_date<<endl;
                             }
                             else
