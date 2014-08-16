@@ -109,7 +109,7 @@ void executesql(const char * sql){
     sprintf(cmd,"mysql %s -u%s -p%s -s -N -e \"%s;\" &",db_name,user_name,password,sql);
     system(cmd);
 }
-
+//set Event to timeline and f_matches
 void emit2Event(const int iIndex,const int iValue0,const int iValue1)
 {
     char sql[300];
@@ -118,8 +118,6 @@ void emit2Event(const int iIndex,const int iValue0,const int iValue1)
         cout<<"Event "<<iIndex<<" value: "<<iValue0<<" - "<<iValue1<<endl;
         return;
     }
-
-    //sprintf(sql,"INSERT IGNORE INTO f_timeline (`event`, `value`, `team`, `match`, `date`) VALUE (%d,%d,%d,%d,NOW())",iIndex,iValue,iTeam,mid);
     sprintf(sql,"INSERT INTO f_timeline2 (event, home, away, match_id) VALUE (%d,%d,%d,%d); ",iIndex,iValue0,iValue1,mid);
     executesql(sql);
     string field;
@@ -152,6 +150,9 @@ void emit2Event(const int iIndex,const int iValue0,const int iValue1)
     case 8:
         field="minutes";
         break;
+    case 11:
+        field="team";
+        break;
     }
     if (!field.empty())
     {
@@ -167,7 +168,7 @@ void emit2Event(const int iIndex,const int iValue0,const int iValue1)
     }
 
 }
-
+//Set special event
 void setEvent2(const int iEvent,const int iValue0=0,const int iValue1=0) //special events
 {
     char sql[300];
@@ -175,7 +176,7 @@ void setEvent2(const int iEvent,const int iValue0=0,const int iValue1=0) //speci
     executesql(sql);
 
 }
-
+//Save values to array and emit event
 void set2Value(const int iIndex, const int iValue0=0, const int iValue1=0)
 {
     if (DEBUG)
@@ -261,6 +262,7 @@ void updateha(const int m_id,const string home_id,const string away_id)
     char sql[1000];
     sprintf(sql,"UPDATE f_matches set hteam=%s, ateam=%s where match_id=%d;",home_id.c_str(),away_id.c_str(),m_id);
     executesql(sql);
+
 }
 bool getMatch(const int id) //for major league
 {
@@ -297,6 +299,8 @@ bool getMatch(const int id) //for major league
         n.retainTagByName("p");
         n.retainTagByName("a");
         slug = n.getBetweenAttr("/","/",2);
+        slug.erase(remove(slug.begin(),slug.end(),'\''),slug.end());
+        n.replace("'","\\'",-1);
         hname=n.getContent();
         //n.setContent(slug);
         //slug=n.getBetween()
@@ -309,9 +313,12 @@ bool getMatch(const int id) //for major league
         t.retainTagByName("p");
         t.retainTagByName("a");
         slug = n.getBetweenAttr("/","/",2);
+        slug.erase(remove(slug.begin(),slug.end(),'\''),slug.end());
+        n.replace("'","\\'",-1);
         aname=t.getContent();
         addTeam(a_id,aname,slug,"","");
         updateha(id,h_id,a_id);
+        //emit2Event(11,atoi(h_id.c_str()),atoi(a_id.c_str()));
     }
     else //only get time & status
     {

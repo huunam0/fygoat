@@ -720,6 +720,10 @@ int main(int argc, char** argv)
             //restart_ftrigger();
         }
         getToday(sDate);
+        if ((isFirstTime))
+        {
+            setEvent100();
+        }
         //break;//debug
         if (RELOAD)
         {
