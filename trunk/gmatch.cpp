@@ -109,7 +109,7 @@ void executesql(const char * sql){
     sprintf(cmd,"mysql %s -u%s -p%s -s -N -e \"%s;\" &",db_name,user_name,password,sql);
     system(cmd);
 }
-//set Event to timeline and f_matches
+//set Event to timeline and update f_matches
 void emit2Event(const int iIndex,const int iValue0,const int iValue1)
 {
     char sql[300];
@@ -267,8 +267,9 @@ void updateha(const int m_id,const string home_id,const string away_id)
 bool getMatch(const int id) //for major league
 {
     shtml sh,t,n,nh,nh2;
-    string hname, h_id, aname, a_id, slug;
-    int v[2];
+    shtml tdh,tda;
+    string hname, h_id, aname, a_id, slug,tmp;
+    int v[2],w[2];
     int sc[2]={0,0};
     int sc1[2]={0,0};
     char url[300];
@@ -286,7 +287,7 @@ bool getMatch(const int id) //for major league
     /* Remove odd parts*/
     sh.retainTagByName("section");
     sh.retainTagByName("div");
-    sh.retainTagByName("div");
+    sh.retainTagByName("div");//main-content
 
     t=sh.cutTagByName("section");
     t.retainTagByName("section");
@@ -360,25 +361,106 @@ bool getMatch(const int id) //for major league
 
     t=sh.cutTagByName("section");//omit
     t=sh.cutTagByName("section");
-    t.retainTagByName("div");
-    t.retainTagByName("div");
-    n=t.cutTagByName("section");//score sumary
-    //process - not enought infos
-    n=t.cutTagByName("section");//omit
-    n=t.cutTagByName("section");//omit
-    n=t.cutTagByName("section");//yellow & red card(s)
-    nh=n.cutTagByName("div"); // home-yellow
-    //nh.viewContent();
-    v[0]=nh.count("soccer-icons-yellowcard");
-    nh=n.cutTagByName("div");
-    v[1]=nh.count("soccer-icons-yellowcard");
-    set2Value(3,v[0],v[1]);
-    nh=n.cutTagByName("div"); // home-red
-    v[0]=nh.count("soccer-icons-redcard");
-    nh=n.cutTagByName("div");
-    v[1]=nh.count("soccer-icons-redcard");
-    set2Value(2,v[0],v[1]);
+    if (t.containAttr("gc-stat-list"))
+    {
+        t=sh.cutTagByName("div");
+        t=sh.cutTagByName("div");
+        n=t.cutTagByName("section");//sumary score
+        n=t.cutTagByName("section");//match stats
+        n.retainTagByName("table");
+        nh=n.cutTagByName("tr");
+        while (!nh.isEmpty())
+        {
+            tdh=nh.cutTagByName("td");
+            t=nh.cutTagByName("td");
+            tda=nh.cutTagByName("td");
+            v[0]=tdh.toInt();
+            v[1]=tda.toInt();
+            if (t.contain("Shots (on goal)"))
+            {
+                set2Value(4,v[0],v[1]);
+                tmp=tdh.getBetween("(",")");
+                w[0]=atoi(tmp.c_str());
+                tmp=tda.getBetween("(",")");
+                w[1]=atoi(tmp.c_str());
+                set2Value(5,w[0],w[1]);
+            }
+            else if (t.contain("Corner kicks"))
+            {
+                set2Value(6,v[0],v[1]);
+            }
+            else if (t.contain("Time of Possession"))
+            {
+                set2Value(7,v[0],v[1]);
+            }
+            else if (t.contain("Yellow Cards"))
+            {
+                set2Value(3,v[0],v[1]);
+            }
+            else if (t.contain("Red Cards"))
+            {
+                set2Value(2,v[0],v[1]);
+            }
 
+            nh=n.cutTagByName("tr");
+        }
+    }
+    else if (t.containAttr("mod-tabs"))
+    {
+        t.retainTagByName("div");
+        t.retainTagByName("div"); //#matchstats
+        n=t.cutTagByName("section");
+        while (!n.isEmpty())
+        {
+            if (n.contain("Yellow Cards") && n.contain("Red Cards"))
+            {
+                nh=n.cutTagByName("div");
+                v[0]=nh.count("soccer-icons-yellowcard");
+                nh=n.cutTagByName("div");
+                v[1]=nh.count("soccer-icons-yellowcard");
+                set2Value(3,v[0],v[1]);
+                nh=n.cutTagByName("div");
+                w[0]=nh.count("soccer-icons-redcard");
+                nh=n.cutTagByName("div");
+                w[1]=nh.count("soccer-icons-redcard");
+                set2Value(2,w[0],w[1]);
+            }
+            n=t.cutTagByName("section");
+        }
+    }
+    else
+    {
+        v[0]=t.count("soccer-icons-yellowcard");
+        w[0]=t.count("soccer-icons-redcard");
+        t=sh.cutTagByName("section");
+        v[1]=t.count("soccer-icons-yellowcard");
+        w[1]=t.count("soccer-icons-redcard");
+        set2Value(3,v[0],v[1]);
+        set2Value(2,w[0],w[1]);
+    }
+/*
+    else
+    {
+        t.retainTagByName("div");
+        t.retainTagByName("div");
+        n=t.cutTagByName("section");//score sumary
+        //process - not enought infos
+        n=t.cutTagByName("section");//omit
+        n=t.cutTagByName("section");//omit
+        n=t.cutTagByName("section");//yellow & red card(s)
+        nh=n.cutTagByName("div"); // home-yellow
+        //nh.viewContent();
+        v[0]=nh.count("soccer-icons-yellowcard");
+        nh=n.cutTagByName("div");
+        v[1]=nh.count("soccer-icons-yellowcard");
+        if ((v[0]>0) || (v[1]>0)) set2Value(3,v[0],v[1]);
+        nh=n.cutTagByName("div"); // home-red
+        v[0]=nh.count("soccer-icons-redcard");
+        nh=n.cutTagByName("div");
+        v[1]=nh.count("soccer-icons-redcard");
+        if ((v[0]>0) || (v[1]>0)) set2Value(2,v[0],v[1]);
+    }
+*/
     isFirstTime=false;
     //cout<<"End of get data"<<endl;
     return true;
@@ -419,7 +501,7 @@ int main(int argc, char** argv)
         init_mysql_conf();
         mid = atoi(argv[1]);
         killSame(mid);
-        //setEvent(10);
+        deleteTimeline(mid);
         getMatch(mid);
         if (status>0) {
             setEvent2(10);

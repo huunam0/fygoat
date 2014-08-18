@@ -218,37 +218,15 @@ bool init_mysql(bool bForce = false) {
 }
 */
 //Xu li chinh
-void getTable(const string sLeague,const  bool isLive = false)
-{
-    //if (DEBUG) cout<<"Get table "<<sLeague<<endl;
-    if (sLeague.empty()) return;
-    char cmd[500];
-    write_log_call("Get table %s ",sLeague.c_str());
-    sprintf(cmd,"%sg%stable %s &",f_home,(isLive?"live":""),sLeague.c_str());
-    system(cmd);
-}
-void getTable(const string sLeague)
-{
-    //if (DEBUG) cout<<"Get table "<<sLeague<<endl;
-    if (sLeague.empty()) return;
-    char cmd[500];
-    write_log_call("Get table %s ",sLeague.c_str());
-    sprintf(cmd,"%sgtable %s &",f_home,sLeague.c_str());
-    if (DEBUG)
-    {
-        cout<<cmd<<endl;
-        return;
-    }
-    system(cmd);
-}
+
 //from june 2014, add slug
 void getTable(const string sLeague_id, const string sLeague_slug)
 {
     //if (DEBUG) cout<<"Get table "<<sLeague<<endl;
-    if (sLeague_id.empty()) return;
+    if (sLeague_id.empty() || sLeague_slug.empty()) return;
     char cmd[500];
-    write_log_call("Get table %s ",sLeague_id.c_str());
-    sprintf(cmd,"%sgtable %s %s &",f_home,sLeague_id.c_str(), sLeague_slug.c_str());
+    write_log_call("%sgtable %s/%s &",f_home,sLeague_slug.c_str(),sLeague_id.c_str());
+    sprintf(cmd,"%sgtable %s/%s &",f_home,sLeague_slug.c_str(),sLeague_id.c_str());
     system(cmd);
 }
 void addLeague(const string lid,const  string lname,const string lslug)
@@ -508,23 +486,51 @@ void getToday(const string sDay="")
             {
                 gid.clear();
                 group.clear();
+                league_slug.clear();
+                league.clear();
+                liveTable=t.containAttr("score-table-link");
                 n=t.cutTagByName("a");
-                liveTable=n.containAttr("score-table-link");
-                nh.setContent(n.getAttr());
-                nh.retainBetween("href=\"","\"");
-                //nh.viewContent();
-                int shift = 0;
-                if (nh.contain("http://www.espnfc.com/"))
-                    shift=2;
-                league_slug=nh.getBetween("/","/",shift+1);
-                league=nh.getBetween("/","/",shift+2); //id
-                //league=nh.getContent();
+                if (n.containAttr("name"))
+                {
+                    league=n.getBetweenAttr("name=\"","\"");
+                    n=t.cutTagByName("a");
+                }
+                if (n.containAttr("score-table-link"))
+                {
+                    liveTable=true;
+                    nh.setContent(n.getAttr());
+                    nh.retainBetween("href=\"","\"");
+                    //nh.viewContent();
+                    int shift = 0;
+                    if (nh.contain("http://www.espnfc.com/"))
+                        shift=2;
+                    nh.replace("'","",-1);// remove single quote
+                    league_slug=nh.getBetween("/","/",shift+1);
+                    if (league.empty())
+                    league=nh.getBetween("/","/",shift+2);
+                    n=t.cutTagByName("a");
+                }
+                if (league_slug.empty()) //haven't got slug
+                {
+                    nh.setContent(n.getAttr());
+                    nh.retainBetween("href=\"","\"");
+                    int shift = 0;
+                    if (nh.contain("http://www.espnfc.com/"))
+                        shift=2;
+                    nh.replace("'","",-1);// remove single quote
+                    league_slug=nh.getBetween("/","/",shift+1);
+                    if (league.empty())
+                    league=nh.getBetween("/","/",shift+2);
+                }
+
+                n.replace("'","\\'");
+                league_name=n.getContent();
+
                 if (liveTable)
                 {
                     n=t.cutTagByName("a");
                 }
-                n.replace("'","''");
-                league_name=n.getContent();
+
             }
 
             n=t.cutTagByName("div");//each group //if any
@@ -715,7 +721,7 @@ int main(int argc, char** argv)
         if ((isFirstTime))
         {
 
-            setEvent100();
+            deleteTimeline();
             write_log_call("is First Time or new day");
             //restart_ftrigger();
         }
