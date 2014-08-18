@@ -187,7 +187,7 @@ void addTeam(const string tid, const string tname, const string tslug)
 }
 void resetTable(string sLeague, string tids, string tnames)
 {
-    char sql[500];
+    char sql[1500];
     sprintf(sql,"update f_teams set team_updated=0,team_date=NOW() where (team_league='%s') and (team_id not in (%s)) and (team_name not in (%s))",sLeague.c_str(),tids.c_str(),tnames.c_str());
     executesql(sql);
 }
@@ -199,6 +199,7 @@ void getTable(string sLeague) //sLeague includes slug & id
     size_t ix = tleague.find("/");
     if (ix!=string::npos)
         tleague.erase(0,ix+1);
+    if (DEBUG) cout<<"LEAGUE: "<<tleague<<endl;
     //m.loadfromfile("http://www.espnfc.com/league-of-ireland-premier-division/116/table");
 	if (!m.loadFromURL((string("http://www.espnfc.com/")+sLeague+string("/table")).c_str())) return;
     m.removeBetween("<!--","-->",-1);
@@ -256,8 +257,10 @@ void getTable(string sLeague) //sLeague includes slug & id
                     if (nh.containTag("a"))
                         nh.retainTagByName("a");
                     teamname=nh.getContent();
-                    team_slug=nh.getBetweenAttr("/","/",2);
-                    teamid=nh.getBetweenAttr("/","/",3);
+                    int shift = 0;
+                    if (nh.containAttr("http://www.espnfc.com")) shift=2;
+                    team_slug=nh.getBetweenAttr("/","/",shift+2);
+                    teamid=nh.getBetweenAttr("/","/",shift+3);
                     teamlist+=","+teamid;
                     nh=n.cutTagByName("td");
                     nh=n.cutTagByName("td");

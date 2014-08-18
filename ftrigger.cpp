@@ -1,5 +1,5 @@
 #include <time.h>
-#include <mysql/mysql.h>
+//#include <mysql/mysql.h>
 #include <string.h>
 #include "ftrigger.h"
 #include <stdarg.h>
@@ -9,7 +9,7 @@
 #include <errno.h>
 
 twitCurl twitterObj;
-string t_name, t_pass, t_key, t_secret, t_token, t_tokensecret,replyMsg, fb_page_email;
+string t_name, t_pass, t_key, t_secret, t_token, t_tokensecret,replyMsg;
 #define BUFFER_SIZE 1024
 static char host_name[BUFFER_SIZE];
 static char user_name[BUFFER_SIZE];
@@ -19,7 +19,7 @@ static int port_number;
 static bool DEBUG = false;
 #define LOCKFILE "/var/run/ftrigger.pid"
 #define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
-static MYSQL *conn;
+//static MYSQL *conn;
 string hadsent=string("#");
 //For daemon start:
 static bool STOP=false;
@@ -95,23 +95,23 @@ bool init_conf()
 	FILE *fp=NULL;
 	char buf[BUFFER_SIZE];
 
-    char t_username[BUFFER_SIZE];
-    char t_password [BUFFER_SIZE];
+
+
     char consumerkey [BUFFER_SIZE];
     char consumersecret [BUFFER_SIZE];
     char token[BUFFER_SIZE];
     char tokensecret[BUFFER_SIZE];
-    char fb_pg_email[BUFFER_SIZE];
 
-	t_username[0]=0;
-	t_password[0]=0;
+
+
+
 	consumerkey[0]=0;
 	consumersecret[0]=0;
     host_name[0]=0;
 	user_name[0]=0;
 	password[0]=0;
 	db_name[0]=0;
-	fb_pg_email[0]=0;
+
 	port_number=3306;
 
 	fp = fopen("/etc/footygoat/footygoat.conf", "r");
@@ -123,16 +123,14 @@ bool init_conf()
             read_buf(buf, "F_USER_NAME",user_name);
             read_buf(buf, "F_PASSWORD",password);
             read_buf(buf, "F_DB_NAME",db_name);
-            read_int(buf, "F_PORT_NUMBER", &port_number);
-            read_buf(buf, "F_FB_EMAIL",fb_pg_email);
             read_buf(buf, "F_T_C_KEY",consumerkey);
             read_buf(buf, "F_T_C_SECRET",consumersecret);
             read_buf(buf, "F_T_ATOKEN_KEY",token);
             read_buf(buf, "F_T_ATOKEN_SECRET",tokensecret);
         }
-        fb_page_email=std::string(fb_pg_email);
-        t_name=std::string(t_username);
-        t_pass=std::string(t_password);
+
+
+
         t_key=std::string(consumerkey);
         t_secret=std::string(consumersecret);
         t_token=std::string(token);
@@ -146,48 +144,10 @@ bool init_conf()
         return false;
     }
 }
-bool executesql(const char * sql)
-{
-	if (mysql_real_query(conn,sql,strlen(sql)))
-    {
-		//sleep(20);
-		write_log("Error in sql %s; %d: %s",sql,mysql_errno(conn),mysql_error(conn));
-		conn=NULL;
-		return false;
-	}
-	else
-	    return true;
-}
-int init_mysql(bool bForce = false) {
-    if((conn==NULL) || (bForce))
-    {
-		conn=mysql_init(NULL);		// init the database connection
-		/* connect the database */
-		const char timeout=30;
-		mysql_options(conn,MYSQL_OPT_CONNECT_TIMEOUT,&timeout);
-
-		if(!mysql_real_connect(conn,host_name,user_name,password,db_name,port_number,0,0))
-        {
-			write_log("Error init mysql %d: %s",bForce?1:0,mysql_error(conn));
-			//write_log("host=%s,user=%s,pas=%s,db=%s,port=%d",host_name,user_name,password,db_name,port_number);
-			return false;
-		}
-	}
-	if (!executesql("set names utf8"))
-    {
-		if(!bForce)
-        {
-			write_log("Re-initialize mysql ");
-			return init_mysql(true);
-		}
-		else
-        {
-            init_conf();
-            return false;
-        }
-
-    }
-	return true;
+void executesql(const char * sql){
+    char cmd[1000];
+    sprintf(cmd,"mysql %s -u%s -p%s -s -N -e \"%s;\" &",db_name,user_name,password,sql);
+    system(cmd);
 }
 
 
@@ -475,7 +435,7 @@ int main( int argc, char* argv[] )
 	signal(SIGHUP,reverify);
     while(!STOP)
     {
-        init_mysql();
+        //init_mysql();
         work();
     	sleep(sleep_time);
 	}

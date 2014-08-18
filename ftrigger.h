@@ -3,5 +3,6 @@
 //#include <fstream>
 #include "needed.h"
 #include <stdarg.h>
-#include "includes/twitcurl.h"
-
+#include "include/twitcurl.h"
+#include "include/oauthlib.h"
+#include "include/curl/curl.h"
