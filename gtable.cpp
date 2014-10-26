@@ -264,11 +264,6 @@ void getTable(string sLeague) //sLeague includes slug & id
                     teamlist+=","+teamid;
                     nh=n.cutTagByName("td");
                     nh=n.cutTagByName("td");
-                    pts=nh.toInt();
-                    nh=n.cutTagByName("td");
-                    gd=nh.toInt();
-                    nh=n.cutTagByName("td");
-                    nh=n.cutTagByName("td");
                     play=nh.toInt();
                     nh=n.cutTagByName("td");
                     ow=nh.toInt();
@@ -280,6 +275,7 @@ void getTable(string sLeague) //sLeague includes slug & id
                     of=nh.toInt();
                     nh=n.cutTagByName("td");
                     oa=nh.toInt();
+
                     nh=n.cutTagByName("td");
                     nh=n.cutTagByName("td");
                     hw=nh.toInt();
@@ -291,11 +287,18 @@ void getTable(string sLeague) //sLeague includes slug & id
                     hf=nh.toInt();
                     nh=n.cutTagByName("td");
                     ha=nh.toInt();
-                    aw=ow-hw;
-                    ad=od-hd;
-                    al=ol-hl;
-                    af=of-hf;
-                    aa=oa-ha;
+
+                    nh=n.cutTagByName("td");
+                    nh=n.cutTagByName("td");
+                    aw=nh.toInt();
+                    nh=n.cutTagByName("td");
+                    ad=nh.toInt();
+                    nh=n.cutTagByName("td");
+                    al=nh.toInt();
+                    nh=n.cutTagByName("td");
+                    af=nh.toInt();
+                    nh=n.cutTagByName("td");
+                    aa=nh.toInt();
                     addTeam(teamid,teamname,team_slug);
                 }
                 n=t.cutTagByName("tr");
