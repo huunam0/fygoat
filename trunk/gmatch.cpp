@@ -511,7 +511,7 @@ int main(int argc, char** argv)
                 if (!getMatch(mid)) break;
                 sleep(5);
                 kt++;
-                if (kt>5400)
+                if (kt>2000)
                 {
                     write_log("Overtime match %d:%d times",mid,kt);
                     break;

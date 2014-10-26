@@ -550,16 +550,17 @@ void getToday(const string sDay="")
                             gid=nh.getBetweenAttr("data-gameId=\"","\"");
                             matchid=atoi(gid.c_str());
                             if (matchid!=matchs[iNo].mid) isNewDay=true;
-                            if (nh.containAttr("score complete full"))
+                            nh.retainTagByName("div");
+                            if (nh.containAttr("scorebox-container complete"))
                             {
                                 iStatus=7;
                                 //+Postp
                             }
-                            else if (nh.containAttr("score live full"))
+                            else if (nh.containAttr("scorebox-container live"))
                             {
                                 iStatus=1;
                             }
-                            else if (nh.containAttr("score upcoming full"))
+                            else if (nh.containAttr("scorebox-container upcoming"))
                             {
                                 iStatus=0;
                             }
@@ -683,7 +684,10 @@ void restart_ftrigger()
 {
     system("service ftriggers restart");
 }
-
+void killgmatch()
+{
+    system("pkill -f gmatch &");
+}
 int main(int argc, char** argv)
 {
     bool bForce = false;
@@ -701,17 +705,21 @@ int main(int argc, char** argv)
         if (argc>2) DEBUG=true;
     }
     sDate="";
-    if (!DEBUG) daemon_init();
-    if (already_running())
+    if (!DEBUG)
     {
-        write_log("Footygoat is already running!");
-        return 1;
+        daemon_init();
+        if (already_running())
+        {
+            write_log("Footygoat is already running!");
+            return 1;
+        }
     }
 	init_mysql_conf();
     signal(SIGQUIT,call_for_exit);
 	signal(SIGKILL,call_for_exit);
 	signal(SIGTERM,call_for_exit);
 	write_log_call("Starting...");
+	killgmatch();
     while (!STOP)
     {
         if (!isFirstTime)
@@ -735,7 +743,7 @@ int main(int argc, char** argv)
         {
             RELOAD=false;
             //reload_ftrigger();
-            //restart_ftrigger();
+            restart_ftrigger();
         }
         //isFirstTime=false;
         bForce=(stat0==0);
