@@ -7,4 +7,4 @@ compile gtable
 compile gtoday
 create directory  /usr/bin/footygoat/
 copy gmatch,gtable,gtoday to /usr/bin/footygoat/
-
+x
